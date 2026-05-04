@@ -1,0 +1,1414 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>De Biason | Calculadora de Jornada de Trabalho</title>
+  <!--
+    Este arquivo implementa uma versão recriada da ferramenta "Calculadora de Jornada de Trabalho" sob o
+    novo Design System da marca De Biason. A estrutura e a interface foram refeitas para
+    proporcionar uma experiência consistente, mantendo a mesma lógica de cálculo da ferramenta
+    original. Todos os elementos visuais seguem as regras definidas: paleta exclusiva,
+    bordas arredondadas (12px), sombras suaves e tipografia moderna. Comentários foram
+    adicionados para documentar a funcionalidade.
+  -->
+  <style>
+    /*
+      === Design System De Biason ===
+      Definição de cores, espaçamentos e componentes reutilizáveis. As cores foram derivadas
+      das imagens fornecidas, representando a identidade visual da marca. Ajuste os valores
+      hexadecimais conforme necessário para adequar ao material oficial.
+    */
+    :root {
+      /* Paleta principal */
+      --color-brand: #003f8c;       /* azul escuro para cabeçalhos e identidade */
+      --color-accent: #007593;      /* azul petróleo para botões e CTAs */
+      --color-background: #f2f4f7;  /* off‑white para planos de fundo */
+      --color-surface: #ffffff;     /* branco para cartões */
+      --color-text-primary: #08203b;/* cinza azulado para textos */
+      --color-text-secondary: #445b78;/* cor neutra para descrições */
+      --color-border: #e0e4eb;      /* borda sutil para separar seções */
+      --radius: 12px;               /* raio de borda padrão */
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* sombra leve */
+      --font-family: 'Inter', Arial, sans-serif;   /* tipografia moderna */
+    }
+
+    /* Importação da fonte Inter via Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    /* Estilos gerais de reset e base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      background-color: var(--color-background);
+      color: var(--color-text-primary);
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin: 0;
+      font-weight: 600;
+      color: var(--color-brand);
+    }
+    p {
+      margin: 0 0 1rem;
+      line-height: 1.5;
+    }
+    a {
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+    /* Layout geral: cabeçalho e conteúdo principal em duas colunas */
+    header {
+      background-color: var(--color-brand);
+      color: #fff;
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow);
+    }
+    header .brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    main {
+      display: flex;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    /* Cartão reutilizável */
+    .card {
+      background-color: var(--color-surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+    }
+    .card h2 {
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+    /* Guia de Utilização */
+    .guide {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .guide section + section {
+      margin-top: 1rem;
+    }
+    .guide h3 {
+      font-size: 1rem;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+    }
+    .guide ul {
+      padding-left: 1.5rem;
+      margin: 0;
+    }
+    .guide li {
+      margin-bottom: 0.5rem;
+      color: var(--color-text-secondary);
+    }
+    /* Calculadora */
+    .calculator {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+    }
+    .inputs-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+    }
+    .inputs-table th,
+    .inputs-table td {
+      padding: 0.5rem;
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .inputs-table th {
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+    .inputs-table input[type="time"] {
+      width: 100%;
+      padding: 0.25rem 0.5rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background-color: var(--color-background);
+      color: var(--color-text-primary);
+      font-family: var(--font-family);
+    }
+    .cta-button {
+      align-self: flex-start;
+      padding: 0.75rem 1.5rem;
+      background-color: var(--color-accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .cta-button:hover {
+      background-color: #005f74;
+    }
+    .calculatorActions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .results {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .result-card {
+      flex: 1 1 200px;
+      background-color: var(--color-background);
+      border-radius: var(--radius);
+      padding: 1rem;
+      text-align: center;
+      border: 1px solid var(--color-border);
+    }
+    .result-card .label {
+      font-size: 0.92rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.35rem;
+    }
+    .result-card .value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--color-brand);
+    }
+    .result-card__meta {
+      margin-top: 0.35rem;
+      font-size: 0.86rem;
+      color: var(--color-text-secondary);
+    }
+    .report-preview {
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(242,244,247,.96));
+    }
+    .report-preview[hidden] {
+      display: none !important;
+    }
+    .report-preview__head {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .report-preview__eyebrow {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 0.75rem;
+      border-radius: 999px;
+      background: rgba(0, 117, 147, 0.12);
+      color: var(--color-accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.75rem;
+    }
+    .report-preview__title {
+      margin: 0 0 0.4rem;
+      color: var(--color-brand);
+      font-size: 1.18rem;
+    }
+    .report-preview__copy {
+      margin: 0;
+      color: var(--color-text-secondary);
+    }
+    .report-preview__stamp {
+      min-width: 220px;
+      padding: 0.95rem 1rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--color-border);
+      background: #fff;
+      color: var(--color-text-secondary);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+    .report-preview__stamp strong {
+      display: block;
+      color: var(--color-brand);
+      margin-bottom: 0.2rem;
+    }
+    .report-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.9rem;
+      margin-bottom: 1.25rem;
+    }
+    .report-summary__card {
+      padding: 1rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--color-border);
+      background: #fff;
+    }
+    .report-summary__label {
+      color: var(--color-text-secondary);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .report-summary__value {
+      color: var(--color-brand);
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    .report-summary__meta {
+      margin-top: 0.45rem;
+      color: var(--color-text-secondary);
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+    .report-section + .report-section {
+      margin-top: 1.25rem;
+    }
+    .report-section__head {
+      margin-bottom: 0.75rem;
+    }
+    .report-section__head h4 {
+      margin: 0 0 0.3rem;
+      color: var(--color-brand);
+      font-size: 1.02rem;
+    }
+    .report-section__head p {
+      margin: 0;
+      color: var(--color-text-secondary);
+      font-size: 0.92rem;
+    }
+    .report-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+    .report-table {
+      width: 100%;
+      min-width: 980px;
+      border-collapse: collapse;
+    }
+    .report-table col.day { width: 10%; }
+    .report-table col.time { width: 8%; }
+    .report-table col.interval { width: 8%; }
+    .report-table col.metric { width: 8%; }
+    .report-table col.status { width: 12%; }
+    .report-table col.note { width: 20%; }
+    .report-table th,
+    .report-table td {
+      padding: 0.72rem 0.8rem;
+      border-bottom: 1px solid var(--color-border);
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.9rem;
+    }
+    .report-table th {
+      background: #f8fbfd;
+      color: var(--color-text-secondary);
+      font-size: 0.77rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+    .report-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .report-table td.is-right {
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    .report-table td.is-center {
+      text-align: center;
+      white-space: nowrap;
+    }
+    .report-status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 0.7rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .report-status--ok {
+      background: rgba(0, 117, 147, 0.12);
+      color: var(--color-accent);
+    }
+    .report-status--warn {
+      background: rgba(201, 96, 35, 0.12);
+      color: #a14f1d;
+    }
+    .report-status--empty {
+      background: rgba(68, 91, 120, 0.12);
+      color: var(--color-text-secondary);
+    }
+    .report-note {
+      color: var(--color-text-secondary);
+      line-height: 1.45;
+    }
+    .report-notes {
+      margin: 0;
+      padding-left: 1.2rem;
+      color: var(--color-text-secondary);
+    }
+    .report-notes li + li {
+      margin-top: 0.45rem;
+    }
+
+    /* Estilos específicos para impressão */
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+      /* Esconde elementos interativos e guias ao imprimir */
+      header, .guide, button {
+        display: none !important;
+      }
+      .calculator > h2,
+      .calculatorActions,
+      .inputs-table,
+      .results {
+        display: none !important;
+      }
+      /* Ajusta margens e remove sombras para impressão limpa */
+      body {
+        background: #fff;
+        color: #000;
+      }
+      main {
+        display: block;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+      }
+      .card {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+      }
+      .result-card {
+        border: none;
+        font-size: 1.2rem;
+      }
+      .report-preview {
+        margin-top: 0;
+        padding: 0;
+        border: none;
+        background: #fff;
+      }
+      .report-preview__head {
+        margin-bottom: 0.6rem;
+      }
+      .report-preview__eyebrow {
+        min-height: 22px;
+        padding: 0 0.55rem;
+        margin-bottom: 0.45rem;
+        font-size: 0.62rem;
+      }
+      .report-preview__title {
+        font-size: 1rem;
+        margin-bottom: 0.18rem;
+      }
+      .report-preview__copy,
+      .report-section__head p,
+      .report-preview__stamp,
+      .report-note,
+      .report-notes li,
+      .report-summary__meta {
+        font-size: 0.72rem;
+        line-height: 1.3;
+      }
+      .report-summary {
+        gap: 0.45rem;
+        margin-bottom: 0.75rem;
+      }
+      .report-summary__card {
+        padding: 0.65rem 0.7rem;
+      }
+      .report-summary__label {
+        font-size: 0.62rem;
+        margin-bottom: 0.3rem;
+      }
+      .report-summary__value {
+        font-size: 1rem;
+      }
+      .report-section + .report-section {
+        margin-top: 0.75rem;
+      }
+      .report-section__head {
+        margin-bottom: 0.45rem;
+      }
+      .report-section__head h4 {
+        font-size: 0.82rem;
+        margin-bottom: 0.15rem;
+      }
+      .report-preview__stamp,
+      .report-summary__card,
+      .report-table-wrap {
+        border-color: rgba(15, 23, 42, 0.18);
+      }
+      .report-table-wrap {
+        overflow: visible;
+      }
+      .report-table {
+        min-width: 0;
+        width: 100%;
+        table-layout: fixed;
+      }
+      .report-table th,
+      .report-table td {
+        padding: 0.28rem 0.32rem;
+        font-size: 0.64rem;
+        line-height: 1.2;
+        word-break: break-word;
+      }
+      .report-table th {
+        font-size: 0.58rem;
+        letter-spacing: 0.04em;
+      }
+      .report-status {
+        min-height: 18px;
+        padding: 0 0.35rem;
+        font-size: 0.56rem;
+      }
+      .report-notes {
+        padding-left: 0.95rem;
+      }
+      .report-notes li + li {
+        margin-top: 0.22rem;
+      }
+    }
+  </style>
+  <style id="biason-polish">
+    :root{
+      --biason-brand:#081a24;
+      --biason-accent:#007ea7;
+      --biason-bg:#f4f7fb;
+      --biason-line:rgba(15,23,42,.10);
+      --biason-shadow:0 24px 48px -30px rgba(8,26,36,.48);
+      --biason-radius:20px;
+    }
+    body{
+      background:
+        radial-gradient(circle at top right, rgba(0,126,167,.10), transparent 24%),
+        linear-gradient(180deg, #eef4f9 0%, #f6f8fb 28%, var(--biason-bg) 100%);
+      color:#0b1b2a;
+    }
+    header{
+      position:sticky;
+      top:0;
+      z-index:20;
+      padding:22px 24px;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,.16), transparent 24%),
+        linear-gradient(135deg, #081a24, #0b3d91 68%, #0a6f85);
+      box-shadow:0 18px 40px -28px rgba(8,26,36,.7);
+    }
+    header::before{
+      content:"BIASON \2022 Horas e folha";
+      display:block;
+      max-width:1280px;
+      margin:0 auto;
+      color:rgba(255,255,255,.86);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    header::after{
+      content:"Calculo local com leitura mais clara para conferencia, validacao de horarios e impressao do relatorio.";
+      display:block;
+      max-width:1280px;
+      margin:8px auto 0;
+      color:rgba(255,255,255,.78);
+      font-size:14px;
+      line-height:1.5;
+    }
+    header .brand{
+      display:block;
+      max-width:1280px;
+      margin:12px auto 0;
+      font-size:0;
+      line-height:1;
+    }
+    header .brand::before{
+      content:"Jornada de Trabalho";
+      font-size:clamp(28px,3vw,34px);
+      font-weight:800;
+      letter-spacing:-.03em;
+      color:#fff;
+    }
+    main{
+      display:grid;
+      grid-template-columns:minmax(290px,330px) minmax(0,1fr);
+      gap:18px;
+      max-width:1280px;
+      margin:18px auto 0;
+      padding:0 24px 32px;
+    }
+    main > *{min-width:0}
+    .card{
+      border-radius:var(--biason-radius);
+      border:1px solid var(--biason-line);
+      box-shadow:var(--biason-shadow);
+      padding:22px;
+      background:rgba(255,255,255,.94);
+    }
+    .guide{
+      position:sticky;
+      top:110px;
+      background:linear-gradient(180deg, rgba(8,26,36,.02), rgba(0,126,167,.04));
+    }
+    .guide h2,
+    .calculator h2{
+      color:var(--biason-brand);
+      font-size:clamp(22px,2.4vw,28px);
+      letter-spacing:-.02em;
+      margin-bottom:14px;
+    }
+    .guide h3{
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight:800;
+      color:#0a6f85;
+      margin-bottom:8px;
+    }
+    .guide p,
+    .guide li{
+      line-height:1.6;
+      color:#526173;
+    }
+    .inputs-table{
+      border-collapse:separate;
+      border-spacing:0;
+      border:1px solid var(--biason-line);
+      border-radius:18px;
+      background:#fff;
+      margin-bottom:18px;
+      overflow:hidden;
+    }
+    .inputs-table th,
+    .inputs-table td{
+      padding:12px 14px;
+      border-bottom:1px solid var(--biason-line);
+    }
+    .inputs-table thead th{
+      background:#f7fbfd;
+      color:#5b6b7a;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .inputs-table input[type="time"]{
+      min-height:44px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fbfdff;
+      color:#0b1b2a;
+    }
+    .inputs-table input[type="time"]:focus{
+      outline:none;
+      border-color:rgba(0,126,167,.45);
+      box-shadow:0 0 0 4px rgba(0,126,167,.12);
+    }
+    .cta-button{
+      min-height:46px;
+      padding:0 16px;
+      border-radius:14px;
+      font-size:14px;
+      font-weight:800;
+      background:var(--biason-accent);
+      box-shadow:0 12px 24px -18px rgba(0,126,167,.55);
+    }
+    .cta-button:hover{background:#006586}
+    .results{
+      gap:12px;
+      margin-top:18px;
+    }
+    .result-card{
+      border-radius:18px;
+      border:1px solid var(--biason-line);
+      background:linear-gradient(180deg, #fbfdff, #f3f8fb);
+      padding:16px;
+      text-align:left;
+      box-shadow:0 18px 30px -26px rgba(8,26,36,.4);
+    }
+    .result-card .value{
+      font-size:28px;
+      letter-spacing:-.03em;
+      color:var(--biason-brand);
+    }
+    @media (max-width: 1024px){
+      main{grid-template-columns:1fr}
+      .guide{position:static;top:auto}
+    }
+    @media (max-width: 720px){
+      header{padding:18px 16px}
+      main{padding:0 16px 24px}
+      .card{padding:18px}
+      .cta-button{width:100%}
+    }
+  </style>
+  <script>document.title='BIASON | Jornada de Trabalho';</script>
+  <style id="biason-hub-return">
+    .hubReturnBar{position:fixed;right:18px;bottom:18px;z-index:120;display:flex}
+    .hubReturnBtn{min-height:44px;padding:0 14px;border-radius:14px;border:1px solid rgba(15,23,42,.12);background:#fff;color:#081a24;font:700 13px Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;cursor:pointer;box-shadow:0 16px 30px -24px rgba(8,26,36,.55)}
+    .hubReturnBtn:hover{transform:translateY(-1px);background:#f8fbfd}
+    @page{size:A4;margin:12mm}
+    @media print{body{background:#fff!important}.hubReturnBar{display:none!important}.card,.result-card,.tableWrap,.panel,.kpi,.summary-item,.total-box,.verdict-box,.chart-container,.preview{box-shadow:none!important;border-color:rgba(15,23,42,.18)!important}}
+  </style>
+  <script id="biason-hub-return-script">
+    (function(){
+      function biasonGoHub(){
+        try{
+          if(window.top && window.top !== window){
+            window.top.postMessage({type:'BIASON_BACK_TO_HUB'}, '*');
+            return;
+          }
+        }catch(err){}
+        try{ window.location.href = new URL('dashboard_unico_ok5_atualizado.html', window.location.href).href; }
+        catch(err){ window.location.href = 'dashboard_unico_ok5_atualizado.html'; }
+      }
+      document.addEventListener('DOMContentLoaded', function(){
+        if(document.querySelector('.hubReturnBar')) return;
+        var wrap = document.createElement('div');
+        wrap.className = 'hubReturnBar';
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'hubReturnBtn';
+        btn.textContent = 'Voltar ao Hub';
+        btn.addEventListener('click', biasonGoHub);
+        wrap.appendChild(btn);
+        document.body.appendChild(wrap);
+      });
+      window.biasonGoHub = biasonGoHub;
+    })();
+  </script>
+<style id="biason-fine-polish">
+  html{scroll-behavior:smooth}
+  ::selection{background:rgba(0,126,167,.18);color:#081a24}
+  *{scrollbar-width:thin;scrollbar-color:rgba(0,126,167,.55) rgba(15,23,42,.08)}
+  *::-webkit-scrollbar{width:10px;height:10px}
+  *::-webkit-scrollbar-track{background:rgba(15,23,42,.06);border-radius:999px}
+  *::-webkit-scrollbar-thumb{background:linear-gradient(180deg, rgba(0,126,167,.72), rgba(8,26,36,.56));border-radius:999px;border:2px solid rgba(255,255,255,.68)}
+  a,button,.btn,.button,.cta-button,input,select,textarea,summary{
+    transition:box-shadow .18s ease,border-color .18s ease,background-color .18s ease,color .18s ease,transform .18s ease,opacity .18s ease;
+  }
+  a:focus-visible,button:focus-visible,.btn:focus-visible,.button:focus-visible,.cta-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{
+    outline:none;
+    border-color:rgba(0,126,167,.55) !important;
+    box-shadow:0 0 0 4px rgba(0,126,167,.18) !important;
+  }
+  .card,.kpi,.result-card,.tableWrap,.chart-container,.dropzone,.help,.sidebar,.hero,.panel,.base-box,.modalPanel{
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background-color .18s ease;
+  }
+  .tableWrap table tbody tr,.inputs-table tbody tr,table tbody tr{transition:background-color .18s ease}
+  .tableWrap table tbody tr:hover td,.inputs-table tbody tr:hover td,table tbody tr:hover td{background:rgba(0,126,167,.04)}
+  .emptyState{
+    border-style:dashed !important;
+    background:linear-gradient(180deg, rgba(0,126,167,.05), rgba(255,255,255,.96)) !important;
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .hero,.sidebar,.card,.kpi,.result-card,.base-box,.tableWrap,.dropzone,.chart-container{
+      animation:biasonFadeUp .34s ease both;
+    }
+  }
+  @keyframes biasonFadeUp{
+    from{opacity:0;transform:translateY(8px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  @media print{
+    *::-webkit-scrollbar{display:none}
+  }
+</style>
+<style id="biason-header-standard">
+  .biasonShellHeader{
+    position:sticky;
+    top:0;
+    z-index:40;
+    padding:0 !important;
+    background:linear-gradient(90deg,#0b3d91 0%, #123f8f 62%, #0a7b8f 100%) !important;
+    color:#fff !important;
+    box-shadow:0 14px 28px -20px rgba(8,26,36,.65) !important;
+    border:none !important;
+  }
+  .biasonShellHeader__inner{
+    max-width:1360px;
+    margin:0 auto;
+    min-height:68px;
+    padding:0 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader__left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-width:0;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader__brand{
+    color:#fff;
+    font-size:17px;
+    line-height:1;
+    font-weight:900;
+    letter-spacing:.02em;
+  }
+  .biasonShellHeader__divider{
+    color:rgba(255,255,255,.5);
+    font-weight:700;
+    line-height:1;
+  }
+  .biasonShellHeader__tool{
+    color:#fff;
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.01em;
+  }
+  .biasonShellHeader__crumb{
+    display:inline-flex;
+    align-items:center;
+    min-height:30px;
+    padding:0 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.20);
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .biasonShellHeader__crumb strong{color:#fff;font-weight:800}
+  .biasonShellHeader__right,
+  .biasonShellHeader .right{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader .btn,
+  .biasonShellHeader .btn-small,
+  .biasonShellHeader button{
+    border-radius:12px;
+  }
+  .biasonShellHeader .brand,
+  .biasonShellHeader .brand__mark,
+  .biasonShellHeader .brand__name,
+  .biasonShellHeader .brand__sub,
+  .biasonShellHeader .pill,
+  .biasonShellHeader .title,
+  .biasonShellHeader .topbar__eyebrow,
+  .biasonShellHeader .topbar__title,
+  .biasonShellHeader .topbar__sub{
+    all:unset;
+  }
+  .biasonShellHeader::before,
+  .biasonShellHeader::after{
+    content:none !important;
+    display:none !important;
+  }
+  @media (max-width:760px){
+    .biasonShellHeader__inner{min-height:64px;padding:10px 12px}
+    .biasonShellHeader__left{gap:10px}
+    .biasonShellHeader__brand{font-size:16px}
+    .biasonShellHeader__tool{font-size:12px}
+    .biasonShellHeader__crumb{font-size:11px;padding:0 10px}
+  }
+</style>
+</head>
+<body>
+    <header class="biasonShellHeader">
+    <div class="biasonShellHeader__inner">
+      <div class="biasonShellHeader__left">
+        <div class="biasonShellHeader__brand">BIASON</div>
+        <div class="biasonShellHeader__divider">|</div>
+        <div class="biasonShellHeader__tool">Calculadora de Jornada de Trabalho</div>
+        <div class="biasonShellHeader__crumb">Página: Jornada</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Guia de Utilização De Biason -->
+    <div class="guide card">
+      <h2>Guia de Utilização De Biason</h2>
+      <section>
+        <h3>O que preencher</h3>
+        <ul>
+          <li>Para cada dia útil da semana, informe o horário de <strong>Entrada</strong>.</li>
+          <li>Informe o horário de início e fim do <strong>Intervalo</strong> (pausa para refeição/descanso).</li>
+          <li>Informe o horário de <strong>Saída</strong> do expediente.</li>
+        </ul>
+      </section>
+      <section>
+        <h3>Lógica da Ferramenta</h3>
+        <p>
+          A calculadora utiliza os horários inseridos para calcular a duração total de trabalho e
+          desmembrá‑la em horas normais e horas noturnas (considerando o período entre 22:00 e 05:00).
+          Os cálculos seguem as regras de repouso legais e descontam o tempo de intervalo.
+        </p>
+      </section>
+      <section>
+        <h3>Interpretação</h3>
+        <p>
+          Após calcular, você verá o total de horas normais, horas noturnas e a carga horária total.
+          Utilize esses valores para analisar a jornada e
+          ajustar os horários, se necessário.
+        </p>
+      </section>
+    </div>
+
+    <!-- Calculadora de jornada -->
+    <div class="calculator card">
+      <h2>Informe os Horários</h2>
+      <table class="inputs-table">
+        <thead>
+          <tr>
+            <th>Dia</th>
+            <th>Entrada</th>
+            <th>Intervalo&nbsp;Início</th>
+            <th>Intervalo&nbsp;Fim</th>
+            <th>Saída</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Linhas para cada dia útil -->
+          <tr data-day="segunda">
+            <th>Segunda</th>
+            <td><input type="time" name="seg-start"></td>
+            <td><input type="time" name="seg-break-start"></td>
+            <td><input type="time" name="seg-break-end"></td>
+            <td><input type="time" name="seg-end"></td>
+          </tr>
+          <tr data-day="terca">
+            <th>Terça</th>
+            <td><input type="time" name="ter-start"></td>
+            <td><input type="time" name="ter-break-start"></td>
+            <td><input type="time" name="ter-break-end"></td>
+            <td><input type="time" name="ter-end"></td>
+          </tr>
+          <tr data-day="quarta">
+            <th>Quarta</th>
+            <td><input type="time" name="qua-start"></td>
+            <td><input type="time" name="qua-break-start"></td>
+            <td><input type="time" name="qua-break-end"></td>
+            <td><input type="time" name="qua-end"></td>
+          </tr>
+          <tr data-day="quinta">
+            <th>Quinta</th>
+            <td><input type="time" name="qui-start"></td>
+            <td><input type="time" name="qui-break-start"></td>
+            <td><input type="time" name="qui-break-end"></td>
+            <td><input type="time" name="qui-end"></td>
+          </tr>
+          <tr data-day="sexta">
+            <th>Sexta</th>
+            <td><input type="time" name="sex-start"></td>
+            <td><input type="time" name="sex-break-start"></td>
+            <td><input type="time" name="sex-break-end"></td>
+            <td><input type="time" name="sex-end"></td>
+          </tr>
+          <!-- Sábado e domingo adicionados para permitir replicação completa da semana -->
+          <tr data-day="sabado">
+            <th>Sábado</th>
+            <td><input type="time" name="sab-start"></td>
+            <td><input type="time" name="sab-break-start"></td>
+            <td><input type="time" name="sab-break-end"></td>
+            <td><input type="time" name="sab-end"></td>
+          </tr>
+          <tr data-day="domingo">
+            <th>Domingo</th>
+            <td><input type="time" name="dom-start"></td>
+            <td><input type="time" name="dom-break-start"></td>
+            <td><input type="time" name="dom-break-end"></td>
+            <td><input type="time" name="dom-end"></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="calculatorActions">
+        <button class="cta-button" id="repWeekdays" type="button">Replicar Seg→Sex</button>
+        <button class="cta-button" id="repFullWeek" type="button">Replicar Seg→Dom</button>
+        <button class="cta-button" id="calcButton" type="button">Calcular</button>
+        <button class="cta-button" id="printButton" type="button">Imprimir demonstrativo</button>
+      </div>
+      <div class="results" id="results">
+        <!-- Resultados serão preenchidos via JavaScript -->
+      </div>
+      <section class="report-preview" id="reportPreview" hidden>
+        <div class="report-preview__head">
+          <div>
+            <span class="report-preview__eyebrow">Demonstrativo final</span>
+            <h3 class="report-preview__title">Demonstrativo consolidado da jornada</h3>
+            <p class="report-preview__copy">
+              Documento final com os totais apurados e a grade completa de horários para
+              conferência clara do cliente.
+            </p>
+          </div>
+          <div class="report-preview__stamp" id="reportStamp"></div>
+        </div>
+
+        <div class="report-summary" id="reportSummary"></div>
+
+        <section class="report-section">
+          <div class="report-section__head">
+            <h4>Grade de Horários</h4>
+            <p>Conferência diária com os horários informados, intervalo e totais calculados.</p>
+          </div>
+          <div class="report-table-wrap">
+            <table class="report-table">
+              <colgroup>
+                <col class="day">
+                <col class="time">
+                <col class="time">
+                <col class="time">
+                <col class="time">
+                <col class="interval">
+                <col class="metric">
+                <col class="metric">
+                <col class="metric">
+                <col class="status">
+                <col class="note">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Dia</th>
+                  <th>Entrada</th>
+                  <th>Int. início</th>
+                  <th>Int. fim</th>
+                  <th>Saída</th>
+                  <th>Intervalo</th>
+                  <th>Normais</th>
+                  <th>Noturnas</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Observação</th>
+                </tr>
+              </thead>
+              <tbody id="reportTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="report-section">
+          <div class="report-section__head">
+            <h4>Observações do relatório</h4>
+            <p>Informações complementares para leitura e validação da jornada apurada.</p>
+          </div>
+          <ul class="report-notes" id="reportNotes"></ul>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // === Funções utilitárias ===
+    /**
+     * Converte uma string HH:MM em minutos totais.
+     * Retorna null para entradas inválidas.
+     * @param {string} str
+     * @returns {number|null}
+     */
+    function parseTime(str) {
+      if (!str) return null;
+      const parts = str.split(':');
+      if (parts.length < 2) return null;
+      const h = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10);
+      if (isNaN(h) || isNaN(m)) return null;
+      return h * 60 + m;
+    }
+
+    /**
+     * Formata minutos em HH:MM (zero padded).
+     * @param {number|null} mins
+     */
+    function formatHHMM(mins) {
+      if (mins == null || isNaN(mins)) return '';
+      const h = Math.floor(mins / 60);
+      const m = mins % 60;
+      return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+    }
+
+    /**
+     * Converte minutos para horas decimais com duas casas.
+     * @param {number|null} mins
+     */
+    function formatDec(mins) {
+      if (mins == null || isNaN(mins)) return '';
+      return (mins / 60).toFixed(2);
+    }
+
+    /**
+     * Calcula a sobreposição de intervalos [aStart, aEnd) e [bStart, bEnd).
+     * Retorna a quantidade de minutos em comum.
+     */
+    function overlap(aStart, aEnd, bStart, bEnd) {
+      const s = Math.max(aStart, bStart);
+      const e = Math.min(aEnd, bEnd);
+      return Math.max(0, e - s);
+    }
+
+    /**
+     * Calcula minutos noturnos (22h às 05h) dentro de um intervalo de trabalho.
+     * Considera dias que podem transbordar a meia-noite.
+     */
+    function calcNightMinutes(start, end) {
+      if (start == null || end == null || end <= start) return 0;
+      let nightMinutes = 0;
+      const dayStart = Math.floor((start - 5 * 60) / (24 * 60));
+      const dayEnd = Math.floor((end + 22 * 60) / (24 * 60));
+      for (let d = dayStart; d <= dayEnd; d++) {
+        const base = d * 24 * 60;
+        // 22:00 -> 24:00
+        nightMinutes += overlap(start, end, base + 22 * 60, base + 24 * 60);
+        // 00:00 -> 05:00
+        nightMinutes += overlap(start, end, base, base + 5 * 60);
+      }
+      return nightMinutes;
+    }
+
+    /**
+     * Normaliza um horário para uma linha de tempo de turno, considerando virada de dia.
+     * Se o horário for anterior ao horário base, assume-se que pertence ao dia seguinte.
+     */
+    function normalizeToShift(time, base) {
+      if (time == null) return null;
+      const baseMod = ((base % (24 * 60)) + (24 * 60)) % (24 * 60);
+      return (time < baseMod) ? time + 24 * 60 : time;
+    }
+
+    function calculateSegment(startTime, endTime) {
+      if (startTime == null || endTime == null) {
+        return { total: 0, night: 0 };
+      }
+      const start = startTime;
+      const end = normalizeToShift(endTime, startTime);
+      if (end <= start) {
+        return { total: 0, night: 0 };
+      }
+      const total = end - start;
+      const night = calcNightMinutes(start, end);
+      return { total, night };
+    }
+
+    function formatDisplayTime(value) {
+      return value || '--';
+    }
+
+    function hasOvernightPair(startTime, endTime) {
+      if (startTime == null || endTime == null) return false;
+      return endTime < (startTime % (24 * 60));
+    }
+
+    function buildDaySummary(row) {
+      const day = row.querySelector('th').textContent.trim();
+      const inputs = Array.from(row.querySelectorAll('input[type="time"]'));
+      const values = inputs.map(inp => inp.value || '');
+      const [entradaStr, intervaloIniStr, intervaloFimStr, saidaStr] = values;
+      const entrada = parseTime(entradaStr);
+      const intervaloIni = parseTime(intervaloIniStr);
+      const intervaloFim = parseTime(intervaloFimStr);
+      const saida = parseTime(saidaStr);
+
+      const bloco1 = calculateSegment(entrada, intervaloIni);
+      const bloco2 = calculateSegment(intervaloFim, saida);
+      const intervalo = calculateSegment(intervaloIni, intervaloFim).total;
+      const minutosTotal = bloco1.total + bloco2.total;
+      const minutosNoturnos = bloco1.night + bloco2.night;
+      const minutosNormais = minutosTotal - minutosNoturnos;
+      const hasAny = values.some(Boolean);
+      const overnight = hasOvernightPair(entrada, intervaloIni)
+        || hasOvernightPair(intervaloIni, intervaloFim)
+        || hasOvernightPair(intervaloFim, saida);
+
+      let status = 'Sem horários';
+      let statusClass = 'empty';
+      let note = 'Dia sem marcações informadas.';
+
+      if (hasAny && minutosTotal <= 0) {
+        status = 'Incompleto';
+        statusClass = 'warn';
+        note = 'Preencha os pares de horários para apurar a jornada.';
+      } else if (minutosTotal > 0) {
+        status = minutosNoturnos > 0
+          ? (minutosNormais > 0 ? 'Jornada mista' : 'Jornada noturna')
+          : 'Jornada diurna';
+        statusClass = 'ok';
+        const noteParts = [];
+        if (intervalo > 0) {
+          noteParts.push(`Intervalo ${formatHHMM(intervalo)}`);
+        }
+        if (overnight) {
+          noteParts.push('Virada de dia');
+        }
+        noteParts.push(`Total do dia ${formatHHMM(minutosTotal)}`);
+        note = noteParts.join(' • ');
+      }
+
+      return {
+        day,
+        entrada: formatDisplayTime(entradaStr),
+        intervaloIni: formatDisplayTime(intervaloIniStr),
+        intervaloFim: formatDisplayTime(intervaloFimStr),
+        saida: formatDisplayTime(saidaStr),
+        intervalo,
+        minutosNormais,
+        minutosNoturnos,
+        minutosTotal,
+        hasAny,
+        status,
+        statusClass,
+        note
+      };
+    }
+
+    function buildScheduleData() {
+      const rows = Array.from(document.querySelectorAll('#tableBody tr'));
+      const details = rows.map(buildDaySummary);
+      const totals = details.reduce((acc, row) => {
+        acc.totNorm += row.minutosNormais;
+        acc.totNight += row.minutosNoturnos;
+        acc.totTotal += row.minutosTotal;
+        return acc;
+      }, { totNorm: 0, totNight: 0, totTotal: 0 });
+
+      return {
+        ...totals,
+        details,
+        workedDays: details.filter(row => row.minutosTotal > 0).length,
+        nightDays: details.filter(row => row.minutosNoturnos > 0).length,
+        incompleteDays: details.filter(row => row.hasAny && row.minutosTotal <= 0).length,
+        emptyDays: details.filter(row => !row.hasAny).length,
+        averageWorkedDay: details.filter(row => row.minutosTotal > 0).length
+          ? Math.round(totals.totTotal / details.filter(row => row.minutosTotal > 0).length)
+          : 0
+      };
+    }
+
+    /**
+     * Processa todas as linhas de entrada e calcula os totais acumulados.
+     * Repete a lógica da planilha: cada bloco só entra no cálculo se os dois horários
+     * daquele trecho estiverem preenchidos.
+     */
+    function calculate() {
+      const { totNorm, totNight, totTotal } = buildScheduleData();
+      return { totNorm, totNight, totTotal };
+    }
+
+    function renderReport(data) {
+      const preview = document.getElementById('reportPreview');
+      const stamp = document.getElementById('reportStamp');
+      const summary = document.getElementById('reportSummary');
+      const tbody = document.getElementById('reportTableBody');
+      const notes = document.getElementById('reportNotes');
+      const now = new Date();
+
+      preview.hidden = false;
+      stamp.innerHTML = `
+        <strong>Emissão do relatório</strong>
+        ${now.toLocaleDateString('pt-BR')} às ${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+        <br>${data.workedDays} dia(s) com jornada registrada e ${data.nightDays} com período noturno.
+      `;
+
+      const summaryCards = [
+        {
+          label: 'Total da semana',
+          value: formatHHMM(data.totTotal),
+          meta: `${formatDec(data.totTotal)} horas decimais apuradas.`
+        },
+        {
+          label: 'Horas normais',
+          value: formatHHMM(data.totNorm),
+          meta: 'Carga diurna calculada a partir dos blocos completos.'
+        },
+        {
+          label: 'Horas noturnas',
+          value: formatHHMM(data.totNight),
+          meta: 'Considera o período entre 22:00 e 05:00.'
+        },
+        {
+          label: 'Dias com jornada',
+          value: String(data.workedDays),
+          meta: `${data.incompleteDays} dia(s) incompleto(s) e média de ${formatHHMM(data.averageWorkedDay)} por dia trabalhado.`
+        }
+      ];
+
+      summary.innerHTML = summaryCards.map(card => `
+        <article class="report-summary__card">
+          <div class="report-summary__label">${card.label}</div>
+          <div class="report-summary__value">${card.value}</div>
+          <div class="report-summary__meta">${card.meta}</div>
+        </article>
+      `).join('');
+
+      tbody.innerHTML = data.details.map(row => `
+        <tr>
+          <td><strong>${row.day}</strong></td>
+          <td class="is-center">${row.entrada}</td>
+          <td class="is-center">${row.intervaloIni}</td>
+          <td class="is-center">${row.intervaloFim}</td>
+          <td class="is-center">${row.saida}</td>
+          <td class="is-right">${row.intervalo > 0 ? formatHHMM(row.intervalo) : '--'}</td>
+          <td class="is-right">${row.minutosTotal > 0 ? formatHHMM(row.minutosNormais) : '--'}</td>
+          <td class="is-right">${row.minutosNoturnos > 0 ? formatHHMM(row.minutosNoturnos) : '--'}</td>
+          <td class="is-right">${row.minutosTotal > 0 ? formatHHMM(row.minutosTotal) : '--'}</td>
+          <td><span class="report-status report-status--${row.statusClass}">${row.status}</span></td>
+          <td class="report-note">${row.note}</td>
+        </tr>
+      `).join('');
+
+      const reportNotes = [
+        'Os totais apresentados foram apurados a partir dos horários informados em cada dia da semana.',
+        'A jornada diária é considerada somente quando os pares de horários do trecho estão completos.',
+        'As horas noturnas contemplam o período entre 22:00 e 05:00, inclusive em jornadas com virada de dia.',
+        'A grade apresenta os horários informados, o intervalo registrado e o total calculado para cada dia.'
+      ];
+
+      if (data.incompleteDays > 0) {
+        reportNotes.push(`${data.incompleteDays} dia(s) ficaram com marcação incompleta e estão sinalizados para revisão.`);
+      }
+
+      notes.innerHTML = reportNotes.map(item => `<li>${item}</li>`).join('');
+    }
+
+    /**
+     * Exibe os resultados formatados nos cartões de resumo.
+     */
+    function renderResults() {
+      const data = buildScheduleData();
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '';
+      const templates = [
+        {
+          label: 'Horas Normais',
+          value: formatHHMM(data.totNorm),
+          meta: `${formatDec(data.totNorm)} h decimais`
+        },
+        {
+          label: 'Horas Noturnas',
+          value: formatHHMM(data.totNight),
+          meta: `${formatDec(data.totNight)} h decimais`
+        },
+        {
+          label: 'Total de Horas',
+          value: formatHHMM(data.totTotal),
+          meta: `${formatDec(data.totTotal)} h decimais`
+        },
+        {
+          label: 'Dias com Jornada',
+          value: String(data.workedDays),
+          meta: `${data.nightDays} dia(s) com período noturno`
+        }
+      ];
+      templates.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'result-card';
+        card.innerHTML = `
+          <div class="label">${item.label}</div>
+          <div class="value">${item.value}</div>
+          <div class="result-card__meta">${item.meta}</div>
+        `;
+        resultsDiv.appendChild(card);
+      });
+      renderReport(data);
+      return data;
+    }
+
+    // Evento: calcula ao clicar no botão
+    document.getElementById('calcButton').addEventListener('click', renderResults);
+
+    // === Funções de replicação e impressão ===
+    /**
+     * Copia os horários da primeira linha (segunda-feira) para os dias úteis (terça a sexta).
+     */
+    function replicateWeekdays() {
+      const rows = document.getElementById('tableBody').querySelectorAll('tr');
+      if (rows.length === 0) return;
+      const mondayInputs = rows[0].querySelectorAll('input[type="time"]');
+      const values = Array.from(mondayInputs).map(inp => inp.value);
+      // Replica para linhas de índice 1 a 4 (terça a sexta)
+      for (let i = 1; i <= 4 && i < rows.length; i++) {
+        const inputs = rows[i].querySelectorAll('input[type="time"]');
+        inputs.forEach((inp, idx) => {
+          inp.value = values[idx];
+        });
+      }
+      document.getElementById('reportPreview').hidden = true;
+    }
+
+    /**
+     * Copia os horários da primeira linha (segunda-feira) para toda a semana (terça a domingo).
+     */
+    function replicateFullWeek() {
+      const rows = document.getElementById('tableBody').querySelectorAll('tr');
+      if (rows.length === 0) return;
+      const mondayInputs = rows[0].querySelectorAll('input[type="time"]');
+      const values = Array.from(mondayInputs).map(inp => inp.value);
+      // Replica para todas as outras linhas (índice 1 em diante)
+      for (let i = 1; i < rows.length; i++) {
+        const inputs = rows[i].querySelectorAll('input[type="time"]');
+        inputs.forEach((inp, idx) => {
+          inp.value = values[idx];
+        });
+      }
+      document.getElementById('reportPreview').hidden = true;
+    }
+
+    /**
+     * Gera um relatório imprimível da jornada calculada usando a função nativa de impressão.
+     */
+    function printReport() {
+      // Garante que os resultados estão atualizados antes de imprimir
+      renderResults();
+      window.requestAnimationFrame(() => window.print());
+    }
+
+    // Atribui ouvintes aos botões de replicação e impressão
+    document.getElementById('repWeekdays').addEventListener('click', () => {
+      replicateWeekdays();
+    });
+    document.getElementById('repFullWeek').addEventListener('click', () => {
+      replicateFullWeek();
+    });
+    document.getElementById('printButton').addEventListener('click', () => {
+      printReport();
+    });
+    document.querySelectorAll('#tableBody input[type="time"]').forEach(input => {
+      input.addEventListener('input', () => {
+        document.getElementById('reportPreview').hidden = true;
+      });
+    });
+  </script>
+</body>
+</html>
+
+
+
+

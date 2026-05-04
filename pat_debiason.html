@@ -1,0 +1,846 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>De Biason | Calculadora de Economia PAT</title>
+  <!--
+    Esta página implementa uma versão reimaginada da “Calculadora Estratégica de
+    Economia PAT 2026” utilizando o Design System unificado da marca
+    De Biason. Foi mantida a lógica original da ferramenta, replicando
+    fielmente os cálculos de economia em encargos e incentivos fiscais,
+    enquanto a interface foi padronizada com cores, tipografia, bordas e
+    sombras consistentes. Comentários explicam cada parte relevante.
+  -->
+  <!-- Fonte Inter para tipografia moderna -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js para o gráfico comparativo -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    /*
+      === Design System De Biason ===
+      Definição de paleta, sombras e tipografia. As cores a seguir
+      foram derivadas das paletas enviadas pelo cliente. Ajuste os
+      valores conforme necessário para aderir ao material oficial.
+    */
+    :root {
+      --color-brand: #003f8c;       /* azul escuro para cabeçalhos e identidade */
+      --color-accent: #007593;      /* azul petróleo para CTAs */
+      --color-background: #f2f4f7;  /* off‑white para planos de fundo */
+      --color-surface: #ffffff;     /* branco para cartões */
+      --color-text-primary: #08203b;/* cinza azulado para textos */
+      --color-text-secondary: #445b78;/* cor neutra para descrições */
+      --color-border: #e0e4eb;      /* borda sutil para separar seções */
+      --radius: 12px;               /* raio de borda padrão */
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* sombra leve */
+      --font-family: 'Inter', Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      background-color: var(--color-background);
+      color: var(--color-text-primary);
+    }
+    h1, h2, h3 { margin: 0; }
+    header {
+      background-color: var(--color-brand);
+      color: #fff;
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow);
+    }
+    header .brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    main {
+      display: flex;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    /* Cartão básico */
+    .card {
+      background-color: var(--color-surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .card h2 {
+      color: var(--color-brand);
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    /* Coluna guia */
+    .guide {
+      flex: 1;
+    }
+    .guide section + section {
+      margin-top: 1rem;
+    }
+    .guide h3 {
+      font-size: 1rem;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+    }
+    .guide p, .guide li {
+      color: var(--color-text-secondary);
+      font-size: 0.875rem;
+    }
+    .guide ul { padding-left: 1.25rem; margin: 0; }
+    .guide li { margin-bottom: 0.5rem; }
+    /* Coluna calculadora */
+    .calculator {
+      flex: 2;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.25rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background-color: var(--color-surface);
+      font-family: var(--font-family);
+      font-size: 0.875rem;
+      color: var(--color-text-primary);
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--color-brand);
+      box-shadow: 0 0 0 3px rgba(0, 63, 140, 0.1);
+    }
+    .cta-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .cta-button {
+      padding: 0.75rem 1.5rem;
+      background-color: var(--color-accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.25s ease;
+    }
+    .cta-button:hover {
+      background-color: #005f74;
+    }
+    .results {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .result-card {
+      background-color: var(--color-background);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      text-align: center;
+    }
+    .result-card .label {
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.25rem;
+    }
+    .result-card .value {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--color-brand);
+    }
+    .verdict-box {
+      margin-top: 1rem;
+      display: none; /* escondido até o cálculo */
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .verdict-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 0.875rem;
+    }
+    .tag-good {
+      background-color: rgba(0, 117, 147, 0.1);
+      color: var(--color-accent);
+      border: 1px solid rgba(0, 117, 147, 0.3);
+    }
+    .tag-warn {
+      background-color: rgba(241, 196, 15, 0.2);
+      color: #7a5a00;
+      border: 1px solid rgba(241, 196, 15, 0.4);
+    }
+    .chart-container {
+      margin-top: 1.5rem;
+    }
+    canvas {
+      max-height: 300px;
+    }
+    .report-note {
+      display: none;
+      margin-top: 14px;
+      padding: 14px 16px;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 16px;
+      background: linear-gradient(180deg, #fbfdff, #f7fbfd);
+      color: #334155;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .report-note strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #081a24;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    /* Estilos de impressão: oculta cabeçalho, guia e botões */
+    @media print {
+      header, .guide, .cta-button, .hint, .form-grid, #patEmpty {
+        display: none !important;
+      }
+      body {
+        background: #fff;
+        color: #000;
+      }
+      .card {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+      }
+    }
+  </style>
+  <style id="biason-polish">
+    :root{
+      --biason-brand:#081a24;
+      --biason-accent:#007ea7;
+      --biason-bg:#f4f7fb;
+      --biason-line:rgba(15,23,42,.10);
+      --biason-shadow:0 24px 48px -30px rgba(8,26,36,.48);
+      --biason-radius:20px;
+    }
+    body{
+      background:
+        radial-gradient(circle at top right, rgba(0,126,167,.10), transparent 24%),
+        linear-gradient(180deg, #eef4f9 0%, #f6f8fb 28%, var(--biason-bg) 100%);
+      color:#0b1b2a;
+    }
+    header{
+      position:sticky;
+      top:0;
+      z-index:20;
+      padding:22px 24px;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,.16), transparent 24%),
+        linear-gradient(135deg, #081a24, #0b3d91 68%, #0a6f85);
+      box-shadow:0 18px 40px -28px rgba(8,26,36,.7);
+    }
+    header::before{
+      content:"BIASON \2022 Beneficios";
+      display:block;
+      max-width:1280px;
+      margin:0 auto;
+      color:rgba(255,255,255,.86);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    header::after{
+      content:"Leitura mais objetiva do impacto do PAT, com calculo local e resultados mais faceis de comparar.";
+      display:block;
+      max-width:1280px;
+      margin:8px auto 0;
+      color:rgba(255,255,255,.78);
+      font-size:14px;
+      line-height:1.5;
+    }
+    header .brand{
+      display:block;
+      max-width:1280px;
+      margin:12px auto 0;
+      font-size:0;
+      line-height:1;
+    }
+    header .brand::before{
+      content:"Economia PAT";
+      font-size:clamp(28px,3vw,34px);
+      font-weight:800;
+      letter-spacing:-.03em;
+      color:#fff;
+    }
+    main{
+      display:grid;
+      grid-template-columns:minmax(290px,330px) minmax(0,1fr);
+      gap:18px;
+      max-width:1280px;
+      margin:18px auto 0;
+      padding:0 24px 32px;
+    }
+    main > *{min-width:0}
+    .card{
+      border-radius:var(--biason-radius);
+      border:1px solid var(--biason-line);
+      box-shadow:var(--biason-shadow);
+      padding:22px;
+      background:rgba(255,255,255,.94);
+    }
+    .guide{
+      position:sticky;
+      top:110px;
+      background:linear-gradient(180deg, rgba(8,26,36,.02), rgba(0,126,167,.04));
+    }
+    .card h2{
+      color:var(--biason-brand);
+      font-size:clamp(22px,2.4vw,28px);
+      letter-spacing:-.02em;
+      margin-bottom:14px;
+    }
+    .guide h3{
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight:800;
+      color:#0a6f85;
+      margin-bottom:8px;
+    }
+    .guide p,
+    .guide li{
+      line-height:1.6;
+      color:#526173;
+    }
+    .form-grid{
+      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+      gap:14px;
+      margin-bottom:18px;
+    }
+    input{
+      min-height:46px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      color:#0b1b2a;
+    }
+    input:focus{
+      border-color:rgba(0,126,167,.45);
+      box-shadow:0 0 0 4px rgba(0,126,167,.12);
+    }
+    .cta-buttons{
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .cta-button{
+      min-height:46px;
+      padding:0 16px;
+      border-radius:14px;
+      font-size:14px;
+      font-weight:800;
+      background:#007ea7;
+      box-shadow:0 12px 24px -18px rgba(0,126,167,.55);
+    }
+    .cta-button:hover{background:#006586}
+    .results{
+      grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+      gap:12px;
+    }
+    .result-card{
+      border-radius:18px;
+      border:1px solid var(--biason-line);
+      background:linear-gradient(180deg, #fbfdff, #f3f8fb);
+      padding:16px;
+      text-align:left;
+      box-shadow:0 18px 30px -26px rgba(8,26,36,.4);
+    }
+    .result-card .value{
+      font-size:28px;
+      letter-spacing:-.03em;
+      color:var(--biason-brand);
+    }
+    .verdict-box{
+      margin-top:16px;
+      border-radius:18px;
+      border:1px solid var(--biason-line);
+      background:#fff;
+      padding:16px;
+      box-shadow:0 18px 30px -26px rgba(8,26,36,.4);
+    }
+    .chart-container{
+      margin-top:18px;
+      padding:16px;
+      border:1px solid var(--biason-line);
+      border-radius:20px;
+      background:#fbfdff;
+    }
+    .emptyState{
+      margin:16px 0;
+      padding:18px;
+      border:1px dashed rgba(0,126,167,.28);
+      border-radius:18px;
+      background:#f8fbfd;
+    }
+    .emptyState strong{
+      display:block;
+      margin-bottom:6px;
+      color:#081a24;
+      font-size:18px;
+      letter-spacing:-.02em;
+    }
+    .emptyState p{
+      margin:0;
+      color:#526173;
+      font-size:13px;
+      line-height:1.55;
+    }
+    @media (max-width: 1024px){
+      main{grid-template-columns:1fr}
+      .guide{position:static;top:auto}
+    }
+    @media (max-width: 720px){
+      header{padding:18px 16px}
+      main{padding:0 16px 24px}
+      .card,.chart-container,.verdict-box{padding:18px}
+      .cta-button{width:100%}
+    }
+  </style>
+  <script>document.title='BIASON | Economia PAT';</script>
+  <style id="biason-hub-return">
+    .hubReturnBar{position:fixed;right:18px;bottom:18px;z-index:120;display:flex}
+    .hubReturnBtn{min-height:44px;padding:0 14px;border-radius:14px;border:1px solid rgba(15,23,42,.12);background:#fff;color:#081a24;font:700 13px Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;cursor:pointer;box-shadow:0 16px 30px -24px rgba(8,26,36,.55)}
+    .hubReturnBtn:hover{transform:translateY(-1px);background:#f8fbfd}
+    @page{size:A4;margin:12mm}
+    @media print{body{background:#fff!important}.hubReturnBar{display:none!important}.card,.result-card,.tableWrap,.panel,.kpi,.summary-item,.total-box,.verdict-box,.chart-container,.preview{box-shadow:none!important;border-color:rgba(15,23,42,.18)!important}}
+  </style>
+  <script id="biason-hub-return-script">
+    (function(){
+      function biasonGoHub(){
+        try{
+          if(window.top && window.top !== window){
+            window.top.postMessage({type:'BIASON_BACK_TO_HUB'}, '*');
+            return;
+          }
+        }catch(err){}
+        try{ window.location.href = new URL('dashboard_unico_ok5_atualizado.html', window.location.href).href; }
+        catch(err){ window.location.href = 'dashboard_unico_ok5_atualizado.html'; }
+      }
+      document.addEventListener('DOMContentLoaded', function(){
+        if(document.querySelector('.hubReturnBar')) return;
+        var wrap = document.createElement('div');
+        wrap.className = 'hubReturnBar';
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'hubReturnBtn';
+        btn.textContent = 'Voltar ao Hub';
+        btn.addEventListener('click', biasonGoHub);
+        wrap.appendChild(btn);
+        document.body.appendChild(wrap);
+      });
+      window.biasonGoHub = biasonGoHub;
+    })();
+  </script>
+<style id="biason-fine-polish">
+  html{scroll-behavior:smooth}
+  ::selection{background:rgba(0,126,167,.18);color:#081a24}
+  *{scrollbar-width:thin;scrollbar-color:rgba(0,126,167,.55) rgba(15,23,42,.08)}
+  *::-webkit-scrollbar{width:10px;height:10px}
+  *::-webkit-scrollbar-track{background:rgba(15,23,42,.06);border-radius:999px}
+  *::-webkit-scrollbar-thumb{background:linear-gradient(180deg, rgba(0,126,167,.72), rgba(8,26,36,.56));border-radius:999px;border:2px solid rgba(255,255,255,.68)}
+  a,button,.btn,.button,.cta-button,input,select,textarea,summary{
+    transition:box-shadow .18s ease,border-color .18s ease,background-color .18s ease,color .18s ease,transform .18s ease,opacity .18s ease;
+  }
+  a:focus-visible,button:focus-visible,.btn:focus-visible,.button:focus-visible,.cta-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{
+    outline:none;
+    border-color:rgba(0,126,167,.55) !important;
+    box-shadow:0 0 0 4px rgba(0,126,167,.18) !important;
+  }
+  .card,.kpi,.result-card,.tableWrap,.chart-container,.dropzone,.help,.sidebar,.hero,.panel,.base-box,.modalPanel{
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background-color .18s ease;
+  }
+  .tableWrap table tbody tr,.inputs-table tbody tr,table tbody tr{transition:background-color .18s ease}
+  .tableWrap table tbody tr:hover td,.inputs-table tbody tr:hover td,table tbody tr:hover td{background:rgba(0,126,167,.04)}
+  .emptyState{
+    border-style:dashed !important;
+    background:linear-gradient(180deg, rgba(0,126,167,.05), rgba(255,255,255,.96)) !important;
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .hero,.sidebar,.card,.kpi,.result-card,.base-box,.tableWrap,.dropzone,.chart-container{
+      animation:biasonFadeUp .34s ease both;
+    }
+  }
+  @keyframes biasonFadeUp{
+    from{opacity:0;transform:translateY(8px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  @media print{
+    *::-webkit-scrollbar{display:none}
+  }
+</style>
+<style id="biason-header-standard">
+  .biasonShellHeader{
+    position:sticky;
+    top:0;
+    z-index:40;
+    padding:0 !important;
+    background:linear-gradient(90deg,#0b3d91 0%, #123f8f 62%, #0a7b8f 100%) !important;
+    color:#fff !important;
+    box-shadow:0 14px 28px -20px rgba(8,26,36,.65) !important;
+    border:none !important;
+  }
+  .biasonShellHeader__inner{
+    max-width:1360px;
+    margin:0 auto;
+    min-height:68px;
+    padding:0 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader__left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-width:0;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader__brand{
+    color:#fff;
+    font-size:17px;
+    line-height:1;
+    font-weight:900;
+    letter-spacing:.02em;
+  }
+  .biasonShellHeader__divider{
+    color:rgba(255,255,255,.5);
+    font-weight:700;
+    line-height:1;
+  }
+  .biasonShellHeader__tool{
+    color:#fff;
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.01em;
+  }
+  .biasonShellHeader__crumb{
+    display:inline-flex;
+    align-items:center;
+    min-height:30px;
+    padding:0 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.20);
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .biasonShellHeader__crumb strong{color:#fff;font-weight:800}
+  .biasonShellHeader__right,
+  .biasonShellHeader .right{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader .btn,
+  .biasonShellHeader .btn-small,
+  .biasonShellHeader button{
+    border-radius:12px;
+  }
+  .biasonShellHeader .brand,
+  .biasonShellHeader .brand__mark,
+  .biasonShellHeader .brand__name,
+  .biasonShellHeader .brand__sub,
+  .biasonShellHeader .pill,
+  .biasonShellHeader .title,
+  .biasonShellHeader .topbar__eyebrow,
+  .biasonShellHeader .topbar__title,
+  .biasonShellHeader .topbar__sub{
+    all:unset;
+  }
+  .biasonShellHeader::before,
+  .biasonShellHeader::after{
+    content:none !important;
+    display:none !important;
+  }
+  @media (max-width:760px){
+    .biasonShellHeader__inner{min-height:64px;padding:10px 12px}
+    .biasonShellHeader__left{gap:10px}
+    .biasonShellHeader__brand{font-size:16px}
+    .biasonShellHeader__tool{font-size:12px}
+    .biasonShellHeader__crumb{font-size:11px;padding:0 10px}
+  }
+</style>
+</head>
+<body>
+    <header class="biasonShellHeader">
+    <div class="biasonShellHeader__inner">
+      <div class="biasonShellHeader__left">
+        <div class="biasonShellHeader__brand">BIASON</div>
+        <div class="biasonShellHeader__divider">|</div>
+        <div class="biasonShellHeader__tool">Economia PAT</div>
+        <div class="biasonShellHeader__crumb">Página: Cálculo</div>
+      </div>
+    </div>
+  </header>
+  <main>
+    <!-- Guia de Utilização De Biason -->
+    <div class="guide card">
+      <h2>Guia de Utilização De Biason</h2>
+      <section>
+        <h3>O que preencher</h3>
+        <ul>
+          <li>Informe a <strong>quantidade de funcionários</strong> que receberão o benefício.</li>
+          <li>Informe o <strong>valor do benefício mensal</strong> concedido a cada colaborador.</li>
+          <li>Informe o <strong>faturamento médio</strong> mensal da empresa.</li>
+          <li>Caso a empresa esteja no regime de <strong>Lucro Real</strong>, informe o valor do <strong>IRPJ devido</strong>. Se não for Lucro Real, deixe em branco ou zero.</li>
+        </ul>
+      </section>
+      <section>
+        <h3>Lógica da Ferramenta</h3>
+        <p>
+          A calculadora estima as economias proporcionadas pelo Programa de Alimentação do Trabalhador (PAT).
+          O <strong>gasto mensal</strong> é calculado multiplicando a quantidade de funcionários pelo valor do benefício.
+          Em seguida, calcula‑se a <strong>economia nos encargos da CLT</strong>, equivalente a 28,8 % do gasto.
+          Para empresas que apuram IRPJ pelo Lucro Real, calcula‑se também o <strong>incentivo fiscal</strong>:
+          15 % sobre o gasto, limitado a 4 % do IRPJ devido. A soma dessas economias resulta na <strong>economia total</strong>.
+        </p>
+      </section>
+      <section>
+        <h3>Interpretação</h3>
+        <p>
+          Após preencher os dados e clicar em “Calcular”, serão exibidos o gasto com o benefício,
+          a economia de encargos, o incentivo fiscal (se aplicável) e a economia total. Será
+          apresentado também um <strong>indicador</strong> que classifica a viabilidade: se a economia total
+          ultrapassar 10 % do gasto, o investimento vale muito a pena; caso contrário, recomenda‑se
+          analisar a viabilidade. Um gráfico de barras compara o custo sem o PAT (considerando
+          encargos) com o custo com PAT (descontando o incentivo fiscal).
+        </p>
+      </section>
+    </div>
+    <!-- Calculadora PAT -->
+    <div class="calculator card">
+      <h2>Informe os dados</h2>
+      <div class="form-grid">
+        <div>
+          <label for="inpQtd">Quantidade de Funcionários</label>
+          <input id="inpQtd" type="number" min="0" step="1" placeholder="Ex.: 30">
+        </div>
+        <div>
+          <label for="inpValor">Valor do Benefício Mensal (R$)</label>
+          <input id="inpValor" type="number" min="0" step="0.01" placeholder="Ex.: 600,00">
+        </div>
+        <div>
+          <label for="inpFat">Faturamento Médio (R$)</label>
+          <input id="inpFat" type="number" min="0" step="0.01" placeholder="Ex.: 250 000,00">
+        </div>
+        <div>
+          <label for="inpIrpj">IRPJ devido (R$) – se Lucro Real</label>
+          <input id="inpIrpj" type="number" min="0" step="0.01" placeholder="Ex.: 40 000,00">
+        </div>
+      </div>
+      <div class="cta-buttons">
+        <button class="cta-button" id="calcButton" type="button">Calcular</button>
+        <button class="cta-button" id="printButton" type="button">Imprimir demonstrativo</button>
+      </div>
+      <div class="emptyState" id="patEmpty">
+        <strong>Antes de calcular</strong>
+        <p>Informe quantidade de funcionarios, valor do beneficio e, se houver, o IRPJ devido para visualizar a economia e o comparativo final.</p>
+      </div>
+      <div class="results">
+        <div class="result-card">
+          <div class="label">Gasto Mensal com Benefício</div>
+          <div class="value" id="outGasto">R$ 0,00</div>
+        </div>
+        <div class="result-card">
+          <div class="label">Economia CLT (28,8 %)</div>
+          <div class="value" id="outClt">R$ 0,00</div>
+        </div>
+        <div class="result-card">
+          <div class="label">Incentivo Fiscal (IRPJ)</div>
+          <div class="value" id="outIrpj">R$ 0,00</div>
+        </div>
+        <div class="result-card">
+          <div class="label">Economia Total</div>
+          <div class="value" id="outTotal">R$ 0,00</div>
+        </div>
+      </div>
+      <div class="verdict-box" id="verdictBox">
+        <div>
+          <span class="verdict-tag tag-good" id="verdictTag">
+            <span id="verdictTxt">VALE MUITO A PENA</span>
+          </span>
+          <div style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--color-text-secondary)" id="verdictSub">
+            Economia total &gt; 10 % do gasto com o benefício
+          </div>
+        </div>
+        <div style="text-align: right">
+          <div style="font-size: 0.75rem; color: var(--color-text-secondary)">Taxa de economia</div>
+          <div style="font-weight: 700; font-size: 1rem" id="outRate">0,00 %</div>
+        </div>
+      </div>
+      <div class="report-note" id="reportNote">
+        <strong>Demonstrativo final</strong>
+        Preencha os dados para gerar um resumo claro do custo do benefício, da economia estimada e do comparativo final.
+      </div>
+      <div class="chart-container" id="chartContainer" style="display:none">
+        <canvas id="patChart"></canvas>
+      </div>
+    </div>
+  </main>
+  <script>
+    // === Funções utilitárias ===
+    const $ = (id) => document.getElementById(id);
+
+    // Formata valores em Real brasileiro
+    function brl(v) {
+      return (Number(v) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    // Formata valores percentuais
+    function pct(v) {
+      return (Number(v) || 0).toLocaleString('pt-BR', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    let chart;
+
+    // Inicializa ou retorna o gráfico do comparativo
+    function ensureChart() {
+      const ctx = $('patChart');
+      if (!chart) {
+        chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Custo sem PAT', 'Custo com PAT'],
+            datasets: [{
+              label: 'Custo (R$)',
+              data: [0, 0],
+              backgroundColor: [
+                'rgba(0, 63, 140, 0.7)',
+                'rgba(0, 117, 147, 0.7)'
+              ],
+              borderRadius: 8
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => brl(ctx.raw)
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { callback: (value) => brl(value) }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // Função principal de cálculo
+    function calcular() {
+      const qtd = Number($('inpQtd').value) || 0;
+      const valor = Number($('inpValor').value) || 0;
+      const irpjDevido = Number($('inpIrpj').value) || 0;
+
+      const gasto = qtd * valor;
+      const econClt = gasto * 0.288;
+      let econIrpj = 0;
+      if (irpjDevido > 0) {
+        const potencial = gasto * 0.15;
+        const limite = irpjDevido * 0.04;
+        econIrpj = Math.min(potencial, limite);
+      }
+      const econTotal = econClt + econIrpj;
+      const rate = gasto > 0 ? econTotal / gasto : 0;
+
+      // Custo sem PAT: benefício pago como salário + encargos
+      const custoSemPat = gasto + econClt;
+      // Custo com PAT: benefício pago e abatimento do incentivo fiscal
+      const custoComPat = Math.max(gasto - econIrpj, 0);
+
+      // Atualiza textos
+      $('outGasto').textContent = brl(gasto);
+      $('outClt').textContent = brl(econClt);
+      $('outIrpj').textContent = brl(econIrpj);
+      $('outTotal').textContent = brl(econTotal);
+      $('outRate').textContent = pct(rate);
+      $('patEmpty').style.display = 'none';
+      $('reportNote').style.display = 'block';
+      $('chartContainer').style.display = 'block';
+      $('reportNote').innerHTML =
+        `<strong>Demonstrativo final</strong>Com <strong>${qtd}</strong> colaborador(es) e benefício mensal de <strong>${brl(valor)}</strong>, o custo direto projetado é <strong>${brl(gasto)}</strong>. A economia potencial estimada é de <strong>${brl(econTotal)}</strong>, considerando encargos e, quando informado, o incentivo fiscal do IRPJ.`;
+
+      // Atualiza veredito
+      const vb = $('verdictBox');
+      const tag = $('verdictTag');
+      const txt = $('verdictTxt');
+      const sub = $('verdictSub');
+      vb.style.display = 'flex';
+      if (rate > 0.10) {
+        tag.className = 'verdict-tag tag-good';
+        txt.textContent = 'VALE MUITO A PENA';
+        sub.textContent = 'Economia total > 10 % do gasto com o benefício';
+      } else {
+        tag.className = 'verdict-tag tag-warn';
+        txt.textContent = 'ANALISAR VIABILIDADE';
+        sub.textContent = 'Economia total ≤ 10 % do gasto com o benefício';
+      }
+
+      // Atualiza gráfico
+      ensureChart();
+      chart.data.datasets[0].data = [custoSemPat, custoComPat];
+      chart.update();
+    }
+
+    // Associa eventos
+    document.getElementById('calcButton').addEventListener('click', calcular);
+    document.getElementById('printButton').addEventListener('click', () => {
+      // Antes de imprimir, calcula com dados atuais
+      calcular();
+      window.print();
+    });
+
+  </script>
+</body>
+</html>
+
+
+
+

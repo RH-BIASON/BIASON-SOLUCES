@@ -1,0 +1,1108 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>De Biason | FGTS Digital – Extrato Analítico → TXT</title>
+  <!--
+    Esta página refaz a ferramenta “FGTS Digital — Extrato Analítico (CAIXA) → TXT”
+    com o Design System da marca De Biason. A lógica original de leitura do
+    arquivo, processamento das competências e geração do TXT foi mantida sem
+    alterações. Foi criada uma camada de onboarding com instruções para
+    orientar o usuário, e a estrutura visual segue a mesma identidade aplicada
+    nas demais ferramentas: paleta exclusiva, sombras suaves, bordas de 12 px
+    e tipografia moderna.
+  -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-brand: #003f8c;
+      --color-accent: #007593;
+      --color-background: #f2f4f7;
+      --color-surface: #ffffff;
+      --color-text-primary: #08203b;
+      --color-text-secondary: #445b78;
+      --color-border: #e0e4eb;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --font-family: 'Inter', Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      background-color: var(--color-background);
+      color: var(--color-text-primary);
+    }
+    h1, h2, h3 { margin: 0; }
+    header {
+      background-color: var(--color-brand);
+      color: #fff;
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow);
+    }
+    header .brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    main {
+      display: flex;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    .card {
+      background-color: var(--color-surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .card h2 {
+      color: var(--color-brand);
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .guide section + section {
+      margin-top: 1rem;
+    }
+    .guide h3 {
+      font-size: 1rem;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+    }
+    .guide p, .guide li {
+      color: var(--color-text-secondary);
+      font-size: 0.875rem;
+    }
+    .guide ul {
+      padding-left: 1.25rem;
+      margin: 0;
+    }
+    .guide li {
+      margin-bottom: 0.5rem;
+    }
+    /* Ferramenta visual */
+    .drop-zone {
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius);
+      background-color: #f9fafc;
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--color-text-secondary);
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+      cursor: pointer;
+    }
+    .drop-zone.dragover {
+      border-color: var(--color-accent);
+      background-color: #e7f3f7;
+    }
+    .pills {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background-color: var(--color-background);
+      color: var(--color-text-secondary);
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+    .pill b {
+      color: var(--color-brand);
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.25rem;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background-color: var(--color-surface);
+      font-family: var(--font-family);
+      color: var(--color-text-primary);
+      font-size: 0.875rem;
+    }
+    input:disabled {
+      background-color: #f0f4f8;
+      color: var(--color-text-secondary);
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px rgba(0,117,147,0.1);
+    }
+    .cta-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .cta-button {
+      padding: 0.75rem 1.5rem;
+      background-color: var(--color-accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.25s ease;
+    }
+    .cta-button:hover {
+      background-color: #005f74;
+    }
+    .msg {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+    }
+    .msg.ok {
+      background-color: rgba(34,197,94,0.1);
+      color: #166534;
+      border: 1px solid rgba(34,197,94,0.4);
+    }
+    .msg.warn {
+      background-color: rgba(245,158,11,0.1);
+      color: #92400e;
+      border: 1px solid rgba(245,158,11,0.4);
+    }
+    .msg.bad {
+      background-color: rgba(239,68,68,0.1);
+      color: #7f1d1d;
+      border: 1px solid rgba(239,68,68,0.4);
+    }
+    pre {
+      padding: 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background-color: #f0f4f8;
+      color: var(--color-text-primary);
+      font-family: "Courier New", monospace;
+      font-size: 0.75rem;
+      white-space: pre-wrap;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .footnote {
+      margin-top: 1rem;
+      color: var(--color-text-secondary);
+      font-size: 0.75rem;
+    }
+    @media print {
+      header, .guide, .cta-button, .drop-zone, .pills { display: none !important; }
+      body { background: #fff; color: #000; }
+      .card { box-shadow: none; border: none; padding: 0; }
+    }
+  </style>
+  <style id="biason-polish">
+    :root{
+      --biason-brand:#081a24;
+      --biason-accent:#007ea7;
+      --biason-bg:#f4f7fb;
+      --biason-line:rgba(15,23,42,.10);
+      --biason-shadow:0 24px 48px -30px rgba(8,26,36,.48);
+      --biason-radius:20px;
+    }
+    body{
+      background:
+        radial-gradient(circle at top right, rgba(0,126,167,.10), transparent 24%),
+        linear-gradient(180deg, #eef4f9 0%, #f6f8fb 28%, var(--biason-bg) 100%);
+      color:#0b1b2a;
+    }
+    header{
+      position:sticky;
+      top:0;
+      z-index:20;
+      padding:22px 24px;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,.16), transparent 24%),
+        linear-gradient(135deg, #081a24, #0b3d91 68%, #0a6f85);
+      box-shadow:0 18px 40px -28px rgba(8,26,36,.7);
+    }
+    header::before{
+      content:"BIASON \2022 FGTS";
+      display:block;
+      max-width:1280px;
+      margin:0 auto;
+      color:rgba(255,255,255,.86);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    header::after{
+      content:"Fluxo de importacao e geracao do TXT com mais contraste, menos vazio e melhor leitura dos dados carregados.";
+      display:block;
+      max-width:1280px;
+      margin:8px auto 0;
+      color:rgba(255,255,255,.78);
+      font-size:14px;
+      line-height:1.5;
+    }
+    header .brand{
+      display:block;
+      max-width:1280px;
+      margin:12px auto 0;
+      font-size:0;
+      line-height:1;
+    }
+    header .brand::before{
+      content:"FGTS Digital";
+      font-size:clamp(28px,3vw,34px);
+      font-weight:800;
+      letter-spacing:-.03em;
+      color:#fff;
+    }
+    main{
+      display:grid;
+      grid-template-columns:minmax(290px,330px) minmax(0,1fr);
+      gap:18px;
+      max-width:1280px;
+      margin:18px auto 0;
+      padding:0 24px 32px;
+    }
+    main > *{min-width:0}
+    .card{
+      border-radius:var(--biason-radius);
+      border:1px solid var(--biason-line);
+      box-shadow:var(--biason-shadow);
+      padding:22px;
+      background:rgba(255,255,255,.94);
+    }
+    .guide{
+      position:sticky;
+      top:110px;
+      background:linear-gradient(180deg, rgba(8,26,36,.02), rgba(0,126,167,.04));
+    }
+    .card h2{
+      color:var(--biason-brand);
+      font-size:clamp(22px,2.4vw,28px);
+      letter-spacing:-.02em;
+      margin-bottom:14px;
+    }
+    .guide h3{
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight:800;
+      color:#0a6f85;
+      margin-bottom:8px;
+    }
+    .guide p,
+    .guide li,
+    .footnote{
+      line-height:1.6;
+      color:#526173;
+    }
+    .drop-zone{
+      min-height:190px;
+      border-radius:20px;
+      border-color:rgba(0,126,167,.35);
+      background:
+        radial-gradient(circle at top right, rgba(0,126,167,.08), transparent 28%),
+        linear-gradient(180deg, #f9fcff, #f3f8fb);
+      display:grid;
+      place-items:center;
+      gap:12px;
+      padding:22px;
+    }
+    .drop-zone p{margin:0;font-size:15px;color:#526173}
+    .drop-zone.dragover{
+      border-color:rgba(0,126,167,.75);
+      background:#edf8fc;
+    }
+    .pills{gap:10px}
+    .pill{
+      border-radius:999px;
+      padding:8px 12px;
+      border:1px solid rgba(15,23,42,.10);
+      background:#fff;
+      box-shadow:0 12px 22px -20px rgba(8,26,36,.3);
+      font-size:12px;
+    }
+    .form-grid{
+      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+      gap:14px;
+      margin-top:18px;
+    }
+    input[type="text"],
+    input[type="number"]{
+      min-height:46px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      color:#0b1b2a;
+    }
+    input:focus{
+      border-color:rgba(0,126,167,.45);
+      box-shadow:0 0 0 4px rgba(0,126,167,.12);
+    }
+    .cta-buttons{
+      gap:12px;
+      margin-top:18px;
+    }
+    .cta-button{
+      min-height:46px;
+      padding:0 16px;
+      border-radius:14px;
+      font-size:14px;
+      font-weight:800;
+      background:#007ea7;
+      box-shadow:0 12px 24px -18px rgba(0,126,167,.55);
+    }
+    .cta-button:hover{background:#006586}
+    .msg{
+      margin-top:16px;
+      border-radius:16px;
+      padding:12px 14px;
+      font-weight:700;
+    }
+    .emptyState{
+      margin-top:16px;
+      padding:18px;
+      border:1px dashed rgba(0,126,167,.28);
+      border-radius:18px;
+      background:#f8fbfd;
+    }
+    .emptyState h3{
+      margin:0 0 8px;
+      color:#081a24;
+      font-size:18px;
+      letter-spacing:-.02em;
+    }
+    .emptyState p{
+      margin:0;
+      color:#526173;
+      font-size:13px;
+      line-height:1.55;
+    }
+    .emptyState ul{
+      margin:12px 0 0;
+      padding-left:18px;
+      color:#526173;
+      font-size:13px;
+      line-height:1.55;
+    }
+    pre{
+      border-radius:18px;
+      border:1px solid rgba(15,23,42,.10);
+      background:#081a24;
+      color:#e4f3f9;
+      padding:16px;
+      max-height:260px;
+    }
+    @media (max-width: 1024px){
+      main{grid-template-columns:1fr}
+      .guide{position:static;top:auto}
+    }
+    @media (max-width: 720px){
+      header{padding:18px 16px}
+      main{padding:0 16px 24px}
+      .card,.drop-zone,pre{padding:18px}
+      .cta-button{width:100%}
+    }
+  </style>
+  <script>document.title='BIASON | FGTS Digital';</script>
+  <style id="biason-hub-return">
+    .hubReturnBar{position:fixed;right:18px;bottom:18px;z-index:120;display:flex}
+    .hubReturnBtn{min-height:44px;padding:0 14px;border-radius:14px;border:1px solid rgba(15,23,42,.12);background:#fff;color:#081a24;font:700 13px Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;cursor:pointer;box-shadow:0 16px 30px -24px rgba(8,26,36,.55)}
+    .hubReturnBtn:hover{transform:translateY(-1px);background:#f8fbfd}
+    @page{size:A4;margin:12mm}
+    @media print{body{background:#fff!important}.hubReturnBar{display:none!important}.card,.tableWrap,.panel,.kpi,.summary-item,.total-box,.verdict-box,.chart-container,.preview,pre{box-shadow:none!important;border-color:rgba(15,23,42,.18)!important}}
+  </style>
+  <script id="biason-hub-return-script">
+    (function(){
+      function biasonGoHub(){
+        try{
+          if(window.top && window.top !== window){
+            window.top.postMessage({type:'BIASON_BACK_TO_HUB'}, '*');
+            return;
+          }
+        }catch(err){}
+        try{ window.location.href = new URL('dashboard_unico_ok5_atualizado.html', window.location.href).href; }
+        catch(err){ window.location.href = 'dashboard_unico_ok5_atualizado.html'; }
+      }
+      document.addEventListener('DOMContentLoaded', function(){
+        if(document.querySelector('.hubReturnBar')) return;
+        var wrap = document.createElement('div');
+        wrap.className = 'hubReturnBar';
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'hubReturnBtn';
+        btn.textContent = 'Voltar ao Hub';
+        btn.addEventListener('click', biasonGoHub);
+        wrap.appendChild(btn);
+        document.body.appendChild(wrap);
+      });
+      window.biasonGoHub = biasonGoHub;
+    })();
+  </script>
+<style id="biason-fine-polish">
+  html{scroll-behavior:smooth}
+  ::selection{background:rgba(0,126,167,.18);color:#081a24}
+  *{scrollbar-width:thin;scrollbar-color:rgba(0,126,167,.55) rgba(15,23,42,.08)}
+  *::-webkit-scrollbar{width:10px;height:10px}
+  *::-webkit-scrollbar-track{background:rgba(15,23,42,.06);border-radius:999px}
+  *::-webkit-scrollbar-thumb{background:linear-gradient(180deg, rgba(0,126,167,.72), rgba(8,26,36,.56));border-radius:999px;border:2px solid rgba(255,255,255,.68)}
+  a,button,.btn,.button,.cta-button,input,select,textarea,summary{
+    transition:box-shadow .18s ease,border-color .18s ease,background-color .18s ease,color .18s ease,transform .18s ease,opacity .18s ease;
+  }
+  a:focus-visible,button:focus-visible,.btn:focus-visible,.button:focus-visible,.cta-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{
+    outline:none;
+    border-color:rgba(0,126,167,.55) !important;
+    box-shadow:0 0 0 4px rgba(0,126,167,.18) !important;
+  }
+  .card,.kpi,.result-card,.tableWrap,.chart-container,.dropzone,.help,.sidebar,.hero,.panel,.base-box,.modalPanel{
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background-color .18s ease;
+  }
+  .tableWrap table tbody tr,.inputs-table tbody tr,table tbody tr{transition:background-color .18s ease}
+  .tableWrap table tbody tr:hover td,.inputs-table tbody tr:hover td,table tbody tr:hover td{background:rgba(0,126,167,.04)}
+  .emptyState{
+    border-style:dashed !important;
+    background:linear-gradient(180deg, rgba(0,126,167,.05), rgba(255,255,255,.96)) !important;
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .hero,.sidebar,.card,.kpi,.result-card,.base-box,.tableWrap,.dropzone,.chart-container{
+      animation:biasonFadeUp .34s ease both;
+    }
+  }
+  @keyframes biasonFadeUp{
+    from{opacity:0;transform:translateY(8px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  @media print{
+    *::-webkit-scrollbar{display:none}
+  }
+</style>
+<style id="biason-header-standard">
+  .biasonShellHeader{
+    position:sticky;
+    top:0;
+    z-index:40;
+    padding:0 !important;
+    background:linear-gradient(90deg,#0b3d91 0%, #123f8f 62%, #0a7b8f 100%) !important;
+    color:#fff !important;
+    box-shadow:0 14px 28px -20px rgba(8,26,36,.65) !important;
+    border:none !important;
+  }
+  .biasonShellHeader__inner{
+    max-width:1360px;
+    margin:0 auto;
+    min-height:68px;
+    padding:0 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader__left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-width:0;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader__brand{
+    color:#fff;
+    font-size:17px;
+    line-height:1;
+    font-weight:900;
+    letter-spacing:.02em;
+  }
+  .biasonShellHeader__divider{
+    color:rgba(255,255,255,.5);
+    font-weight:700;
+    line-height:1;
+  }
+  .biasonShellHeader__tool{
+    color:#fff;
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.01em;
+  }
+  .biasonShellHeader__crumb{
+    display:inline-flex;
+    align-items:center;
+    min-height:30px;
+    padding:0 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.20);
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .biasonShellHeader__crumb strong{color:#fff;font-weight:800}
+  .biasonShellHeader__right,
+  .biasonShellHeader .right{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader .btn,
+  .biasonShellHeader .btn-small,
+  .biasonShellHeader button{
+    border-radius:12px;
+  }
+  .biasonShellHeader .brand,
+  .biasonShellHeader .brand__mark,
+  .biasonShellHeader .brand__name,
+  .biasonShellHeader .brand__sub,
+  .biasonShellHeader .pill,
+  .biasonShellHeader .title,
+  .biasonShellHeader .topbar__eyebrow,
+  .biasonShellHeader .topbar__title,
+  .biasonShellHeader .topbar__sub{
+    all:unset;
+  }
+  .biasonShellHeader::before,
+  .biasonShellHeader::after{
+    content:none !important;
+    display:none !important;
+  }
+  @media (max-width:760px){
+    .biasonShellHeader__inner{min-height:64px;padding:10px 12px}
+    .biasonShellHeader__left{gap:10px}
+    .biasonShellHeader__brand{font-size:16px}
+    .biasonShellHeader__tool{font-size:12px}
+    .biasonShellHeader__crumb{font-size:11px;padding:0 10px}
+  }
+</style>
+</head>
+<body>
+    <header class="biasonShellHeader">
+    <div class="biasonShellHeader__inner">
+      <div class="biasonShellHeader__left">
+        <div class="biasonShellHeader__brand">BIASON</div>
+        <div class="biasonShellHeader__divider">|</div>
+        <div class="biasonShellHeader__tool">FGTS Digital</div>
+        <div class="biasonShellHeader__crumb">Página: Conversão</div>
+      </div>
+    </div>
+  </header>
+  <main>
+    <!-- Guia de Utilização -->
+    <div class="guide card">
+      <h2>Guia de Utilização De Biason</h2>
+      <section>
+        <h3>O que preencher</h3>
+        <ul>
+          <li>Arraste e solte o arquivo <strong>Extrato Analítico (.txt)</strong> da CAIXA ou selecione manualmente.</li>
+          <li>Depois de carregado, informe a <strong>Matrícula</strong> do vínculo no FGTS Digital.</li>
+          <li>Opcionalmente, defina a competência inicial e final (MM‑AAAA) para limitar o período considerado.</li>
+          <li>A <strong>Categoria</strong> é fixa (<em>101</em>). A <strong>Alíquota</strong> vem pré‑definida em 8 %; utilize 2 % somente para aprendizes.</li>
+        </ul>
+      </section>
+      <section>
+        <h3>Lógica da Ferramenta</h3>
+        <p>
+          A ferramenta lê o extrato e identifica os depósitos de FGTS para um único trabalhador. Os valores
+          são convertidos em bases de cálculo dividindo o depósito pela alíquota. Caso haja depósitos de
+          décimo terceiro, estes são separados em coluna própria. Para cada competência com depósito,
+          gera‑se uma linha no formato exigido pelo FGTS Digital: CNPJ base do empregador, CPF do
+          trabalhador, data de admissão, matrícula, competência, categoria e valores de base principal e 13º.
+        </p>
+      </section>
+      <section>
+        <h3>Interpretação</h3>
+        <p>
+          Ao clicar em “Gerar TXT”, o arquivo será criado e baixado automaticamente. Se houver
+          inconsistências (como CPF ou CNPJ inválidos), mensagens de erro serão exibidas. Você
+          também pode copiar o conteúdo do arquivo gerado para a área de transferência. Use o TXT
+          para enviar as competências ao FGTS Digital conforme orientações da CAIXA.
+        </p>
+      </section>
+    </div>
+    <!-- Ferramenta de geração -->
+    <div class="tool card">
+      <h2>Gerador de Arquivo TXT</h2>
+      <div id="drop" class="drop-zone">
+        <p>Arraste e solte o arquivo aqui ou clique em “Selecionar”</p>
+        <button id="btnPick" type="button" class="cta-button">Selecionar</button>
+        <input id="fileInput" type="file" accept=".txt,text/plain" style="display:none">
+      </div>
+      <div id="pills" class="pills" style="display:none"></div>
+      <div id="emptyState" class="emptyState">
+        <h3>Antes de gerar o TXT</h3>
+        <p>Envie o extrato analitico para preencher automaticamente CPF, empregador, admissao e competencias com deposito.</p>
+        <ul>
+          <li>Importe o arquivo TXT do trabalhador.</li>
+          <li>Confira a matricula e o intervalo de competencias.</li>
+          <li>So depois gere ou copie o TXT final.</li>
+        </ul>
+      </div>
+      <div id="form" style="display:none">
+        <div class="form-grid">
+          <div>
+            <label for="matricula">Matrícula do vínculo no FGTS Digital (obrigatória)</label>
+            <input id="matricula" type="text" placeholder="Ex.: 12" autocomplete="off">
+          </div>
+          <div>
+            <label for="categoria">Categoria (fixa)</label>
+            <input id="categoria" type="text" value="101" disabled>
+          </div>
+          <div>
+            <label for="compIni">Competência inicial (MM‑AAAA)</label>
+            <input id="compIni" type="text" placeholder="Deixe em branco para usar a 1ª com depósito">
+          </div>
+          <div>
+            <label for="compFim">Competência final (MM‑AAAA)</label>
+            <input id="compFim" type="text" placeholder="Deixe em branco para usar a última">
+          </div>
+          <div>
+            <label for="aliquota">Alíquota</label>
+            <input id="aliquota" type="number" step="0.01" value="0.08">
+            <small style="display:block;margin-top:4px;color: var(--color-text-secondary);font-size:0.75rem;">Use 0,08 para 8 % ou 0,02 se for aprendiz.</small>
+          </div>
+          <div>
+            <label for="preview">Prévia (primeiras competências com depósito)</label>
+            <pre id="preview">—</pre>
+          </div>
+          <div>
+            <label for="empregador">CNPJ base do empregador (8 dígitos)</label>
+            <input id="empregador" type="text" placeholder="Preenchido automaticamente">
+          </div>
+          <div>
+            <label for="cpf">CPF do trabalhador</label>
+            <input id="cpf" type="text" placeholder="Preenchido automaticamente">
+          </div>
+          <div>
+            <label for="admissao">Data de admissão (DD‑MM‑AAAA)</label>
+            <input id="admissao" type="text" placeholder="Preenchido automaticamente">
+          </div>
+        </div>
+        <div class="cta-buttons">
+          <button id="btnGenerate" type="button" class="cta-button">Gerar TXT</button>
+          <button id="btnCopy" type="button" class="cta-button">Copiar TXT</button>
+          <button id="btnReset" type="button" class="cta-button">Limpar</button>
+        </div>
+        <div id="msg" class="msg" style="display:none"></div>
+        <h3>TXT Gerado</h3>
+        <pre id="out">—</pre>
+        <p class="footnote">Esta ferramenta aceita apenas um trabalhador por arquivo e gera apenas meses com depósito.</p>
+      </div>
+    </div>
+  </main>
+  <script>
+  (() => {
+    const $ = (id) => document.getElementById(id);
+    const monthMap = {
+      "JANEIRO":"01","FEVEREIRO":"02","MARCO":"03","MARÇO":"03","ABRIL":"04","MAIO":"05","JUNHO":"06",
+      "JULHO":"07","AGOSTO":"08","SETEMBRO":"09","OUTUBRO":"10","NOVEMBRO":"11","DEZEMBRO":"12"
+    };
+    const sanitizeDigits = (s) => (s || "").replace(/\D+/g, "");
+    const parseMoneyBR = (s) => {
+      const cleaned = String(s||"").trim().replace(/\./g,"").replace(",", ".");
+      const n = Number(cleaned);
+      return Number.isFinite(n) ? n : null;
+    };
+    const roundBankers = (x, decimals = 2) => {
+      // Round half UP (0.005 -> 0.01). This matches Excel's usual rounding and
+      // avoids "half-to-even" (banker's rounding) differences of 0,01.
+      const factor = Math.pow(10, decimals);
+      // Small epsilon to reduce binary floating artifacts (e.g., 1.005 issues)
+      return Math.round((Number(x) + 1e-12) * factor) / factor;
+    };
+
+    const fmtMoneyBR = (n) => {
+      const v = roundBankers(n, 2);
+      return v.toFixed(2).replace(".", ",");
+    };
+    const compToNum = (mmYYYY) => {
+      const m = /^(\d{2})-(\d{4})$/.exec(mmYYYY || "");
+      if (!m) return null;
+      return Number(m[2])*100 + Number(m[1]);
+    };
+    const numToComp = (num) => {
+      const y = Math.floor(num/100), m = num%100;
+      return String(m).padStart(2,"0") + "-" + String(y);
+    };
+    const addMonths = (num, d) => {
+      let y=Math.floor(num/100), m=num%100; m+=d;
+      while(m>12){m-=12;y++;} while(m<1){m+=12;y--;}
+      return y*100+m;
+    };
+
+    function msg(kind, html){
+      const box = $("msg");
+      box.style.display = "block";
+      box.className = "msg " + kind;
+      box.innerHTML = html;
+    }
+    function clearMsg(){
+      $("msg").style.display = "none";
+      $("msg").innerHTML = "";
+    }
+
+    // Parser consolidating deposits by worker key (CPF preferred; fallback PIS / matrícula)
+    // Includes de-duplication of identical lançamentos to avoid duplicidade ao importar páginas.
+    function parseExtrato(text){
+      const lines = text.split(/\r?\n/);
+      const byKey = new Map(); // key -> record
+      let currentKey = null;
+
+      const entryRe = /^\s*(\d{2}\/\d{2}\/\d{4})\s+(.+?)\s+([0-9\.\,]+)\s*$/;
+      const seen = new Set(); // dedup identical lançamento lines
+
+      function ensure(key){
+        if(!byKey.has(key)){
+          byKey.set(key, {
+            key,
+            cpf: null,
+            pis: null,
+            matricula: null,
+            nome: null,
+            adm: null,
+            empregadorNome: null,
+            empregadorCnpj: null,
+            byComp: new Map(),
+            rawDeposits: 0,
+            dupLines: 0,
+          });
+        }
+        return byKey.get(key);
+      }
+      function addDep(rec, comp, kind, v){
+        if(!rec.byComp.has(comp)) rec.byComp.set(comp, { principal:0, v13:0, raws:0 });
+        const o = rec.byComp.get(comp);
+        if(kind==="13") o.v13 += v; else o.principal += v;
+        o.raws += 1;
+        rec.rawDeposits += 1;
+      }
+
+      for(let i=0;i<lines.length;i++){
+        const ln = lines[i] || "";
+
+        // CPF (quando vem explícito)
+        if(/\bCPF\b/i.test(ln)){
+          const mcpf = /(\d{3}\.?\d{3}\.?\d{3}-?\d{2}|\b\d{11}\b)/.exec(ln);
+          if(mcpf){
+            const digits = mcpf[1].replace(/\D+/g, "");
+            if(digits.length===11){
+              currentKey = digits;
+              const r = ensure(currentKey);
+              r.cpf = r.cpf || digits;
+            }
+          }
+        }
+
+        // No TXT da CAIXA, o CPF muitas vezes aparece no bloco de "MATRICULA".
+        if(/\bMATRICULA\b/i.test(ln)){
+          // tenta achar um CPF (11 dígitos) nas próximas linhas
+          let foundCpf = null;
+          for(let j=i;j<Math.min(i+10, lines.length);j++){
+            const m = /\b(\d{11})\b/.exec(lines[j]);
+            if(m){ foundCpf = m[1]; break; }
+          }
+          if(foundCpf){
+            currentKey = foundCpf;
+            const r = ensure(currentKey);
+            r.cpf = r.cpf || foundCpf;
+          } else {
+            // fallback: se não achou CPF, usa matrícula numérica como chave
+            let mat = null;
+            for(let j=i;j<Math.min(i+10, lines.length);j++){
+              const m = /\b(\d{8,14})\b/.exec(lines[j]);
+              if(m){ mat = m[1]; break; }
+            }
+            if(mat){
+              if(!currentKey) currentKey = "MAT:" + mat;
+              const r = ensure(currentKey);
+              r.matricula = r.matricula || mat;
+            }
+          }
+        }
+
+        // PIS/PASEP (fallback de agrupamento)
+        if(/PIS\/?PASEP/i.test(ln)){
+          let mpis = /\b(\d{11})\b/.exec(ln);
+          if(!mpis){
+            for(let j=i+1;j<Math.min(i+5, lines.length);j++){
+              mpis = /\b(\d{8,14})\b/.exec(lines[j]);
+              if(mpis) break;
+            }
+          }
+          if(mpis){
+            if(!currentKey) currentKey = "PIS:" + mpis[1];
+            const r = ensure(currentKey);
+            r.pis = r.pis || mpis[1];
+          }
+        }
+        // Nome do trabalhador
+        if(/NOME DO TRABALHADOR/i.test(ln)){
+          for(let j=i+1;j<Math.min(i+6, lines.length);j++){
+            const t = (lines[j]||"").trim();
+            if(!t) continue;
+            const m = /^(.*?)(\s{2,}|\d{3,}|$)/.exec(t);
+            const name = (m ? m[1] : t).trim();
+            if(name && currentKey){
+              const r = ensure(currentKey);
+              r.nome = r.nome || name;
+            }
+            break;
+          }
+        }
+        // Data de admissão
+        if(/DTA\.ADM\./i.test(ln)){
+          for(let j=i;j<Math.min(i+8, lines.length);j++){
+            const m = /(\d{2}\/\d{2}\/\d{4})/.exec(lines[j]);
+            if(m && currentKey){
+              const r = ensure(currentKey);
+              r.adm = r.adm || m[1];
+              break;
+            }
+          }
+        }
+        // Nome e CNPJ do empregador
+        if(/NOME DO EMPREGADOR/i.test(ln)){
+          let nameLine = null;
+          for(let j=i+1;j<Math.min(i+6, lines.length);j++){
+            const t = (lines[j]||"").trim();
+            if(t){ nameLine = t; break; }
+          }
+          let cnpj = null;
+          for(let j=i;j<Math.min(i+10, lines.length);j++){
+            const m = /\b(\d{11,14})\b/.exec(lines[j]);
+            if(m){ cnpj = m[1]; break; }
+          }
+          if(currentKey){
+            const r = ensure(currentKey);
+            if(nameLine) r.empregadorNome = r.empregadorNome || nameLine.replace(/\s{2,}.*/, "").trim();
+            if(cnpj) r.empregadorCnpj = r.empregadorCnpj || cnpj;
+          }
+        }
+        // Depósitos de FGTS
+        const m = entryRe.exec(ln);
+        if(m && currentKey){
+          const desc = m[2].trim().toUpperCase();
+          const val = parseMoneyBR(m[3]);
+          if(!Number.isFinite(val)) continue;
+          if(!desc.startsWith("DEPOSITO")) continue;
+
+          const mm = /DEPOSITO(?:\s+EM\s+ATRASO)?\s+([A-ZÇÃÉÍÓÚ]+)\/(\d{4})/.exec(desc);
+          if(!mm) continue;
+          const mes = monthMap[mm[1]];
+          if(!mes) continue;
+          const comp = `${mes}-${mm[2]}`;
+          const nComp = compToNum(comp);
+          if(!nComp) continue;
+
+          const is13 = /\b13\b|13º|13o|D[ÉE]CIMO|DECIMO/.test(desc);
+          const sig = `${currentKey}|${m[1]}|${desc}|${m[3]}`;
+          if(seen.has(sig)){
+            ensure(currentKey).dupLines += 1;
+          } else {
+            seen.add(sig);
+            addDep(ensure(currentKey), comp, is13 ? "13" : "principal", val);
+          }
+        }
+      }
+
+      return [...byKey.values()].filter(r => r.byComp.size > 0);
+    }
+
+    function defaultRangeFromDeposits(record){
+      const comps = [...record.byComp.keys()]
+        .map(c => ({c, n: compToNum(c)}))
+        .filter(x => x.n)
+        .sort((a,b)=>a.n-b.n);
+      if(!comps.length) return {ini:null, fim:null};
+      return {ini: comps[0].c, fim: comps[comps.length-1].c};
+    }
+    function previewLines(record){
+      const comps = [...record.byComp.keys()]
+        .map(c => ({c, n: compToNum(c)}))
+        .filter(x => x.n)
+        .sort((a,b)=>a.n-b.n)
+        .slice(0, 18);
+      if(!comps.length) return "Nenhum depósito reconhecido.";
+      return comps.map(x => {
+        const o = record.byComp.get(x.c);
+        const dep = (o.principal||0) + (o.v13||0);
+        return `${x.c}  depósito=${fmtMoneyBR(dep)}  linhas=${o.raws}`;
+      }).join("\n");
+    }
+    function buildTxt(record){
+      clearMsg();
+      const matricula = $("matricula").value.trim();
+      if(!matricula){ msg("bad", "Informe a <b>Matrícula</b> do vínculo no FGTS Digital."); return null; }
+      const cpf = sanitizeDigits($("cpf").value);
+      const emp = sanitizeDigits($("empregador").value);
+      const adm = ($("admissao").value || "").trim();
+      const categoria = "101";
+      const aliqRaw = String($("aliquota").value || "0.08").trim();
+      const aliq = Number(aliqRaw);
+      if(!Number.isFinite(aliq) || !(aliq > 0 && aliq < 1)){
+        msg("bad", "Alíquota inválida. Use <b>0.08</b> (8 %) ou <b>0.02</b> (2 %).");
+        return null;
+      }
+      let ini = $("compIni").value.trim();
+      let fim = $("compFim").value.trim();
+      const auto = defaultRangeFromDeposits(record);
+      if(!ini) ini = auto.ini;
+      if(!fim) fim = auto.fim;
+      const nIni = compToNum(ini);
+      const nFim0 = compToNum(fim);
+      if(!cpf || cpf.length !== 11) { msg("bad","CPF inválido ou não identificado no arquivo."); return null; }
+      if(!(emp.length === 8 || emp.length === 11)) { msg("bad","Empregador inválido (CNPJ base deve ter 8 ou 11 dígitos)." ); return null; }
+      if(!/^\d{2}-\d{2}-\d{4}$/.test(adm)) { msg("bad","Data de admissão inválida ou não identificada."); return null; }
+      if(!nIni || !nFim0) { msg("bad","Competências inválidas. Use MM-AAAA."); return null; }
+      const nFim = nFim0;
+      if(nIni > nFim){ msg("bad","Competência inicial maior que a final."); return null; }
+      const lines = [];
+      lines.push(`1;${emp};${cpf};${adm};${matricula};`);
+      for(let cur = nIni; cur <= nFim; cur = addMonths(cur, 1)){
+        const comp = numToComp(cur);
+        const o = record.byComp.get(comp);
+        if(!o) continue;
+        const baseP = (o.principal || 0) ? (o.principal / aliq) : 0;
+        const base13 = (o.v13 || 0) ? (o.v13 / aliq) : 0;
+        if(base13 > 0){ lines.push(`2;${comp};${categoria};${fmtMoneyBR(baseP)};${fmtMoneyBR(base13)};`); }
+        else{ lines.push(`2;${comp};${categoria};${fmtMoneyBR(baseP)};;`); }
+      }
+      if(lines.length === 1){ msg("warn","Nenhuma competência com depósito encontrada no intervalo informado."); return null; }
+      return lines.join("\r\n");
+    }
+    function downloadText(filename, text){
+      const blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a);
+      a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+    function setPills(fileName, record){
+      const empDigits = sanitizeDigits(record.empregadorCnpj || "");
+      const empBase = empDigits.length >= 8 ? empDigits.slice(0,8) : empDigits;
+      const pills = [];
+      pills.push(`<span class="pill"><b>Arquivo:</b> ${fileName}</span>`);
+      if(record.nome) pills.push(`<span class="pill"><b>Trabalhador:</b> ${record.nome}</span>`);
+      if(record.cpf) pills.push(`<span class="pill"><b>CPF:</b> ${record.cpf}</span>`);
+      if(record.empregadorNome) pills.push(`<span class="pill"><b>Empregador:</b> ${record.empregadorNome}</span>`);
+      if(empBase) pills.push(`<span class="pill"><b>CNPJ base:</b> ${empBase}</span>`);
+      if(record.adm) pills.push(`<span class="pill"><b>Admissão:</b> ${record.adm}</span>`);
+      pills.push(`<span class="pill"><b>Meses c/ depósito:</b> ${record.byComp.size}</span>`);
+      if(record.dupLines){
+        pills.push(`<span class="pill"><b>Duplicidades ignoradas:</b> ${record.dupLines}</span>`);
+      }
+      $("pills").innerHTML = pills.join("");
+      $("pills").style.display = "flex";
+    }
+    let activeRecord = null;
+    let generated = "";
+    async function onFile(file){
+      clearMsg();
+      const text = await file.text();
+      const records = parseExtrato(text);
+      if(!records.length){ msg("bad","Não consegui identificar depósitos no arquivo. Certifique-se de usar o TXT do Extrato Analítico da CAIXA."); return; }
+      if(records.length > 1){ msg("bad","Este gerador aceita apenas um trabalhador por arquivo. Foram encontrados múltiplos registros."); return; }
+      activeRecord = records[0];
+      const empDigits = sanitizeDigits(activeRecord.empregadorCnpj || "");
+      const empBase = empDigits.length >= 8 ? empDigits.slice(0,8) : empDigits;
+      $("cpf").value = activeRecord.cpf || "";
+      $("empregador").value = empBase || "";
+      $("admissao").value = (activeRecord.adm || "").replaceAll("/", "-");
+      $("preview").textContent = previewLines(activeRecord);
+      const rng = defaultRangeFromDeposits(activeRecord);
+      $("compIni").value = rng.ini || "";
+      $("compFim").value = rng.fim || "";
+      setPills(file.name, activeRecord);
+      $("emptyState").style.display = "none";
+      $("form").style.display = "block";
+      $("out").textContent = "—";
+      generated = "";
+      $("matricula").value = "";
+    }
+    function reset(){
+      activeRecord = null; generated = "";
+      $("form").style.display = "none";
+      $("emptyState").style.display = "block";
+      $("pills").style.display = "none";
+      $("pills").innerHTML = "";
+      $("out").textContent = "—";
+      $("preview").textContent = "—";
+      $("matricula").value = "";
+      $("compIni").value = "";
+      $("compFim").value = "";
+      $("empregador").value = "";
+      $("cpf").value = "";
+      $("admissao").value = "";
+      $("aliquota").value = "0.08";
+      clearMsg();
+    }
+    $("btnPick").addEventListener("click", ()=> $("fileInput").click());
+    $("fileInput").addEventListener("change", (e)=>{
+      const f = e.target.files?.[0]; if(f) onFile(f);
+    });
+    const drop = $("drop");
+    drop.addEventListener("dragover", (e)=>{
+      e.preventDefault(); drop.classList.add("dragover");
+    });
+    drop.addEventListener("dragleave", (e)=>{
+      e.preventDefault(); drop.classList.remove("dragover");
+    });
+    drop.addEventListener("drop", (e)=>{
+      e.preventDefault(); drop.classList.remove("dragover");
+      const f = e.dataTransfer.files?.[0]; if(f) onFile(f);
+    });
+    $("btnGenerate").addEventListener("click", ()=>{
+      if(!activeRecord){ msg("bad","Arraste um arquivo primeiro."); return; }
+      const txt = buildTxt(activeRecord);
+      if(!txt) return;
+      generated = txt;
+      $("out").textContent = txt;
+      const cpf = sanitizeDigits($("cpf").value) || "cpf";
+      const ini = ($("compIni").value || "").trim() || "ini";
+      const fim = ($("compFim").value || "").trim() || "fim";
+      const fname = `FGTS_Digital_recomposicao_${cpf}_${ini}_a_${fim}.txt`.replaceAll("/", "-");
+      downloadText(fname, txt);
+      if($("msg").style.display === "none"){ msg("ok","TXT gerado e baixado."); }
+      else{ $("msg").innerHTML += "<br><br><b>TXT gerado e baixado.</b>"; }
+    });
+    $("btnCopy").addEventListener("click", async ()=>{
+      if(!generated){ msg("warn","Gere o TXT primeiro."); return; }
+      try{
+        await navigator.clipboard.writeText(generated);
+        msg("ok","TXT copiado.");
+      }catch{
+        msg("warn","Não foi possível copiar automaticamente. Copie manualmente do quadro.");
+      }
+    });
+    $("btnReset").addEventListener("click", reset);
+    reset();
+  })();
+  </script>
+</body>
+</html>
+
+
+
+

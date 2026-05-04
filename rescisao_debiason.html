@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>De Biason | Simulador de Rescisão</title>
+  <!--
+    Este documento implementa uma versão reimaginada do “Simulador de Rescisão”
+    de acordo com o Design System unificado da marca De Biason. O objetivo
+    principal desta página é fornecer uma calculadora de verbas rescisórias que
+    preserva integralmente as fórmulas e regras de negócio da ferramenta
+    original, ao mesmo tempo em que apresenta uma interface consistente e
+    moderna. Todas as funções de cálculo foram transplantadas da ferramenta
+    base sem alteração para garantir resultados idênticos.
+  -->
+  <!-- Importa a fonte Inter para uma tipografia moderna e legível -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /*
+      === Design System De Biason ===
+      Esta seção define variáveis de cor, tipografia, raio de borda e sombra
+      para garantir consistência visual entre as ferramentas do ecossistema.
+      Ajuste os valores de acordo com a paleta oficial enviada pelo cliente.
+    */
+    :root {
+      --color-brand: #003f8c;        /* azul escuro para cabeçalhos e identidade */
+      --color-accent: #007593;       /* azul petróleo para CTAs */
+      --color-background: #f2f4f7;   /* off‑white para fundos */
+      --color-surface: #ffffff;      /* branco para cartões */
+      --color-text-primary: #08203b; /* cinza azulado para textos principais */
+      --color-text-secondary: #445b78;/* cor neutra para descrições */
+      --color-border: #e0e4eb;       /* borda sutil */
+      --color-danger: #b30000;       /* vermelho para avisos */
+      --radius: 12px;                /* raio de borda padrão */
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.1); /* sombra leve */
+      --font-family: 'Inter', Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      background-color: var(--color-background);
+      color: var(--color-text-primary);
+    }
+    h1, h2, h3 { margin: 0; }
+    /* Cabeçalho principal com marca e título da ferramenta */
+    header {
+      background-color: var(--color-brand);
+      color: #fff;
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow);
+    }
+    header .brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    /* Layout principal: duas colunas (guia e calculadora) */
+    main {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    /* Cartões reutilizáveis */
+    .card {
+      background-color: var(--color-surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .card h2 {
+      color: var(--color-brand);
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    /* Guia de utilização */
+    .guide section + section { margin-top: 1rem; }
+    .guide h3 {
+      font-size: 1rem;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+    }
+    .guide p, .guide li {
+      color: var(--color-text-secondary);
+      font-size: 0.875rem;
+    }
+    .guide ul {
+      padding-left: 1.25rem;
+      margin: 0;
+    }
+    .guide li { margin-bottom: 0.5rem; }
+    /* Calculadora: organização de campos em grid */
+    .calculator {
+      flex: 2;
+    }
+    .section { margin-bottom: 1.5rem; }
+    .section h3 {
+      font-size: 1rem;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.25rem;
+    }
+    input[type="number"],
+    input[type="date"],
+    select {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--color-border);
+      background-color: #f9fafb;
+      color: var(--color-text-primary);
+      font-size: 0.875rem;
+    }
+    input[type="number"]:focus,
+    input[type="date"]:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 2px rgba(0,117,147,0.2);
+    }
+    /* Botões */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .actions button {
+      padding: 0.6rem 1rem;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #fff;
+    }
+    .btn-primary { background-color: var(--color-accent); }
+    .btn-secondary { background-color: var(--color-brand); }
+    .btn-danger { background-color: var(--color-danger); }
+    /* Resultados resumidos */
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .summary-item {
+      flex: 1 1 200px;
+      background-color: var(--color-background);
+      padding: 1rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .summary-item h4 {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+    }
+    .summary-item span {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-brand);
+    }
+    /* Detalhes em listas */
+    .details {
+      margin-top: 1rem;
+    }
+    .detail-section + .detail-section { margin-top: 1rem; }
+    .detail-section h4 {
+      font-size: 0.95rem;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 0.875rem;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-empty {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+    .form-note {
+      grid-column: 1 / -1;
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+    }
+    /* Mensagem de aviso sobre FGTS */
+    .alert {
+      font-size: 0.85rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      background-color: #fff4e5;
+      border: 1px solid #ffddaa;
+      color: #5d3c00;
+    }
+    .alert.danger {
+      background-color: #fdecea;
+      border-color: #f5c6cb;
+      color: #b30000;
+    }
+    @media (max-width: 768px) {
+      main { flex-direction: column; }
+    }
+    /* Estilos de impressão: ocultar formulários e ações para focar nos resultados */
+    @media print {
+      .guide, .actions, .section.form, .alert { display: none !important; }
+      header { background: #fff !important; color: #000 !important; box-shadow: none; }
+      body { background: #fff; color: #000; }
+      .summary-item span { color: #000; }
+      .detail-row { border-color: #ccc; }
+    }
+  </style>
+  <style id="biason-polish">
+    :root{
+      --biason-brand:#081a24;
+      --biason-accent:#007ea7;
+      --biason-bg:#f4f7fb;
+      --biason-line:rgba(15,23,42,.10);
+      --biason-shadow:0 24px 48px -30px rgba(8,26,36,.48);
+      --biason-radius:20px;
+    }
+    body{
+      background:
+        radial-gradient(circle at top right, rgba(0,126,167,.10), transparent 24%),
+        linear-gradient(180deg, #eef4f9 0%, #f6f8fb 28%, var(--biason-bg) 100%);
+      color:#0b1b2a;
+    }
+    header{
+      position:sticky;
+      top:0;
+      z-index:20;
+      padding:22px 24px;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,.16), transparent 24%),
+        linear-gradient(135deg, #081a24, #0b3d91 68%, #0a6f85);
+      box-shadow:0 18px 40px -28px rgba(8,26,36,.7);
+    }
+    header::before{
+      content:"BIASON \2022 Desligamento";
+      display:block;
+      max-width:1280px;
+      margin:0 auto;
+      color:rgba(255,255,255,.86);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    header::after{
+      content:"Visual mais claro para conferenciar verbas, descontos e impressao do resumo rescisorio sem mexer na logica de calculo.";
+      display:block;
+      max-width:1280px;
+      margin:8px auto 0;
+      color:rgba(255,255,255,.78);
+      font-size:14px;
+      line-height:1.5;
+    }
+    header .brand{
+      display:block;
+      max-width:1280px;
+      margin:12px auto 0;
+      font-size:0;
+      line-height:1;
+    }
+    header .brand::before{
+      content:"Simulador de Rescisao";
+      font-size:clamp(28px,3vw,34px);
+      font-weight:800;
+      letter-spacing:-.03em;
+      color:#fff;
+    }
+    main{
+      display:grid;
+      grid-template-columns:minmax(290px,330px) minmax(0,1fr);
+      gap:18px;
+      max-width:1280px;
+      margin:18px auto 0;
+      padding:0 24px 32px;
+    }
+    main > *{min-width:0}
+    .card{
+      border-radius:var(--biason-radius);
+      border:1px solid var(--biason-line);
+      box-shadow:var(--biason-shadow);
+      padding:22px;
+      background:rgba(255,255,255,.94);
+    }
+    .guide{
+      position:sticky;
+      top:110px;
+      background:linear-gradient(180deg, rgba(8,26,36,.02), rgba(0,126,167,.04));
+    }
+    .card h2{
+      color:var(--biason-brand);
+      font-size:clamp(22px,2.4vw,28px);
+      letter-spacing:-.02em;
+      margin-bottom:14px;
+    }
+    .guide h3,
+    .section h3,
+    .detail-section h4{
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight:800;
+      color:#0a6f85;
+      margin-bottom:8px;
+    }
+    .guide p,
+    .guide li,
+    .alert,
+    .detail-row{
+      line-height:1.6;
+      color:#526173;
+    }
+    .section{
+      padding:18px;
+      border:1px solid var(--biason-line);
+      border-radius:18px;
+      background:#fbfdff;
+    }
+    .section.form{margin-bottom:18px}
+    input[type="number"],
+    input[type="date"],
+    select{
+      min-height:46px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      color:#0b1b2a;
+    }
+    input[type="number"]:focus,
+    input[type="date"]:focus,
+    select:focus{
+      border-color:rgba(0,126,167,.45);
+      box-shadow:0 0 0 4px rgba(0,126,167,.12);
+    }
+    .actions{
+      gap:12px;
+      margin-top:18px;
+    }
+    .actions button{
+      min-height:46px;
+      padding:0 16px;
+      border-radius:14px;
+      font-size:14px;
+      font-weight:800;
+      box-shadow:0 12px 24px -18px rgba(0,126,167,.45);
+    }
+    .btn-primary{background:#007ea7}
+    .btn-secondary{background:#0b3d91}
+    .btn-danger{background:#c2410c}
+    .summary{
+      gap:12px;
+      margin-top:18px;
+    }
+    .summary-item{
+      border-radius:18px;
+      border:1px solid var(--biason-line);
+      background:linear-gradient(180deg, #fbfdff, #f3f8fb);
+      padding:16px;
+      box-shadow:0 18px 30px -26px rgba(8,26,36,.4);
+    }
+    .summary-item span{
+      font-size:28px;
+      letter-spacing:-.03em;
+      color:var(--biason-brand);
+    }
+    .reportBanner{
+      margin-top:18px;
+      padding:18px 20px;
+      border:1px solid var(--biason-line);
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(11,61,145,.06), rgba(0,126,167,.04));
+      box-shadow:0 18px 30px -26px rgba(8,26,36,.35);
+    }
+    .reportBanner__eyebrow{
+      display:inline-flex;
+      align-items:center;
+      min-height:26px;
+      padding:0 10px;
+      border-radius:999px;
+      background:rgba(8,26,36,.06);
+      color:#0a6f85;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    .reportBanner__title{
+      margin-top:10px;
+      font-size:20px;
+      font-weight:800;
+      letter-spacing:-.02em;
+      color:var(--biason-brand);
+    }
+    .reportBanner__text,
+    .reportBanner__meta{
+      margin:8px 0 0;
+      font-size:13px;
+      line-height:1.55;
+      color:#425468;
+    }
+    .reportBanner__meta{
+      font-weight:700;
+      color:#223449;
+    }
+    .details{display:grid;gap:12px}
+    .detail-section{
+      border:1px solid var(--biason-line);
+      border-radius:18px;
+      background:#fff;
+      padding:16px;
+    }
+    .detail-row{
+      padding:10px 0;
+      font-size:13px;
+    }
+    .alert{
+      border-radius:16px;
+      font-weight:700;
+    }
+    @media (max-width: 1024px){
+      main{grid-template-columns:1fr}
+      .guide{position:static;top:auto}
+    }
+    @media (max-width: 720px){
+      header{padding:18px 16px}
+      main{padding:0 16px 24px}
+      .card,.section,.detail-section{padding:18px}
+      .actions button{width:100%}
+    }
+    @media print{
+      .biasonShellHeader,
+      header,
+      .hubReturnBar,
+      .guide,
+      .actions,
+      .section.form,
+      .alert{
+        display:none !important;
+      }
+      @page{size:A4;margin:8mm}
+      body{
+        background:#fff !important;
+        color:#000 !important;
+      }
+      main{
+        display:block !important;
+        max-width:none !important;
+        margin:0 !important;
+        padding:0 !important;
+      }
+      .card.calculator{
+        box-shadow:none !important;
+        border:none !important;
+        padding:0 !important;
+        background:#fff !important;
+      }
+      .calculator h2{
+        margin-bottom:8px !important;
+        font-size:18px !important;
+      }
+      .reportBanner{
+        margin:0 0 8px !important;
+        padding:10px 12px !important;
+        border-radius:12px !important;
+        box-shadow:none !important;
+        break-inside:avoid;
+        page-break-inside:avoid;
+      }
+      .reportBanner__title{
+        margin-top:6px !important;
+        font-size:15px !important;
+      }
+      .reportBanner__text,
+      .reportBanner__meta{
+        margin-top:4px !important;
+        font-size:10.4px !important;
+        line-height:1.32 !important;
+      }
+      .summary{
+        display:grid !important;
+        grid-template-columns:repeat(4, 1fr) !important;
+        gap:8px !important;
+        margin-top:8px !important;
+      }
+      .summary-item{
+        padding:10px !important;
+        border-radius:12px !important;
+        box-shadow:none !important;
+        break-inside:avoid;
+        page-break-inside:avoid;
+      }
+      .summary-item h4{
+        font-size:10px !important;
+        line-height:1.2 !important;
+      }
+      .summary-item span{
+        font-size:18px !important;
+      }
+      .details{
+        grid-template-columns:1.15fr .85fr !important;
+        gap:8px !important;
+        margin-top:8px !important;
+      }
+      #detailVerbas{
+        grid-row:1 / span 2;
+      }
+      .detail-section{
+        padding:10px 12px !important;
+        border-radius:12px !important;
+        box-shadow:none !important;
+        break-inside:avoid;
+        page-break-inside:avoid;
+      }
+      .detail-section h4{
+        margin-bottom:6px !important;
+        font-size:10px !important;
+        letter-spacing:.08em !important;
+      }
+      .detail-row{
+        padding:5px 0 !important;
+        font-size:10.3px !important;
+        line-height:1.2 !important;
+      }
+      #pillTempo{
+        margin-top:6px !important;
+        font-size:10px !important;
+        line-height:1.3 !important;
+      }
+    }
+  </style>
+  <script>document.title='BIASON | Simulador de Rescisao';</script>
+  <style id="biason-hub-return">
+    .hubReturnBar{position:fixed;right:18px;bottom:18px;z-index:120;display:flex}
+    .hubReturnBtn{min-height:44px;padding:0 14px;border-radius:14px;border:1px solid rgba(15,23,42,.12);background:#fff;color:#081a24;font:700 13px Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;cursor:pointer;box-shadow:0 16px 30px -24px rgba(8,26,36,.55)}
+    .hubReturnBtn:hover{transform:translateY(-1px);background:#f8fbfd}
+    @page{size:A4;margin:12mm}
+    @media print{body{background:#fff!important}.hubReturnBar{display:none!important}.card,.detail-section,.summary-item,.tableWrap,.panel,.kpi,.total-box,.verdict-box,.chart-container,.preview{box-shadow:none!important;border-color:rgba(15,23,42,.18)!important}}
+  </style>
+  <script id="biason-hub-return-script">
+    (function(){
+      function biasonGoHub(){
+        try{
+          if(window.top && window.top !== window){
+            window.top.postMessage({type:'BIASON_BACK_TO_HUB'}, '*');
+            return;
+          }
+        }catch(err){}
+        try{ window.location.href = new URL('dashboard_unico_ok5_atualizado.html', window.location.href).href; }
+        catch(err){ window.location.href = 'dashboard_unico_ok5_atualizado.html'; }
+      }
+      document.addEventListener('DOMContentLoaded', function(){
+        if(document.querySelector('.hubReturnBar')) return;
+        var wrap = document.createElement('div');
+        wrap.className = 'hubReturnBar';
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'hubReturnBtn';
+        btn.textContent = 'Voltar ao Hub';
+        btn.addEventListener('click', biasonGoHub);
+        wrap.appendChild(btn);
+        document.body.appendChild(wrap);
+      });
+      window.biasonGoHub = biasonGoHub;
+    })();
+  </script>
+<style id="biason-fine-polish">
+  html{scroll-behavior:smooth}
+  ::selection{background:rgba(0,126,167,.18);color:#081a24}
+  *{scrollbar-width:thin;scrollbar-color:rgba(0,126,167,.55) rgba(15,23,42,.08)}
+  *::-webkit-scrollbar{width:10px;height:10px}
+  *::-webkit-scrollbar-track{background:rgba(15,23,42,.06);border-radius:999px}
+  *::-webkit-scrollbar-thumb{background:linear-gradient(180deg, rgba(0,126,167,.72), rgba(8,26,36,.56));border-radius:999px;border:2px solid rgba(255,255,255,.68)}
+  a,button,.btn,.button,.cta-button,input,select,textarea,summary{
+    transition:box-shadow .18s ease,border-color .18s ease,background-color .18s ease,color .18s ease,transform .18s ease,opacity .18s ease;
+  }
+  a:focus-visible,button:focus-visible,.btn:focus-visible,.button:focus-visible,.cta-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{
+    outline:none;
+    border-color:rgba(0,126,167,.55) !important;
+    box-shadow:0 0 0 4px rgba(0,126,167,.18) !important;
+  }
+  .card,.kpi,.result-card,.tableWrap,.chart-container,.dropzone,.help,.sidebar,.hero,.panel,.base-box,.modalPanel{
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background-color .18s ease;
+  }
+  .tableWrap table tbody tr,.inputs-table tbody tr,table tbody tr{transition:background-color .18s ease}
+  .tableWrap table tbody tr:hover td,.inputs-table tbody tr:hover td,table tbody tr:hover td{background:rgba(0,126,167,.04)}
+  .emptyState{
+    border-style:dashed !important;
+    background:linear-gradient(180deg, rgba(0,126,167,.05), rgba(255,255,255,.96)) !important;
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .hero,.sidebar,.card,.kpi,.result-card,.base-box,.tableWrap,.dropzone,.chart-container{
+      animation:biasonFadeUp .34s ease both;
+    }
+  }
+  @keyframes biasonFadeUp{
+    from{opacity:0;transform:translateY(8px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  @media print{
+    *::-webkit-scrollbar{display:none}
+  }
+</style>
+<style id="biason-header-standard">
+  .biasonShellHeader{
+    position:sticky;
+    top:0;
+    z-index:40;
+    padding:0 !important;
+    background:linear-gradient(90deg,#0b3d91 0%, #123f8f 62%, #0a7b8f 100%) !important;
+    color:#fff !important;
+    box-shadow:0 14px 28px -20px rgba(8,26,36,.65) !important;
+    border:none !important;
+  }
+  .biasonShellHeader__inner{
+    max-width:1360px;
+    margin:0 auto;
+    min-height:68px;
+    padding:0 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader__left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-width:0;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader__brand{
+    color:#fff;
+    font-size:17px;
+    line-height:1;
+    font-weight:900;
+    letter-spacing:.02em;
+  }
+  .biasonShellHeader__divider{
+    color:rgba(255,255,255,.5);
+    font-weight:700;
+    line-height:1;
+  }
+  .biasonShellHeader__tool{
+    color:#fff;
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.01em;
+  }
+  .biasonShellHeader__crumb{
+    display:inline-flex;
+    align-items:center;
+    min-height:30px;
+    padding:0 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.20);
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .biasonShellHeader__crumb strong{color:#fff;font-weight:800}
+  .biasonShellHeader__right,
+  .biasonShellHeader .right{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader .btn,
+  .biasonShellHeader .btn-small,
+  .biasonShellHeader button{
+    border-radius:12px;
+  }
+  .biasonShellHeader .brand,
+  .biasonShellHeader .brand__mark,
+  .biasonShellHeader .brand__name,
+  .biasonShellHeader .brand__sub,
+  .biasonShellHeader .pill,
+  .biasonShellHeader .title,
+  .biasonShellHeader .topbar__eyebrow,
+  .biasonShellHeader .topbar__title,
+  .biasonShellHeader .topbar__sub{
+    all:unset;
+  }
+  .biasonShellHeader::before,
+  .biasonShellHeader::after{
+    content:none !important;
+    display:none !important;
+  }
+  @media (max-width:760px){
+    .biasonShellHeader__inner{min-height:64px;padding:10px 12px}
+    .biasonShellHeader__left{gap:10px}
+    .biasonShellHeader__brand{font-size:16px}
+    .biasonShellHeader__tool{font-size:12px}
+    .biasonShellHeader__crumb{font-size:11px;padding:0 10px}
+  }
+</style>
+</head>
+<body>
+    <header class="biasonShellHeader">
+    <div class="biasonShellHeader__inner">
+      <div class="biasonShellHeader__left">
+        <div class="biasonShellHeader__brand">BIASON</div>
+        <div class="biasonShellHeader__divider">|</div>
+        <div class="biasonShellHeader__tool">Simulador de Rescisão</div>
+        <div class="biasonShellHeader__crumb">Página: Simulação</div>
+      </div>
+    </div>
+  </header>
+  <main>
+    <!-- Guia de utilização -->
+    <div class="card guide">
+      <h2>Guia de Utilização De Biason</h2>
+      <section>
+        <h3>O que preencher</h3>
+        <ul>
+          <li><strong>Salário mensal</strong>: remuneração bruta do colaborador.</li>
+          <li><strong>Saldo FGTS</strong>: valor disponível na conta do FGTS (caso exista).</li>
+          <li><strong>Data de admissão</strong> e <strong>data de desligamento</strong> para calcular o aviso prévio.</li>
+          <li><strong>Dias trabalhados no mês</strong>: número de dias trabalhados no mês da demissão.</li>
+          <li><strong>Meses trabalhados de 13º</strong>: número de meses completos ou parciais acumulados do 13º.</li>
+          <li><strong>Férias vencidas</strong> e <strong>férias proporcionais</strong>: dias de férias ainda não gozadas.</li>
+          <li><strong>Tipo de rescisão</strong> (sem justa causa ou pedido de demissão) e tipo de aviso prévio.</li>
+          <li><strong>Dependentes</strong> e <strong>pensão alimentícia</strong> para abatimento do IRRF.</li>
+          <li><strong>Percentual de insalubridade</strong> caso se aplique (0 %, 10 %, 20 %, 40 %).</li>
+          <li><strong>Consignado CLT</strong>: informe se existe empréstimo ativo, a margem percentual desejada (padrão sugerido de 35 %) e o valor da parcela do mês.</li>
+        </ul>
+      </section>
+      <section>
+        <h3>Lógica da ferramenta</h3>
+        <p>Esta calculadora replica exatamente as regras do simulador de rescisão original. A partir dos dados informados, ela calcula o saldo de salário proporcional, a projeção de 13º salário, o aviso prévio (trabalhado ou indenizado), férias vencidas e proporcionais com 1/3, e aplica os descontos de INSS e IRRF. Para rescisões sem justa causa, calcula também o FGTS rescisório e a multa de 40 %. Quando houver consignado CLT informado, a ferramenta estima a margem disponível a partir do líquido antes do FGTS e limita o desconto à parcela do mês ou ao percentual definido. Todas as operações seguem as fórmulas vigentes em 2026.</p>
+      </section>
+      <section>
+        <h3>Interpretação</h3>
+        <p>Após clicar em <em>Calcular</em>, a ferramenta exibirá um resumo com o total de verbas a receber, os descontos estimados e a multa do FGTS (quando aplicável). Consulte os detalhes para ver o cálculo de cada componente (saldo de salário, 13º, férias, consignado, etc.). O valor líquido estimado considera as verbas calculadas, abate os descontos legais e, se houver consignado CLT informado, também considera o desconto estimado dentro da margem parametrizada. Nas dispensas sem justa causa, a multa do FGTS é somada ao final. Em pedidos de demissão, a multa de FGTS não é incluída.</p>
+      </section>
+    </div>
+    <!-- Calculadora -->
+    <div class="card calculator">
+      <h2>Relatório rescisório</h2>
+      <!-- mensagem de aviso FGTS -->
+      <div id="msgFgts" class="alert danger" style="display:none">
+        ⚠ Esta simulação corresponde a um pedido de demissão. A multa de 40 % do FGTS não é considerada.
+      </div>
+      <!-- Formulário de entrada -->
+      <div class="section form">
+        <h3>Dados para cálculo</h3>
+        <div class="form-grid">
+          <div>
+            <label for="B6">Salário mensal (R$)</label>
+            <input type="number" id="B6" placeholder="0,00" min="0" step="0.01">
+          </div>
+          <div>
+            <label for="B14">Saldo FGTS atual (R$)</label>
+            <input type="number" id="B14" placeholder="0,00" min="0" step="0.01">
+          </div>
+          <div>
+            <label for="B7">Data de admissão</label>
+            <input type="date" id="B7">
+          </div>
+          <div>
+            <label for="B8">Data de desligamento</label>
+            <input type="date" id="B8">
+          </div>
+          <div>
+            <label for="B9">Dias trabalhados no mês</label>
+            <input type="number" id="B9" placeholder="0" min="0" step="1">
+          </div>
+          <div>
+            <label for="B10">Meses trabalhados de 13º</label>
+            <input type="number" id="B10" placeholder="0" min="0" max="12" step="1">
+          </div>
+          <div>
+            <label for="B11">Dias de férias vencidas</label>
+            <input type="number" id="B11" placeholder="0" min="0" step="1">
+          </div>
+          <div>
+            <label for="B12">Dias de férias proporcionais</label>
+            <input type="number" id="B12" placeholder="0" min="0" step="1">
+          </div>
+          <div id="wrapB13">
+            <label for="B13">Aviso prévio</label>
+            <select id="B13">
+              <option value="Trabalhado">Trabalhado</option>
+              <option value="Indenizado">Indenizado</option>
+              <option value="NãoDevido">Não devido</option>
+            </select>
+          </div>
+          <div id="wrapPD" style="display:none">
+            <label for="PD_AVISO">Aviso pedido demissão</label>
+            <select id="PD_AVISO">
+              <option value="Trabalhado">Cumprido</option>
+              <option value="NaoCumprido">Não cumprido</option>
+            </select>
+          </div>
+          <div>
+            <label for="tipoRescisao">Tipo de rescisão</label>
+            <select id="tipoRescisao">
+              <option value="SemJustaCausa">Sem justa causa</option>
+              <option value="PedidoDemissao">Pedido de demissão</option>
+            </select>
+          </div>
+          <div>
+            <label for="B15">Número de dependentes</label>
+            <input type="number" id="B15" placeholder="0" min="0" step="1">
+          </div>
+          <div>
+            <label for="D15">Pensão alimentícia (R$)</label>
+            <input type="number" id="D15" placeholder="0,00" min="0" step="0.01">
+          </div>
+          <div>
+            <label for="INSAL_PCT">Insalubridade</label>
+            <select id="INSAL_PCT">
+              <option value="0">0 %</option>
+              <option value="0.10">10 %</option>
+              <option value="0.20">20 %</option>
+              <option value="0.40">40 %</option>
+            </select>
+          </div>
+          <div>
+            <label for="CONSIGNADO_ATIVO">Possui consignado CLT?</label>
+            <select id="CONSIGNADO_ATIVO">
+              <option value="Nao">Não</option>
+              <option value="Sim">Sim</option>
+            </select>
+          </div>
+          <div>
+            <label for="CONSIGNADO_PCT">Margem consignável (%)</label>
+            <input type="number" id="CONSIGNADO_PCT" value="35" placeholder="35,00" min="0" max="100" step="0.01">
+          </div>
+          <div>
+            <label for="CONSIGNADO_PARCELA">Parcela do consignado (R$)</label>
+            <input type="number" id="CONSIGNADO_PARCELA" placeholder="0,00" min="0" step="0.01">
+          </div>
+          <div class="form-note">A margem de 35% já vem preenchida como padrão para o consignado CLT, mas o campo permanece editável para cenários específicos.</div>
+        </div>
+      </div>
+      <!-- Ações -->
+      <div class="actions">
+        <button class="btn-primary" id="btnCalc">Calcular</button>
+        <button class="btn-secondary" id="btnReset">Limpar</button>
+        <button class="btn-danger" id="btnPrint">Imprimir demonstrativo</button>
+      </div>
+      <div class="reportBanner">
+        <div class="reportBanner__eyebrow">Demonstrativo final</div>
+        <div class="reportBanner__title">Demonstrativo das verbas rescisórias</div>
+        <p class="reportBanner__text" id="reportSummaryText">Preencha os dados da rescisão para gerar um demonstrativo claro das verbas, descontos estimados e valor líquido final.</p>
+        <p class="reportBanner__meta" id="reportMeta">Tipo de desligamento, aviso prévio, período e projeções serão exibidos aqui após o cálculo.</p>
+      </div>
+      <!-- Resumo -->
+      <div class="summary">
+        <div class="summary-item">
+          <h4>Verbas calculadas</h4>
+          <span id="resumo_verbas">R$ 0,00</span>
+        </div>
+        <div class="summary-item">
+          <h4>Descontos estimados</h4>
+          <span id="resumo_descontos">R$ 0,00</span>
+        </div>
+        <div class="summary-item">
+          <h4>Multa do FGTS</h4>
+          <span id="resumo_multa_fgts">R$ 0,00</span>
+        </div>
+        <div class="summary-item">
+          <h4>Valor líquido estimado</h4>
+          <span id="resumo_total">R$ 0,00</span>
+        </div>
+      </div>
+      <!-- Detalhes -->
+      <div class="details">
+        <div class="detail-section" id="detailVerbas">
+          <h4>Composição das verbas</h4>
+          <div id="det_verbas"></div>
+        </div>
+        <div class="detail-section" id="detailDescontos">
+          <h4>Descontos legais</h4>
+          <div id="det_descontos"></div>
+        </div>
+        <div class="detail-section" id="detailConsignado">
+          <h4>Consignado CLT</h4>
+          <div id="det_consignado" class="detail-empty">Informe se há consignado CLT e clique em Calcular para estimar a margem disponível, o desconto possível e eventual saldo acima do limite informado.</div>
+        </div>
+        <div class="detail-section" id="detailFgts">
+          <h4>FGTS e valor final</h4>
+          <div id="det_fgts"></div>
+        </div>
+        <div style="margin-top:0.5rem; font-size:0.8rem; color:var(--color-text-secondary);" id="pillTempo">Preencha os dados acima e clique em Calcular para completar o cenário do relatório.</div>
+      </div>
+    </div>
+  </main>
+  <script>
+    /*
+      === Funções utilitárias ===
+      As funções abaixo foram importadas da ferramenta original para manter
+      fidelidade nos cálculos. Não altere a lógica interna, apenas adicione
+      comentários quando necessário.
+    */
+    // Formatador de moeda BRL
+    const brl = new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' });
+    // Arredonda para duas casas decimais
+    const round2 = (x) => Math.round((x + Number.EPSILON) * 100) / 100;
+    // Converte string para número, retornando 0 caso inválido
+    const n = (v) => {
+      const x = Number(v);
+      return Number.isFinite(x) ? x : 0;
+    };
+    // Converte data ISO (yyyy-mm-dd) para objeto Date ou null
+    function parseDateISO(s){
+      if(!s) return null;
+      const d = new Date(s + "T00:00:00");
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+    function formatDateBR(iso){
+      const d = parseDateISO(iso);
+      return d ? d.toLocaleDateString('pt-BR') : 'não informado';
+    }
+    // Calcula diferença inteira em anos entre duas datas
+    function datedifYears(start, end){
+      if(!start || !end) return 0;
+      let y = end.getFullYear() - start.getFullYear();
+      const m = end.getMonth() - start.getMonth();
+      if (m < 0 || (m === 0 && end.getDate() < start.getDate())) y--;
+      return Math.max(0, y);
+    }
+    // Soma dias a uma data
+    function addDays(dateObj, days){
+      const d = new Date(dateObj.getTime());
+      d.setDate(d.getDate() + days);
+      return d;
+    }
+    // Retorna o último dia de um mês
+    function endOfMonth(d){ return new Date(d.getFullYear(), d.getMonth() + 1, 0); }
+    // Retorna o primeiro dia de um mês
+    function startOfMonth(d){ return new Date(d.getFullYear(), d.getMonth(), 1); }
+    // Conta quantos meses (avos) com >=15 dias existem entre data inicial e data final (periodo inclusivo)
+    function avosPorCalendario(startDate, totalDias){
+      if(!startDate || !Number.isFinite(totalDias) || totalDias <= 0) return 0;
+      const endDate = addDays(startDate, totalDias - 1);
+      let cur = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+      const last = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+      let avos = 0;
+      while (cur <= last){
+        const monthStart = startOfMonth(cur);
+        const monthEnd = endOfMonth(cur);
+        const segStart = (startDate > monthStart) ? startDate : monthStart;
+        const segEnd = (endDate < monthEnd) ? endDate : monthEnd;
+        if (segEnd >= segStart){
+          const dias = Math.floor((segEnd - segStart) / (24*3600*1000)) + 1;
+          if (dias >= 15) avos += 1;
+        }
+        cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+      }
+      return avos;
+    }
+    // Fórmula INSS patronal (2026) replicada da planilha original
+    function inssE21(base){
+      const b = Math.max(0, base);
+      const p1 = Math.max(Math.min(b, 1621.00) - 0, 0) * 0.075;
+      const p2 = Math.max(Math.min(b, 2902.84) - 1621.00, 0) * 0.09;
+      const p3 = Math.max(Math.min(b, 4354.27) - 2902.84, 0) * 0.12;
+      const p4 = Math.max(Math.min(b, 8475.55) - 4354.27, 0) * 0.14;
+      return round2(p1 + p2 + p3 + p4);
+    }
+    // IRRF (mantém padrão original). Depende da remuneração e base após INSS e deduções.
+    function irrfE23(E14, E22){
+      let val = 0;
+      if (E14 <= 5000) {
+        val = 0;
+      } else if (E14 <= 7350) {
+        const b = Math.max(0, E22);
+        if (b <= 2428.80) val = 0;
+        else if (b <= 2826.65) val = b * 0.075 - 182.16;
+        else if (b <= 3751.05) val = b * 0.15  - 394.16;
+        else if (b <= 4664.68) val = b * 0.225 - 675.49;
+        else val = b * 0.275 - 908.73;
+        val = Math.max(0, val);
+      } else {
+        val = 0;
+      }
+      return round2(val);
+    }
+    // Variável global para preservar a data de desligamento original (B8) durante a edição visual
+    let B8_original = "";
+    // Aplica comportamento de exibição da data de aviso prévio sem alterar o valor real
+    function aplicarB8Visual(){
+      const b8 = document.getElementById("B8");
+      if (!B8_original) B8_original = b8.value;
+      // mantém exatamente como digitado
+      if (B8_original) b8.value = B8_original;
+    }
+    // Alterna a visibilidade de campos de acordo com o tipo de rescisão
+    function toggleModo(tipo){
+      const wrapB13 = document.getElementById('wrapB13');
+      const wrapPD  = document.getElementById('wrapPD');
+      const msgFgts = document.getElementById('msgFgts');
+      if (tipo === 'PedidoDemissao'){
+        if (wrapB13) wrapB13.style.display = 'none';
+        if (wrapPD)  wrapPD.style.display  = '';
+        if (msgFgts) msgFgts.style.display = '';
+      } else {
+        if (wrapB13) wrapB13.style.display = '';
+        if (wrapPD)  wrapPD.style.display  = 'none';
+        if (msgFgts) msgFgts.style.display = 'none';
+      }
+    }
+    // Constrói HTML de uma linha de detalhamento
+    function rowHTML(label, value){
+      return `<div class="detail-row"><div>${label}</div><div>${brl.format(value)}</div></div>`;
+    }
+    function textRowHTML(label, value){
+      return `<div class="detail-row"><div>${label}</div><div>${value}</div></div>`;
+    }
+    function consignadoPlaceholderHTML(){
+      return 'Informe se há consignado CLT e clique em Calcular para estimar a margem disponível, o desconto possível e eventual saldo acima do limite informado.';
+    }
+    function normalizarPercentualConsignado(valor){
+      const bruto = Math.max(0, n(valor));
+      return bruto > 1 ? bruto / 100 : bruto;
+    }
+    // Função principal de cálculo: replica exatamente a lógica do simulador original
+    function calcular(){
+      const B6  = n(document.getElementById('B6').value);
+      const B14 = n(document.getElementById('B14').value);
+      const B9  = document.getElementById('B9').value === "" ? null : n(document.getElementById('B9').value);
+      const B10 = document.getElementById('B10').value === "" ? null : n(document.getElementById('B10').value);
+      const B11 = document.getElementById('B11').value === "" ? null : n(document.getElementById('B11').value);
+      const B12 = document.getElementById('B12').value === "" ? null : n(document.getElementById('B12').value);
+
+      const tipo = (document.getElementById('tipoRescisao')?.value || 'SemJustaCausa');
+      const PD_AVISO = (document.getElementById('PD_AVISO')?.value || 'Trabalhado');
+      // aplica mudança visual de campos de aviso prévio e FGTS
+      toggleModo(tipo);
+      const B13 = document.getElementById('B13').value;
+      const B15 = document.getElementById('B15').value === "" ? null : n(document.getElementById('B15').value);
+      const D15 = document.getElementById('D15').value === "" ? null : n(document.getElementById('D15').value);
+      const consignadoAtivo = (document.getElementById('CONSIGNADO_ATIVO')?.value || 'Nao') === 'Sim';
+      const consignadoPctInformado = document.getElementById('CONSIGNADO_PCT')?.value === "" ? 35 : n(document.getElementById('CONSIGNADO_PCT').value);
+      const consignadoPct = normalizarPercentualConsignado(consignadoPctInformado);
+      const consignadoParcela = document.getElementById('CONSIGNADO_PARCELA')?.value === "" ? 0 : n(document.getElementById('CONSIGNADO_PARCELA').value);
+      const B7_iso = document.getElementById('B7').value;
+      const B8_campo = document.getElementById('B8').value;
+      const B8_base = B8_original || B8_campo; // base real para cálculo
+      const dtB7 = parseDateISO(B7_iso);
+      const dtB8 = parseDateISO(B8_base);
+
+      const B17 = (document.getElementById('B6').value === "" ? 0 : (B6 / 30));
+      // Parâmetros domínio
+      const MIN_WAGE = 1621.00;
+      const INSAL_PCT = (() => {
+        const sel = document.getElementById('INSAL_PCT');
+        return sel ? Number(sel.value) : 0;
+      })();
+      const insalMensal = round2(MIN_WAGE * INSAL_PCT);
+      const insalDia = round2((insalMensal / 30) * (B9 === null ? 0 : B9));
+      const dtAvisoBase = (!dtB8) ? null : addDays(dtB8, 30);
+      const B18 = (!dtB7 || !dtAvisoBase) ? 0 : datedifYears(dtB7, dtAvisoBase);
+      const B19 = Math.min(90, 30 + 3 * B18);
+      let diasAvisoPago = (B13 === "Indenizado") ? B19 : (B13 === "Trabalhado" ? Math.max(0, B19 - 30) : 0);
+      let projMeses = dtB8 ? avosPorCalendario(dtB8, diasAvisoPago) : 0;
+      // Ajustes para pedido de demissão: não paga aviso, não projeta avos do aviso
+      if (tipo === 'PedidoDemissao'){
+        diasAvisoPago = 0;
+        projMeses = 0;
+      }
+      const E6  = (B9  === null ? 0 : round2(B17 * B9));
+      // 13º proporcional + projeção do aviso
+      const proj13 = (B13 === "Trabalhado" || B13 === "Indenizado") ? (B6 * projMeses / 12) : 0;
+      const E7  = round2((B10 === null ? 0 : (B6 * B10 / 12)) + proj13);
+      // Aviso prévio: paga ou desconta conforme pedido de demissão
+      let E8 = 0;
+      if (tipo === 'PedidoDemissao'){
+        E8 = round2((PD_AVISO === 'NaoCumprido') ? (-B17 * 30) : 0);
+      } else {
+        E8 = round2((B13 === "Trabalhado" || B13 === "Indenizado") ? (B17 * diasAvisoPago) : 0);
+      }
+      const E9  = (B11 === null ? 0 : round2(B17 * B11));
+      const E10 = round2(E9 === 0 ? 0 : (E9 / 3));
+      // Férias proporcionais + projeção do aviso
+      const projFerias = (B13 === "Trabalhado" || B13 === "Indenizado") ? (B6 * projMeses / 12) : 0;
+      const E11 = round2((B12 === null ? 0 : (B17 * B12)) + projFerias);
+      const E12 = round2(E11 === 0 ? 0 : (E11 / 3));
+      const E14 = round2(E6 + E7 + E8 + E9 + E10 + E11 + E12);
+      const H6  = round2(E6 + E7 + E8);
+      const H7  = round2(0.08 * H6);
+      const H8  = round2(B14);
+      const H9  = round2((tipo === 'PedidoDemissao') ? 0 : (0.4 * (H8 + H7)));
+      // Bases para INSS e IRRF
+      const baseINSS_mensal = round2(E6 + insalDia);
+      const baseINSS_13 = round2(E7 + (insalMensal * (((B10 === null ? 0 : B10) + projMeses) / 12)));
+      const E21 = round2(inssE21(baseINSS_mensal) + inssE21(baseINSS_13));
+      const dep = (B15 === null ? 0 : B15);
+      const pensao = (D15 === null ? 0 : D15);
+      const baseIR = round2(Math.max(0, (baseINSS_mensal + baseINSS_13) - E21));
+      const E22 = round2(Math.max(0, baseIR - (dep * 189.59) - pensao - 607.2));
+      const E23 = irrfE23(E14, E22);
+      const descontosLegais = round2(E21 + E23);
+      const baseConsignado = round2(Math.max(0, E14 - descontosLegais));
+      const margemConsignado = round2(consignadoAtivo ? (baseConsignado * consignadoPct) : 0);
+      const descontoConsignado = round2(consignadoAtivo ? Math.min(consignadoParcela, margemConsignado) : 0);
+      const saldoConsignado = round2(consignadoAtivo ? Math.max(0, consignadoParcela - descontoConsignado) : 0);
+      const descontos = round2(descontosLegais + descontoConsignado);
+      const H12 = round2((tipo === 'PedidoDemissao') ? (E14 - descontos) : (E14 - descontos + H9));
+      // Atualiza resumo
+      document.getElementById('resumo_verbas').textContent = brl.format(E14);
+      document.getElementById('resumo_descontos').textContent = brl.format(descontos);
+      document.getElementById('resumo_multa_fgts').textContent = brl.format(H9);
+      document.getElementById('resumo_total').textContent = brl.format(H12);
+      // Atualiza pill de tempo
+      const pill = document.getElementById('pillTempo');
+      if (pill){
+        pill.textContent = (B18 ? `Tempo estimado de empresa: ${B18} ano(s). Aviso considerado: ${diasAvisoPago} dia(s). Projeção em 13º e férias: ${projMeses} avo(s).` : `Informe as datas de admissão e desligamento para completar o cenário do relatório.`);
+      }
+      const reportSummaryText = document.getElementById('reportSummaryText');
+      const reportMeta = document.getElementById('reportMeta');
+      const tipoLabel = (tipo === 'PedidoDemissao') ? 'Pedido de demissão' : 'Dispensa sem justa causa';
+      const avisoLabel = (tipo === 'PedidoDemissao')
+        ? (PD_AVISO === 'NaoCumprido' ? 'Aviso não cumprido pelo empregado' : 'Aviso cumprido pelo empregado')
+        : (B13 === 'Indenizado' ? 'Aviso indenizado' : (B13 === 'Trabalhado' ? 'Aviso trabalhado' : 'Aviso não devido'));
+      if (reportSummaryText){
+        const consignadoTexto = consignadoAtivo
+          ? ` O consignado CLT informado foi limitado a ${brl.format(descontoConsignado)} com margem configurada em ${(consignadoPct * 100).toFixed(2).replace('.', ',')}%.`
+          : '';
+        reportSummaryText.textContent = `Demonstrativo das verbas rescisórias, descontos estimados e valor líquido final calculado para o período de ${formatDateBR(B7_iso)} a ${formatDateBR(B8_base)}.${consignadoTexto}`;
+      }
+      if (reportMeta){
+        const metaParts = [
+          tipoLabel,
+          avisoLabel,
+          B18 ? `${B18} ano(s) completos de empresa` : 'Tempo de empresa não identificado',
+          diasAvisoPago ? `${diasAvisoPago} dia(s) considerados no aviso` : 'Sem dias adicionais de aviso',
+          projMeses ? `Projeção de ${projMeses} avo(s) em 13º e férias` : 'Sem projeção adicional'
+        ];
+        if (consignadoAtivo){
+          metaParts.push(`Consignado: ${brl.format(descontoConsignado)} estimado para desconto`);
+        }
+        reportMeta.textContent = metaParts.join(' • ');
+      }
+      // Preenche detalhamento
+      document.getElementById('det_verbas').innerHTML =
+        rowHTML("Saldo de salário", E6) +
+        rowHTML(`13º proporcional (inclui projeção do aviso • ${projMeses} avo(s))`, E7) +
+        rowHTML((tipo === "PedidoDemissao" ? "Aviso prévio do empregado (desconto, se aplicável)" : "Aviso prévio (Lei 12.506/2011)"), E8) +
+        rowHTML("Férias vencidas", E9) +
+        rowHTML("1/3 férias vencidas", E10) +
+        rowHTML(`Férias proporcionais (inclui projeção do aviso • ${projMeses} avo(s))`, E11) +
+        rowHTML("1/3 férias proporcionais", E12) +
+        rowHTML("<b>Total bruto das verbas</b>", E14);
+      document.getElementById('det_descontos').innerHTML =
+        rowHTML("INSS descontado", E21) +
+        rowHTML("IRRF descontado", E23) +
+        rowHTML("<b>Total de descontos legais</b>", descontosLegais);
+      document.getElementById('det_consignado').innerHTML = consignadoAtivo
+        ? (
+          rowHTML("Base líquida usada na margem", baseConsignado) +
+          textRowHTML("Margem configurada", `${(consignadoPct * 100).toFixed(2).replace('.', ',')}%`) +
+          rowHTML("Limite estimado para desconto", margemConsignado) +
+          rowHTML("Parcela informada do mês", consignadoParcela) +
+          rowHTML("Valor que pode ser descontado", descontoConsignado) +
+          rowHTML("Parcela acima da margem", saldoConsignado)
+        )
+        : consignadoPlaceholderHTML();
+      document.getElementById('det_fgts').innerHTML =
+        rowHTML("Base considerada para FGTS", H6) +
+        rowHTML("Depósito rescisório de FGTS (8%)", H7) +
+        rowHTML("Saldo de FGTS informado", H8) +
+        rowHTML("Multa rescisória do FGTS (40%)", H9) +
+        rowHTML("<b>Valor líquido estimado</b>", H12);
+    }
+    // Função para limpar campos e resultados
+    function limpar(){
+      ["B6","B14","B9","B10","B11","B12","B15","D15","CONSIGNADO_PARCELA"].forEach(id => document.getElementById(id).value = "");
+      document.getElementById('B7').value = "";
+      document.getElementById('B8').value = "";
+      document.getElementById('B13').value = "Trabalhado";
+      document.getElementById('tipoRescisao').value = "SemJustaCausa";
+      document.getElementById('PD_AVISO').value = "Trabalhado";
+      document.getElementById('INSAL_PCT').value = "0";
+      document.getElementById('CONSIGNADO_ATIVO').value = "Nao";
+      document.getElementById('CONSIGNADO_PCT').value = "35";
+      B8_original = "";
+      document.getElementById('resumo_verbas').textContent = 'R$ 0,00';
+      document.getElementById('resumo_descontos').textContent = 'R$ 0,00';
+      document.getElementById('resumo_multa_fgts').textContent = 'R$ 0,00';
+      document.getElementById('resumo_total').textContent = 'R$ 0,00';
+      document.getElementById('det_verbas').innerHTML = '';
+      document.getElementById('det_descontos').innerHTML = '';
+      document.getElementById('det_consignado').innerHTML = consignadoPlaceholderHTML();
+      document.getElementById('det_fgts').innerHTML = '';
+      document.getElementById('pillTempo').textContent = 'Preencha os dados acima e clique em Calcular para completar o cenário do relatório.';
+      document.getElementById('reportSummaryText').textContent = 'Preencha os dados da rescisão para gerar um demonstrativo claro das verbas, descontos estimados e valor líquido final.';
+      document.getElementById('reportMeta').textContent = 'Tipo de desligamento, aviso prévio, período e projeções serão exibidos aqui após o cálculo.';
+      toggleModo('SemJustaCausa');
+    }
+    // Eventos
+    document.getElementById('btnCalc').addEventListener('click', () => { calcular(); });
+    document.getElementById('btnReset').addEventListener('click', () => { limpar(); });
+    document.getElementById('btnPrint').addEventListener('click', () => { calcular(); window.print(); });
+    document.getElementById('tipoRescisao').addEventListener('change', (event) => {
+      aplicarB8Visual();
+      toggleModo(event.target.value);
+    });
+    document.getElementById('B8').addEventListener('input', () => {
+      B8_original = document.getElementById('B8').value;
+      aplicarB8Visual();
+    });
+    window.addEventListener('load', () => {
+      aplicarB8Visual();
+      toggleModo(document.getElementById('tipoRescisao').value);
+      document.getElementById('det_consignado').innerHTML = consignadoPlaceholderHTML();
+    });
+  </script>
+</body>
+</html>
+
+
+
+

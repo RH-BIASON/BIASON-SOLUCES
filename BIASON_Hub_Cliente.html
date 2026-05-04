@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BIASON | HUB Trabalhista</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --brand:#0b3d91;
+      --brand-2:#0a7b8f;
+      --ink:#0b1b2a;
+      --muted:#5b6b7a;
+      --line:#e6ecf3;
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --shadow:0 18px 38px -28px rgba(8,26,36,.42);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(10,123,143,.10), transparent 24%),
+        linear-gradient(180deg, #eef4f9 0%, #f7f9fc 28%, var(--bg) 100%);
+    }
+    ::selection{background:rgba(10,123,143,.18);color:#081a24}
+    a,button,input{transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease}
+    button:focus-visible,a:focus-visible,input:focus-visible{
+      outline:none;
+      box-shadow:0 0 0 4px rgba(10,123,143,.16);
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:40;
+      background:linear-gradient(90deg,#0b3d91 0%, #12408f 60%, #0a7b8f 100%);
+      color:#fff;
+      box-shadow:0 14px 28px -20px rgba(8,26,36,.65);
+    }
+    .topbar__inner{
+      max-width:1360px;
+      min-height:68px;
+      margin:0 auto;
+      padding:0 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .topbar__left{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+      min-width:0;
+    }
+    .brand{font-size:17px;font-weight:900;letter-spacing:.02em}
+    .divider{color:rgba(255,255,255,.5);font-weight:700}
+    .tool{font-size:13px;font-weight:800}
+    .crumb{
+      display:inline-flex;
+      align-items:center;
+      min-height:30px;
+      padding:0 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.20);
+      background:rgba(255,255,255,.12);
+      color:#fff;
+      font-size:12px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+    .topbar__right{
+      margin-left:auto;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .topbarBtn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:38px;
+      padding:0 14px;
+      border:none;
+      border-radius:12px;
+      background:rgba(255,255,255,.14);
+      color:#fff;
+      text-decoration:none;
+      font-size:13px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .topbarBtn:hover{background:rgba(255,255,255,.22);transform:translateY(-1px)}
+
+    main{max-width:1360px;margin:0 auto;padding:22px 18px 40px}
+    .hero{
+      border:1px solid rgba(15,23,42,.08);
+      border-radius:24px;
+      background:
+        radial-gradient(circle at top right, rgba(10,123,143,.10), transparent 26%),
+        linear-gradient(145deg, #ffffff, #f4f9fc 58%, #edf6fb);
+      box-shadow:var(--shadow);
+      padding:22px 24px;
+      margin-bottom:18px;
+    }
+    .hero__eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 12px;
+      border-radius:999px;
+      background:rgba(8,26,36,.06);
+      color:#081a24;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    .hero h1{
+      margin:12px 0 8px;
+      font-size:clamp(42px,4.6vw,52px);
+      line-height:1.02;
+      letter-spacing:-.03em;
+      color:#081a24;
+    }
+    .hero p{
+      margin:0;
+      max-width:70ch;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.55;
+    }
+    .hero__meta{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .hero__pill{
+      display:inline-flex;
+      align-items:center;
+      min-height:34px;
+      padding:0 12px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid rgba(15,23,42,.10);
+      color:#365066;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .sectionHead{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:16px;
+      margin:0 0 14px;
+      flex-wrap:wrap;
+    }
+    .sectionHead__left h2{
+      margin:0;
+      font-size:24px;
+      letter-spacing:-.02em;
+    }
+    .sectionHead__left p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .toolSearch{
+      width:min(360px,100%);
+      min-height:46px;
+      padding:0 14px;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      color:var(--ink);
+      font:inherit;
+      box-shadow:0 10px 24px -20px rgba(8,26,36,.3);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:16px;
+      align-items:stretch;
+    }
+    .card{
+      display:flex;
+      flex-direction:column;
+      min-height:232px;
+      padding:20px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:20px;
+      box-shadow:var(--shadow);
+    }
+    .card:hover{transform:translateY(-4px)}
+    .cardTag{
+      display:inline-flex;
+      align-items:center;
+      width:max-content;
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      background:rgba(8,26,36,.06);
+      color:rgba(8,26,36,.75);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:12px;
+    }
+    .cardActions{display:grid;gap:8px;margin-top:auto}
+    .card h3{
+      margin:0 0 8px;
+      font-size:20px;
+      line-height:1.05;
+      letter-spacing:-.02em;
+      min-height:42px;
+    }
+    .card p{
+      margin:0 0 16px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+      flex:1;
+    }
+    .button{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:44px;
+      width:100%;
+      border:none;
+      border-radius:14px;
+      background:linear-gradient(180deg,#0284c7 0%, #0369a1 100%);
+      color:#fff;
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+      text-decoration:none;
+      box-shadow:0 12px 24px -18px rgba(0,126,167,.45);
+    }
+    .button:hover{transform:translateY(-1px)}
+    .button--ghost{
+      background:#fff;
+      color:#0b1b2a;
+      border:1px solid rgba(15,23,42,.12);
+      box-shadow:none;
+    }
+    .card--featured{
+      border-color:rgba(10,123,143,.28);
+      box-shadow:0 18px 32px -24px rgba(10,123,143,.42), var(--shadow);
+      background:
+        linear-gradient(180deg, rgba(10,123,143,.04), rgba(255,255,255,.98) 22%),
+        #fff;
+    }
+    .hidden{display:none !important}
+
+    .viewer{
+      position:fixed;
+      inset:0;
+      display:none;
+      background:rgba(2,6,23,.55);
+      backdrop-filter:blur(6px);
+      z-index:9999;
+      padding:16px;
+    }
+    .viewer[aria-hidden="false"]{display:flex}
+    .viewer__panel{
+      width:min(1440px,100%);
+      height:calc(100vh - 32px);
+      margin:auto;
+      background:#fff;
+      border-radius:20px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      box-shadow:0 28px 70px rgba(2,6,23,.28);
+      border:1px solid rgba(15,23,42,.12);
+    }
+    .viewer__bar{
+      min-height:62px;
+      padding:12px 14px;
+      border-bottom:1px solid rgba(15,23,42,.08);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      background:#fbfdff;
+    }
+    .viewer__title{
+      min-width:0;
+    }
+    .viewer__title strong{
+      display:block;
+      font-size:15px;
+      color:#0f172a;
+    }
+    .viewer__title span{
+      display:block;
+      color:#64748b;
+      font-size:12px;
+      margin-top:3px;
+      word-break:break-all;
+    }
+    .viewer__actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .viewer__btn{
+      min-height:38px;
+      padding:0 14px;
+      border-radius:12px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      color:#0f172a;
+      font:inherit;
+      font-size:13px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .viewer__btn--primary{
+      background:linear-gradient(180deg,#0284c7 0%, #0369a1 100%);
+      color:#fff;
+      border:none;
+    }
+    .viewer__frame{
+      width:100%;
+      flex:1;
+      border:0;
+      background:#fff;
+    }
+
+    footer{
+      padding:24px 0 8px;
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    @page{
+      size:A4 landscape;
+      margin:9mm;
+    }
+    @media print{
+      body{
+        background:#fff !important;
+        color:#081a24;
+      }
+      .topbar,
+      .viewer,
+      .toolSearch{
+        display:none !important;
+      }
+      main{
+        max-width:none;
+        margin:0;
+        padding:0;
+      }
+      .hero{
+        margin:0 0 8px;
+        padding:10px 12px;
+        border-radius:12px;
+        box-shadow:none;
+        background:#fff;
+        border:1px solid rgba(15,23,42,.14);
+      }
+      .hero__eyebrow{
+        min-height:20px;
+        padding:0 8px;
+        font-size:9px;
+      }
+      .hero h1{
+        margin:6px 0 4px;
+        font-size:21px;
+        line-height:1;
+      }
+      .hero p{
+        font-size:11px;
+        line-height:1.25;
+        max-width:none;
+      }
+      .hero__meta{
+        margin-top:6px;
+        gap:6px;
+      }
+      .hero__pill{
+        min-height:24px;
+        padding:0 8px;
+        font-size:10px;
+      }
+      .sectionHead{
+        margin:0 0 8px;
+        align-items:flex-start;
+      }
+      .sectionHead__left h2{
+        font-size:18px;
+      }
+      .sectionHead__left p{
+        margin-top:2px;
+        font-size:11px;
+        line-height:1.2;
+      }
+      .grid{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:8px;
+      }
+      .card{
+        min-height:0;
+        padding:10px 11px;
+        border-radius:12px;
+        box-shadow:none;
+        break-inside:avoid;
+        page-break-inside:avoid;
+      }
+      .cardTag{
+        min-height:20px;
+        padding:0 7px;
+        margin-bottom:6px;
+        font-size:9px;
+      }
+      .card h3{
+        min-height:0;
+        margin:0 0 4px;
+        font-size:15px;
+        line-height:1.02;
+      }
+      .card p{
+        margin:0 0 8px;
+        font-size:10.5px;
+        line-height:1.22;
+      }
+      .cardActions{
+        gap:5px;
+      }
+      .button,
+      .button--ghost{
+        min-height:28px;
+        font-size:10px;
+        border-radius:9px;
+        box-shadow:none;
+      }
+      footer{
+        padding:10px 0 0;
+        font-size:10px;
+      }
+    }
+
+    @media (max-width:1100px){
+      .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    }
+    @media (max-width:760px){
+      .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .hero h1{font-size:34px}
+    }
+    @media (max-width:620px){
+      main{padding:18px 14px 34px}
+      .grid{grid-template-columns:1fr}
+      .viewer{padding:10px}
+      .viewer__panel{height:calc(100vh - 20px)}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="topbar__left">
+        <div class="brand">BIASON</div>
+        <div class="divider">|</div>
+        <div class="tool">HUB Trabalhista</div>
+        <div class="crumb">Página: Início</div>
+      </div>
+      <div class="topbar__right">
+        <a class="topbarBtn" href="rubricas_debiason_atualizado.html" target="_blank" rel="noopener">Rubricas</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <span class="hero__eyebrow">BIASON</span>
+      <h1>Hub Trabalhista</h1>
+      <p>Um hub único para cálculos, conferências, relatórios e validações do departamento pessoal, com acesso rápido aos módulos operacionais da rotina.</p>
+      <div class="hero__meta">
+        <span class="hero__pill">10 módulos operacionais</span>
+        <span class="hero__pill">1 complemento FGTS</span>
+        <span class="hero__pill">Uso local e seguro</span>
+      </div>
+    </section>
+
+    <section id="sec-ferramentas">
+
+      <div class="sectionHead">
+        <div class="sectionHead__left">
+          <h2>Ferramentas</h2>
+          <p>Selecione um módulo para calcular, consultar, organizar arquivos e apoiar a rotina trabalhista.</p>
+        </div>
+        <input id="toolSearch" class="toolSearch" type="search" placeholder="Buscar ferramenta" autocomplete="off" />
+      </div>
+
+      <div class="grid" id="toolGrid">
+
+        <article class="card" data-search="jornada horas folha calculo">
+          <span class="cardTag">Horas e folha</span>
+          <h3>Jornada</h3>
+          <p>Calcule jornada, horas extras e adicional noturno com leitura clara para conferência e impressão.</p>
+          <div class="cardActions">
+            <button class="button" data-open-file="jornada_debiason.html" data-label="Jornada">Abrir módulo</button>
+          </div>
+        </article>
+
+
+        <article class="card card--featured" data-search="rescisao desligamento verbas">
+          <span class="cardTag">Desligamento</span>
+          <h3>Rescisão</h3>
+          <p>Simule verbas rescisórias com detalhamento organizado para conferência, análise e emissão de resumo.</p>
+          <div class="cardActions">
+            <button class="button" data-open-file="rescisao_debiason.html" data-label="Rescisão">Abrir simulação</button>
+          </div>
+        </article>
+
+
+        <article class="card" data-search="adicional noturno horas dsr rsr">
+          <span class="cardTag">Horas e folha</span>
+          <h3>Adicional Noturno</h3>
+          <p>Apure adicional noturno, hora reduzida e reflexos em DSR/RSR de forma rápida e objetiva.</p>
+          <div class="cardActions">
+            <button class="button" data-open-file="adicional_noturno_debiason.html" data-label="Adicional Noturno">Abrir módulo</button>
+          </div>
+        </article>
+
+
+        <article class="card" data-search="custo clt encargos beneficios provisoes">
+          <span class="cardTag">Custos</span>
+          <h3>Custo CLT</h3>
+          <p>Visualize o custo completo da contratação CLT, incluindo encargos, benefícios e provisões.</p>
+          <div class="cardActions">
+            <button class="button" data-open-file="custo_debiason.html" data-label="Custo CLT">Ver análise</button>
+          </div>
+        </article>
+
+
+        <article class="card card--featured" data-search="rubricas consulta cruzamento tabela incidencias">
+          <span class="cardTag">Consulta oficial</span>
+          <h3>Rubricas Atualizadas</h3>
+          <p>Consulte incidências, cruze bases e valide rubricas com mais segurança em uma base atualizada.</p>
+          <div class="cardActions">
+            <button class="button" data-open-file="rubricas_debiason_atualizado.html" data-label="Rubricas Atualizadas">Abrir consulta</button>
+          </div>
+        </article>
+
+
+        <article class="card" data-search="pat beneficio economia">
+          <span class="cardTag">Benefícios</span>
+          <h3>Economia PAT</h3>
+          <p>Compare custo e benefício do PAT para apoiar decisões com leitura rápida do impacto financeiro.</p>
+          <div class="cardActions">
+            <button class="button" data-open-file="pat_debiason.html" data-label="Economia PAT">Abrir análise</button>
+          </div>
+        </article>
+
+
+        <article class="card" data-search="fgts digital separador extrato txt complemento caixa manual preenchimento">
+          <span class="cardTag">FGTS</span>
+          <h3>FGTS Digital</h3>
+          <p>Converta extratos para FGTS Digital, use o separador quando precisar organizar o arquivo por trabalhador ou preencha o TXT manualmente quando já tiver os valores definidos.</p>
+          <div class="cardActions">
+            <button class="button" data-open-file="fgts_debiason_v2.html" data-label="FGTS Digital">Abrir FGTS Digital</button>
+            <button class="button button--ghost" data-open-file="biason_separador_fgts.html" data-label="Separador FGTS">Abrir separador</button>
+            <button class="button button--ghost" data-open-file="FGTS MANUAL.html" data-label="FGTS Manual">Abrir manual</button>
+          </div>
+        </article>
+
+
+        <article class="card card--featured" data-search="dirf irpf xml s-5002 comprovante relatorio lote funcionarios planilha zip">
+          <span class="cardTag">Comprovantes</span>
+          <h3>DIRF / IRPF</h3>
+          <p>Gere o relatório individual a partir do XML S-5002 ou use o módulo em lote para processar vários funcionários de uma vez.</p>
+          <div class="cardActions">
+            <button class="button" data-open-file="dirf_debiason_indv.html" data-label="DIRF / IRPF">Abrir relatório</button>
+            <button class="button button--ghost" data-open-file="dirf/dirf_debiason_v2.html" data-label="DIRF / IRPF em lote">Abrir em lote</button>
+          </div>
+        </article>
+
+
+        <article class="card" data-search="irrf comparativo lote calculo">
+          <span class="cardTag">Comparativo</span>
+          <h3>Simulador IRRF</h3>
+          <p>Compare cenários de IRRF em cálculo individual ou em lote para apoiar análises e conferências.</p>
+          <div class="cardActions">
+            <button class="button" data-open-file="irrf_debiason_novo.html" data-label="Simulador IRRF">Abrir simulador</button>
+          </div>
+        </article>
+
+
+        <article class="card" data-search="padronizador rubricas csv base preparacao">
+          <span class="cardTag">Preparação de base</span>
+          <h3>Padronizador</h3>
+          <p>Padronize arquivos CSV antes da importação para a base principal de rubricas.</p>
+          <div class="cardActions">
+            <button class="button" data-open-file="padronizador_rubricas.html" data-label="Padronizador">Padronizar arquivo</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <footer>BIASON • Hub de soluções para folha, fiscal e rubricas</footer>
+  </main>
+
+  <div class="viewer" id="viewer" aria-hidden="true">
+    <div class="viewer__panel">
+      <div class="viewer__bar">
+        <div class="viewer__title">
+          <strong id="viewerTitle">Ferramenta</strong>
+          <span id="viewerPath">Arquivo local</span>
+        </div>
+        <div class="viewer__actions">
+          <button class="viewer__btn viewer__btn--primary" id="viewerNewTab" type="button">Abrir em nova aba</button>
+          <button class="viewer__btn" id="viewerClose" type="button">Fechar</button>
+        </div>
+      </div>
+      <iframe class="viewer__frame" id="viewerFrame" title="Ferramenta BIASON"></iframe>
+    </div>
+  </div>
+
+  <script>
+    const viewer = document.getElementById('viewer');
+    const viewerFrame = document.getElementById('viewerFrame');
+    const viewerTitle = document.getElementById('viewerTitle');
+    const viewerPath = document.getElementById('viewerPath');
+    const viewerClose = document.getElementById('viewerClose');
+    const viewerNewTab = document.getElementById('viewerNewTab');
+    const searchInput = document.getElementById('toolSearch');
+    const cards = Array.from(document.querySelectorAll('#toolGrid .card'));
+
+    let currentFile = '';
+    let currentLabel = '';
+
+    function buildLiveUrl(file){
+      const url = new URL(file, window.location.href);
+      url.searchParams.set('_dash', String(Date.now()));
+      return url.href;
+    }
+
+    function openTool(file, label){
+      currentFile = file;
+      currentLabel = label || file;
+      viewerTitle.textContent = currentLabel;
+      viewerPath.textContent = file;
+      viewerFrame.src = buildLiveUrl(file);
+      viewer.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeTool(){
+      viewer.setAttribute('aria-hidden', 'true');
+      viewerFrame.src = 'about:blank';
+      document.body.style.overflow = '';
+      currentFile = '';
+      currentLabel = '';
+    }
+
+    document.addEventListener('click', (event) => {
+      const trigger = event.target.closest('[data-open-file]');
+      if(trigger){
+        event.preventDefault();
+        openTool(trigger.getAttribute('data-open-file'), trigger.getAttribute('data-label'));
+      }
+    });
+
+    viewerClose.addEventListener('click', closeTool);
+    viewerNewTab.addEventListener('click', () => {
+      if(!currentFile) return;
+      window.open(buildLiveUrl(currentFile), '_blank', 'noopener');
+    });
+    viewer.addEventListener('click', (event) => {
+      if(event.target === viewer) closeTool();
+    });
+    document.addEventListener('keydown', (event) => {
+      if(event.key === 'Escape' && viewer.getAttribute('aria-hidden') === 'false'){
+        closeTool();
+      }
+      const isTyping = document.activeElement && ['INPUT','TEXTAREA'].includes(document.activeElement.tagName);
+      if(event.key === '/' && !isTyping){
+        event.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+    });
+
+    searchInput.addEventListener('input', () => {
+      const query = (searchInput.value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+      cards.forEach((card) => {
+        const haystack = (card.dataset.search || card.textContent || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        card.classList.toggle('hidden', !!query && !haystack.includes(query));
+      });
+    });
+
+    window.addEventListener('message', (event) => {
+      try{
+        const msg = event && event.data;
+        if(!msg || typeof msg !== 'object') return;
+        if(msg.type === 'BIASON_BACK_TO_HUB'){
+          closeTool();
+        }
+      }catch(err){
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>
+
+

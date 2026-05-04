@@ -1,0 +1,955 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>De Biason | Simulador IRRF</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --brand:#081a24;
+      --brand-2:#00345c;
+      --accent:#007ea7;
+      --accent-hover:#006586;
+      --bg:#f6f8fb;
+      --surface:#ffffff;
+      --text:#0b1b2a;
+      --muted:#607286;
+      --border:#e3e8ef;
+      --radius:12px;
+      --shadow:0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --font:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      --danger:#b42318;
+      --ok:#067647;
+      --warn:#b54708;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
+    header{background:var(--brand);color:#fff;padding:18px 22px;box-shadow:var(--shadow);position:sticky;top:0;z-index:10}
+    header .title{font-weight:900;letter-spacing:.2px}
+
+    .wrap{max-width:1200px;margin:22px auto;padding:0 22px 28px}
+    .layout{display:grid;grid-template-columns:360px 1fr;gap:18px;align-items:start}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+    .card h2{margin:0 0 10px;color:var(--brand);font-size:16px;letter-spacing:.2px}
+    .card h3{margin:14px 0 8px;color:var(--accent);font-size:13px}
+    .card p,.card li{margin:0 0 8px;color:var(--muted);font-size:13px;line-height:1.45}
+    .card ul{margin:0;padding-left:18px}
+
+    .toolHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+    .toolHead .name{margin:0;font-size:18px;font-weight:900}
+    .toolHead .sub{margin:4px 0 0;color:var(--muted);font-size:13px}
+    .pill{border:1px solid var(--border);background:#f3f7fb;color:var(--muted);border-radius:999px;padding:8px 10px;font-size:12px;white-space:nowrap;height:fit-content}
+
+    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 14px}
+    .tab{border:1px solid var(--border);background:#f3f7fb;color:var(--text);border-radius:999px;padding:10px 12px;font-weight:800;font-size:13px;cursor:pointer}
+    .tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+    .field{grid-column:span 6}
+    .span-12{grid-column:span 12}
+    .span-4{grid-column:span 4}
+    .span-3{grid-column:span 3}
+    label{display:block;font-size:12px;font-weight:800;margin:0 0 6px}
+    input,select,textarea{width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-family:var(--font);font-size:13px;background:#fff;outline:none;transition:border-color .15s, box-shadow .15s}
+    textarea{min-height:110px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:color-mix(in srgb, var(--accent) 55%, var(--border));box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent)}
+    .hint{font-size:12px;color:var(--muted);margin-top:6px}
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .btn{border:0;border-radius:var(--radius);padding:10px 12px;font-weight:900;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;user-select:none}
+    .btn.primary{background:var(--accent);color:#fff;box-shadow:var(--shadow)}
+    .btn.primary:hover{background:var(--accent-hover)}
+    .btn.ghost{background:#eef3f7;color:var(--text);border:1px solid var(--border)}
+
+    .notice{display:none;margin-top:12px;border-radius:var(--radius);padding:10px 12px;font-size:13px;border:1px solid var(--border);background:#fff}
+    .notice.show{display:block}
+    .notice.warn{border-color:#fed7aa;background:#fff7ed;color:#9a3412}
+
+    .cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px}
+    .kpi{border:1px solid var(--border);border-radius:var(--radius);padding:12px;background:#fbfdff}
+    .kpi .k{margin:0 0 6px;color:var(--muted);font-size:12px;font-weight:800}
+    .kpi .v{margin:0;font-size:20px;font-weight:900;color:var(--text)}
+    .kpi .s{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.35}
+
+    .kpi.ok{background:#ecfdf3;border-color:#abefc6}
+    .kpi.ok .v{color:var(--ok)}
+
+    .panel{margin-top:14px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+    .panel .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:#f3f7fb;border-bottom:1px solid var(--border)}
+    .panel .bar strong{font-size:12px}
+    .panel .content{padding:12px;background:#fff}
+
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{border-top:1px solid var(--border);padding:10px 10px;vertical-align:top}
+    thead th{border-top:0;background:#fbfdff;color:var(--brand);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+    td.num, th.num{text-align:right;white-space:nowrap}
+
+    .muted{color:var(--muted)}
+
+    .report-note{
+      margin:0 0 14px;
+      padding:14px 16px;
+      border:1px solid rgba(15,23,42,.12);
+      border-radius:16px;
+      background:linear-gradient(180deg,#fbfdff,#f7fbfd);
+      color:#334155;
+      line-height:1.55;
+      font-size:13px;
+    }
+    .report-note strong{
+      display:block;
+      margin-bottom:6px;
+      color:#081a24;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      font-size:13px;
+    }
+    @media print{
+      header,.no-print,#notice,#noticeLote,#pane-ind > .grid,#pane-lote > .grid{display:none!important}
+      body{background:#fff}
+      .wrap{max-width:none;margin:0;padding:0}
+      .layout{grid-template-columns:1fr}
+      .card{box-shadow:none}
+    }
+  </style>
+  <style id="biason-polish">
+    body{
+      background:
+        radial-gradient(circle at top right, rgba(0,126,167,.10), transparent 24%),
+        linear-gradient(180deg, #eef4f9 0%, #f6f8fb 28%, #f4f7fb 100%);
+      color:#0b1b2a;
+    }
+    header{
+      padding:22px 24px;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,.16), transparent 24%),
+        linear-gradient(135deg, #081a24, #0b3d91 68%, #0a6f85);
+      box-shadow:0 18px 40px -28px rgba(8,26,36,.7);
+    }
+    header::before{
+      content:"BIASON \2022 Comparativo fiscal";
+      display:block;
+      max-width:1280px;
+      margin:0 auto;
+      color:rgba(255,255,255,.86);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    header::after{
+      content:"Cenario individual ou em lote, com memoria de calculo mais clara e layout alinhado ao hub principal.";
+      display:block;
+      max-width:1280px;
+      margin:8px auto 0;
+      color:rgba(255,255,255,.78);
+      font-size:14px;
+      line-height:1.5;
+    }
+    header .title{
+      display:block;
+      max-width:1280px;
+      margin:12px auto 0;
+      font-size:0;
+      line-height:1;
+    }
+    header .title::before{
+      content:"Simulador IRRF";
+      font-size:clamp(28px,3vw,34px);
+      font-weight:800;
+      letter-spacing:-.03em;
+      color:#fff;
+    }
+    .wrap{
+      max-width:1280px;
+      margin:18px auto 0;
+      padding:0 24px 32px;
+    }
+    .layout{
+      grid-template-columns:320px minmax(0,1fr);
+      gap:18px;
+    }
+    .card{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:20px;
+      box-shadow:0 24px 48px -30px rgba(8,26,36,.48);
+      padding:22px;
+      background:rgba(255,255,255,.94);
+    }
+    aside.card{
+      position:sticky;
+      top:108px;
+      background:linear-gradient(180deg, rgba(8,26,36,.02), rgba(0,126,167,.04));
+      align-self:start;
+    }
+    .card h2{
+      font-size:clamp(22px,2.4vw,28px);
+      letter-spacing:-.02em;
+      margin-bottom:12px;
+    }
+    .card h3{
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight:800;
+      color:#0a6f85;
+      margin:16px 0 8px;
+    }
+    .toolHead{
+      margin-bottom:16px;
+      padding-bottom:14px;
+      border-bottom:1px solid var(--border);
+    }
+    .toolHead .name{font-size:28px;letter-spacing:-.03em}
+    .toolHead .sub{font-size:14px;line-height:1.5}
+    .pill{
+      padding:9px 12px;
+      background:#f8fbfd;
+      color:#526173;
+    }
+    .tab{
+      min-height:42px;
+      padding:0 14px;
+      border-radius:999px;
+    }
+    input,select,textarea{
+      min-height:46px;
+      border-radius:14px;
+      padding:10px 12px;
+    }
+    textarea{min-height:120px}
+    .actions{
+      gap:12px;
+      margin-top:18px;
+    }
+    .btn{
+      min-height:46px;
+      padding:0 14px;
+      border-radius:14px;
+    }
+    .cards{
+      gap:12px;
+      margin-top:18px;
+    }
+    .kpi{
+      border-radius:18px;
+      padding:16px;
+      background:linear-gradient(180deg, #fbfdff, #f3f8fb);
+      box-shadow:0 18px 30px -26px rgba(8,26,36,.4);
+    }
+    .kpi .v{
+      font-size:30px;
+      letter-spacing:-.03em;
+    }
+    .panel{
+      margin-top:18px;
+      border-radius:20px;
+      box-shadow:0 24px 48px -30px rgba(8,26,36,.3);
+    }
+    .panel .bar{
+      padding:12px 14px;
+      background:#f7fbfd;
+    }
+    table{font-size:13px}
+    th,td{padding:12px 10px}
+    @media (max-width: 1024px){
+      .layout{grid-template-columns:1fr}
+      aside.card{position:static;top:auto}
+    }
+    @media (max-width: 720px){
+      header{padding:18px 16px}
+      .wrap{padding:0 16px 24px}
+      .card{padding:18px}
+      .actions .btn{width:100%}
+      .cards{grid-template-columns:1fr}
+    }
+  </style>
+  <script>document.title='BIASON | Simulador IRRF';</script>
+  <style id="biason-hub-return">
+    .hubReturnBar{position:fixed;right:18px;bottom:18px;z-index:120;display:flex}
+    .hubReturnBtn{min-height:44px;padding:0 14px;border-radius:14px;border:1px solid rgba(15,23,42,.12);background:#fff;color:#081a24;font:700 13px Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;cursor:pointer;box-shadow:0 16px 30px -24px rgba(8,26,36,.55)}
+    .hubReturnBtn:hover{transform:translateY(-1px);background:#f8fbfd}
+    @page{size:A4;margin:12mm}
+    @media print{body{background:#fff!important}.hubReturnBar{display:none!important}.card,.tableWrap,.panel,.kpi,.summary-item,.total-box,.verdict-box,.chart-container,.preview{box-shadow:none!important;border-color:rgba(15,23,42,.18)!important}}
+  </style>
+  <script id="biason-hub-return-script">
+    (function(){
+      function biasonGoHub(){
+        try{
+          if(window.top && window.top !== window){
+            window.top.postMessage({type:'BIASON_BACK_TO_HUB'}, '*');
+            return;
+          }
+        }catch(err){}
+        try{ window.location.href = new URL('dashboard_unico_ok5_atualizado.html', window.location.href).href; }
+        catch(err){ window.location.href = 'dashboard_unico_ok5_atualizado.html'; }
+      }
+      document.addEventListener('DOMContentLoaded', function(){
+        if(document.querySelector('.hubReturnBar')) return;
+        var wrap = document.createElement('div');
+        wrap.className = 'hubReturnBar';
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'hubReturnBtn';
+        btn.textContent = 'Voltar ao Hub';
+        btn.addEventListener('click', biasonGoHub);
+        wrap.appendChild(btn);
+        document.body.appendChild(wrap);
+      });
+      window.biasonGoHub = biasonGoHub;
+    })();
+  </script>
+<style id="biason-fine-polish">
+  html{scroll-behavior:smooth}
+  ::selection{background:rgba(0,126,167,.18);color:#081a24}
+  *{scrollbar-width:thin;scrollbar-color:rgba(0,126,167,.55) rgba(15,23,42,.08)}
+  *::-webkit-scrollbar{width:10px;height:10px}
+  *::-webkit-scrollbar-track{background:rgba(15,23,42,.06);border-radius:999px}
+  *::-webkit-scrollbar-thumb{background:linear-gradient(180deg, rgba(0,126,167,.72), rgba(8,26,36,.56));border-radius:999px;border:2px solid rgba(255,255,255,.68)}
+  a,button,.btn,.button,.cta-button,input,select,textarea,summary{
+    transition:box-shadow .18s ease,border-color .18s ease,background-color .18s ease,color .18s ease,transform .18s ease,opacity .18s ease;
+  }
+  a:focus-visible,button:focus-visible,.btn:focus-visible,.button:focus-visible,.cta-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{
+    outline:none;
+    border-color:rgba(0,126,167,.55) !important;
+    box-shadow:0 0 0 4px rgba(0,126,167,.18) !important;
+  }
+  .card,.kpi,.result-card,.tableWrap,.chart-container,.dropzone,.help,.sidebar,.hero,.panel,.base-box,.modalPanel{
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background-color .18s ease;
+  }
+  .tableWrap table tbody tr,.inputs-table tbody tr,table tbody tr{transition:background-color .18s ease}
+  .tableWrap table tbody tr:hover td,.inputs-table tbody tr:hover td,table tbody tr:hover td{background:rgba(0,126,167,.04)}
+  .emptyState{
+    border-style:dashed !important;
+    background:linear-gradient(180deg, rgba(0,126,167,.05), rgba(255,255,255,.96)) !important;
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .hero,.sidebar,.card,.kpi,.result-card,.base-box,.tableWrap,.dropzone,.chart-container{
+      animation:biasonFadeUp .34s ease both;
+    }
+  }
+  @keyframes biasonFadeUp{
+    from{opacity:0;transform:translateY(8px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  @media print{
+    *::-webkit-scrollbar{display:none}
+  }
+</style>
+<style id="biason-header-standard">
+  .biasonShellHeader{
+    position:sticky;
+    top:0;
+    z-index:40;
+    padding:0 !important;
+    background:linear-gradient(90deg,#0b3d91 0%, #123f8f 62%, #0a7b8f 100%) !important;
+    color:#fff !important;
+    box-shadow:0 14px 28px -20px rgba(8,26,36,.65) !important;
+    border:none !important;
+  }
+  .biasonShellHeader__inner{
+    max-width:1360px;
+    margin:0 auto;
+    min-height:68px;
+    padding:0 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader__left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-width:0;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader__brand{
+    color:#fff;
+    font-size:17px;
+    line-height:1;
+    font-weight:900;
+    letter-spacing:.02em;
+  }
+  .biasonShellHeader__divider{
+    color:rgba(255,255,255,.5);
+    font-weight:700;
+    line-height:1;
+  }
+  .biasonShellHeader__tool{
+    color:#fff;
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.01em;
+  }
+  .biasonShellHeader__crumb{
+    display:inline-flex;
+    align-items:center;
+    min-height:30px;
+    padding:0 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.20);
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .biasonShellHeader__crumb strong{color:#fff;font-weight:800}
+  .biasonShellHeader__right,
+  .biasonShellHeader .right{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader .btn,
+  .biasonShellHeader .btn-small,
+  .biasonShellHeader button{
+    border-radius:12px;
+  }
+  .biasonShellHeader .brand,
+  .biasonShellHeader .brand__mark,
+  .biasonShellHeader .brand__name,
+  .biasonShellHeader .brand__sub,
+  .biasonShellHeader .pill,
+  .biasonShellHeader .title,
+  .biasonShellHeader .topbar__eyebrow,
+  .biasonShellHeader .topbar__title,
+  .biasonShellHeader .topbar__sub{
+    all:unset;
+  }
+  .biasonShellHeader::before,
+  .biasonShellHeader::after{
+    content:none !important;
+    display:none !important;
+  }
+  @media (max-width:760px){
+    .biasonShellHeader__inner{min-height:64px;padding:10px 12px}
+    .biasonShellHeader__left{gap:10px}
+    .biasonShellHeader__brand{font-size:16px}
+    .biasonShellHeader__tool{font-size:12px}
+    .biasonShellHeader__crumb{font-size:11px;padding:0 10px}
+  }
+</style>
+</head>
+<body>
+    <header class="biasonShellHeader">
+    <div class="biasonShellHeader__inner">
+      <div class="biasonShellHeader__left">
+        <div class="biasonShellHeader__brand">BIASON</div>
+        <div class="biasonShellHeader__divider">|</div>
+        <div class="biasonShellHeader__tool">Simulador IRRF</div>
+        <div class="biasonShellHeader__crumb">Página: Simulação</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="layout">
+      <aside class="card">
+        <h2>Guia de Utilização De Biason</h2>
+        <h3>O que preencher</h3>
+        <ul>
+          <li><strong>Tipo</strong>: selecione <strong>CLT</strong> ou <strong>Autônomo (RPA)</strong>.</li>
+          <li><strong>Salário/Rendimento bruto</strong> e <strong>dependentes</strong>.</li>
+          <li>No <strong>Lote</strong>, cole linhas em <strong>Nome, Salário, Dependentes</strong>.</li>
+        </ul>
+        <h3>Lógica da ferramenta</h3>
+        <p>
+          Replica o cálculo do simulador original: INSS (CLT progressivo / Autônomo 11% limitado ao teto),
+          escolha automática entre <strong>Desconto Simplificado</strong> (R$ 607,20) vs (INSS + dependentes),
+          base IRRF, tabela 2025 e redução 2026 por benefício.
+        </p>
+        <h3>Interpretação</h3>
+        <p>
+          Compare <strong>IRRF 2025</strong> vs <strong>IRRF 2026</strong> e observe o <strong>Ganho mensal</strong>.
+          A memória detalha cada etapa para auditoria.
+        </p>
+      </aside>
+
+      <section class="card">
+        <div class="toolHead">
+          <div>
+            <p class="name">Calculadora IRRF 2026</p>
+            <p class="sub">Comparação de cenário atual (2025) vs Reforma (2026), com memória de cálculo.</p>
+          </div>
+          <div class="pill">v1 • Desktop</div>
+        </div>
+
+        <div class="tabs no-print" role="tablist">
+          <button class="tab" id="tab-ind" role="tab" aria-selected="true" aria-controls="pane-ind">Individual</button>
+          <button class="tab" id="tab-lote" role="tab" aria-selected="false" aria-controls="pane-lote">Importar Lote</button>
+        </div>
+
+        <!-- INDIVIDUAL -->
+        <div id="pane-ind" role="tabpanel" aria-labelledby="tab-ind">
+          <div class="grid">
+            <div class="field span-4">
+              <label for="tipo">Tipo de rendimento</label>
+              <select id="tipo">
+                <option value="CLT">CLT</option>
+                <option value="AUTONOMO">Autônomo (RPA)</option>
+              </select>
+            </div>
+            <div class="field span-4">
+              <label for="nome">Nome (opcional)</label>
+              <input id="nome" type="text" placeholder="Ex.: João Silva" />
+            </div>
+            <div class="field span-4">
+              <label for="dependentes">Dependentes</label>
+              <input id="dependentes" type="number" min="0" step="1" value="0" />
+              <div class="hint">Dedução por dependente: <strong>R$ 189,59</strong> (regra do simulador).</div>
+            </div>
+
+            <div class="field span-6">
+              <label for="salario">Salário / Rendimento bruto (R$)</label>
+              <input id="salario" type="text" inputmode="decimal" placeholder="Ex.: 4.500,00" />
+            </div>
+            <div class="field span-6">
+              <label>Resumo rápido</label>
+              <div class="hint">O sistema decide automaticamente se usa <strong>Desconto Simplificado (R$ 607,20)</strong> ou <strong>INSS + Dependentes</strong>.</div>
+            </div>
+          </div>
+
+          <div class="actions no-print">
+            <button class="btn primary" id="btnCalc">Calcular</button>
+            <button class="btn ghost" id="btnClear">Limpar</button>
+            <button class="btn ghost" id="btnPrint" disabled>Imprimir demonstrativo</button>
+          </div>
+          <div class="notice warn" id="notice"></div>
+
+          <div id="out" style="display:none;">
+            <div class="report-note" id="reportNoteInd">
+              <strong>Demonstrativo final</strong>
+              O resumo do colaborador aparecerá aqui após o cálculo.
+            </div>
+            <div class="cards">
+              <div class="kpi">
+                <p class="k">IRRF (Regra 2025)</p>
+                <p class="v" id="k_ir25">—</p>
+                <p class="s" id="k_ir25_s">—</p>
+              </div>
+              <div class="kpi">
+                <p class="k">IRRF (Reforma 2026)</p>
+                <p class="v" id="k_ir26">—</p>
+                <p class="s" id="k_ir26_s">—</p>
+              </div>
+              <div class="kpi ok">
+                <p class="k">Ganho Mensal</p>
+                <p class="v" id="k_gain">—</p>
+                <p class="s" id="k_gain_s">Economia anual aprox. com 13º: <span id="k_gain_y">—</span></p>
+              </div>
+            </div>
+
+            <div class="panel" style="margin-top:14px;">
+              <div class="bar"><strong>Memória de cálculo</strong><span class="muted" style="font-size:12px;">Base 2025/2026</span></div>
+              <div class="content" style="overflow-x:auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Descrição</th>
+                      <th class="num">Valor / Detalhe</th>
+                    </tr>
+                  </thead>
+                  <tbody id="memBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LOTE -->
+        <div id="pane-lote" role="tabpanel" aria-labelledby="tab-lote" style="display:none;">
+          <div class="grid">
+            <div class="field span-12">
+              <label for="lote">Cole os dados (um por linha)</label>
+              <textarea id="lote" placeholder="João Silva, 4500.00, 2\nMaria, 3200, 0"></textarea>
+              <div class="hint">Formato aceito: <strong>Nome, Salário, Dependentes</strong>. Separador pode ser vírgula, ponto e vírgula ou TAB.</div>
+            </div>
+          </div>
+          <div class="actions no-print">
+            <button class="btn primary" id="btnLote">Processar lote</button>
+            <button class="btn ghost" id="btnLoteClear">Limpar</button>
+            <button class="btn ghost" id="btnLotePrint" disabled>Imprimir demonstrativo</button>
+          </div>
+          <div class="notice warn" id="noticeLote"></div>
+
+          <div id="outLote" style="display:none;">
+            <div class="report-note" id="reportNoteLote">
+              <strong>Demonstrativo final</strong>
+              O resumo consolidado do lote aparecerá aqui após o processamento.
+            </div>
+            <div class="cards" style="grid-template-columns:1fr 1fr 1fr;">
+              <div class="kpi">
+                <p class="k">Registros processados</p>
+                <p class="v" id="l_count">—</p>
+                <p class="s">Linhas válidas (salário > 0).</p>
+              </div>
+              <div class="kpi">
+                <p class="k">Economia total mensal</p>
+                <p class="v" id="l_total">—</p>
+                <p class="s">Soma dos ganhos mensais.</p>
+              </div>
+              <div class="kpi">
+                <p class="k">Economia anual aprox.</p>
+                <p class="v" id="l_total_y">—</p>
+                <p class="s">(aprox. com 13º)</p>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="bar"><strong>Resultados do lote</strong><span class="muted" style="font-size:12px;">IRRF 2025 × 2026</span></div>
+              <div class="content" style="overflow:auto; max-height:520px;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nome</th>
+                      <th class="num">Bruto</th>
+                      <th class="num">Dep.</th>
+                      <th class="num">IRRF 2025</th>
+                      <th class="num">IRRF 2026</th>
+                      <th class="num">Ganho</th>
+                    </tr>
+                  </thead>
+                  <tbody id="l_body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </div>
+
+<script>
+  // ================================
+  // LÓGICA ORIGINAL (extraída do simulador)
+  // ================================
+  const DEDUCAO_DEPENDENTE = 189.59; // Kh
+  const DEDUCAO_SIMPLIFICADA = 607.2; // yf
+  const TETO_AUTONOMO = 7786.02; // Jh
+
+  const INSS_CLT_FAIXAS = [
+    { teto: 1621.00, aliquota: 0.075 },
+    { teto: 2902.84, aliquota: 0.09 },
+    { teto: 4354.27, aliquota: 0.12 },
+    { teto: 8475.55, aliquota: 0.14 },
+  ];
+
+  const TABELA_IR_2025 = [
+    { ate: 2428.80, aliquota: 0.0,   deducao: 0.00 },
+    { ate: 2826.65, aliquota: 0.075, deducao: 182.16 },
+    { ate: 3751.05, aliquota: 0.15,  deducao: 394.16 },
+    { ate: 4664.68, aliquota: 0.225, deducao: 675.49 },
+    { ate: Infinity,aliquota: 0.275, deducao: 908.73 },
+  ];
+
+  function parseMoneyBR(value){ // Ln
+    if(!value) return 0;
+    if(typeof value === 'number') return value;
+    let s = String(value).replace(/[^\d.,-]/g,'');
+    const c = s.lastIndexOf(','), d = s.lastIndexOf('.');
+    if(c>-1 && d>-1){
+      if(c>d) s = s.replace(/\./g,'').replace(',', '.');
+      else s = s.replace(/,/g,'');
+    } else if(c>-1){
+      s = s.replace(',', '.');
+    }
+    return parseFloat(s) || 0;
+  }
+
+  function inssCLT(bruto){ // Wh
+    const N = Number(bruto) || 0;
+    if(N<=0) return 0;
+    let total=0, prev=0;
+    for(const f of INSS_CLT_FAIXAS){
+      const teto=f.teto;
+      if(N>prev){
+        const base = Math.min(N, teto) - prev;
+        if(base>0) total += base * f.aliquota;
+        prev = teto;
+      } else break;
+    }
+    return Math.round(total*100)/100;
+  }
+
+  function inssAutonomo(bruto){ // $h
+    const N = Math.min(Number(bruto)||0, TETO_AUTONOMO);
+    return Math.round(N * 0.11 * 100)/100;
+  }
+
+  function irTabela(base){ // kh
+    const N = Number(base)||0;
+    if(N<=0) return { irTabela:0, aliquota:0, deducao:0, faixaIndex:-1 };
+    const idx = TABELA_IR_2025.findIndex(x => N <= x.ate);
+    const faixa = (idx===-1) ? TABELA_IR_2025[TABELA_IR_2025.length-1] : TABELA_IR_2025[idx];
+    const val = N*faixa.aliquota - faixa.deducao;
+    return {
+      irTabela: Math.max(0, Number(val.toFixed(2))),
+      aliquota: faixa.aliquota,
+      deducao: faixa.deducao,
+      faixaIndex: idx
+    };
+  }
+
+  function reducaoReforma(bruto, ir25){ // Fh
+    const E = Number(bruto)||0;
+    const m = Number(ir25)||0;
+    if(m<=0 || E<=0) return { reducaoReforma:0, tipoBeneficio:null };
+    if(E<=5000) return { reducaoReforma: Number(m.toFixed(2)), tipoBeneficio:"A" };
+    if(E<=7350){
+      const O = 978.62 - 0.133145 * E;
+      const D = Math.max(0, Math.min(m, O));
+      return { reducaoReforma: Number(D.toFixed(2)), tipoBeneficio:"B" };
+    }
+    return { reducaoReforma:0, tipoBeneficio:"C" };
+  }
+
+  function calcularSimulacao(salario, dependentes, tipoRendimento="CLT", nome){ // Ro
+    const bruto = Math.round((Number(salario)||0)*100)/100;
+    const dep = Number(dependentes||0);
+    let inss = (tipoRendimento === "AUTONOMO") ? inssAutonomo(bruto) : inssCLT(bruto);
+
+    const dedDep = dep * DEDUCAO_DEPENDENTE;
+    const dedLegais = inss + dedDep;
+    const usouSimplificado = DEDUCAO_SIMPLIFICADA > dedLegais;
+    const dedUtil = usouSimplificado ? DEDUCAO_SIMPLIFICADA : dedLegais;
+
+    let base = bruto - dedUtil;
+    if(base < 0) base = 0;
+    base = Math.round(base*100)/100;
+
+    const { irTabela: ir_tabela, aliquota, deducao: deducao_ir, faixaIndex } = irTabela(base);
+    const ir_2025 = ir_tabela;
+
+    const { reducaoReforma: reducao_reforma, tipoBeneficio: tipo_beneficio } = reducaoReforma(bruto, ir_tabela);
+    const ir_2026 = Math.max(0, Number((ir_tabela - reducao_reforma).toFixed(2)));
+
+    const liquido_2025 = Number((bruto - inss - ir_2025).toFixed(2));
+    const liquido_2026 = Number((bruto - inss - ir_2026).toFixed(2));
+
+    return {
+      nome: nome || "Colaborador",
+      tipo_rendimento: tipoRendimento,
+      salario_bruto: bruto,
+      dependentes: dep,
+      inss_real: inss,
+      deducao_simplificada: DEDUCAO_SIMPLIFICADA,
+      deducao_dependentes: dedDep,
+      usou_simplificado: usouSimplificado,
+      deducao_utilizada: dedUtil,
+      base_irrf: base,
+      ir_tabela,
+      aliquota,
+      deducao_ir,
+      faixa_index: faixaIndex,
+      ir_2025,
+      reducao_reforma,
+      tipo_beneficio,
+      ir_2026,
+      salario_liquido_2025: liquido_2025,
+      salario_liquido_2026: liquido_2026,
+      ganho_mensal: Number((liquido_2026 - liquido_2025).toFixed(2))
+    };
+  }
+
+  function parseLote(text){ // Ih
+    const lines = String(text||"").split(/\r?\n/);
+    const out=[];
+    for(const line of lines){
+      if(!line.trim()) continue;
+      let sep=",";
+      if(line.includes(";")) sep=";";
+      else if(line.includes("\t")) sep="\t";
+      const parts = line.split(sep).map(x=>x.trim());
+      let nome="Anônimo", salario=0, dep=0;
+      if(parts.length>=2){
+        const firstIsNumber = !isNaN(parseFloat(parts[0].replace(/[^\d]/g,""))) && parts[0].length < 15;
+        if(firstIsNumber){
+          salario = parseMoneyBR(parts[0]);
+          dep = parseInt(parts[1])||0;
+        } else {
+          nome = parts[0];
+          salario = parseMoneyBR(parts[1]);
+          dep = parseInt(parts[2])||0;
+        }
+      } else if(parts.length===1){
+        salario = parseMoneyBR(parts[0]);
+      }
+      if(salario>0) out.push(calcularSimulacao(salario, dep, "CLT", nome));
+    }
+    return out;
+  }
+
+  // ================================
+  // UI helpers
+  // ================================
+  const fmtBRL = (n)=> (Number(n)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const fmtPct = (n)=> ((Number(n)||0)*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1}) + '%';
+
+  function showWarn(id, msg){
+    const el = document.getElementById(id);
+    if(!msg){ el.classList.remove('show'); el.textContent=''; return; }
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+
+  function tr(desc, val, isNum=true){
+    const td1 = `<td>${desc}</td>`;
+    const td2 = isNum ? `<td class="num">${val}</td>` : `<td class="num"><span class="muted">${val}</span></td>`;
+    return `<tr>${td1}${td2}</tr>`;
+  }
+
+  // Tabs
+  const tabInd = document.getElementById('tab-ind');
+  const tabLote = document.getElementById('tab-lote');
+  const paneInd = document.getElementById('pane-ind');
+  const paneLote = document.getElementById('pane-lote');
+
+  function setTab(which){
+    const ind = which==='ind';
+    tabInd.setAttribute('aria-selected', ind ? 'true':'false');
+    tabLote.setAttribute('aria-selected', ind ? 'false':'true');
+    paneInd.style.display = ind ? 'block':'none';
+    paneLote.style.display = ind ? 'none':'block';
+  }
+  tabInd.addEventListener('click', ()=>setTab('ind'));
+  tabLote.addEventListener('click', ()=>setTab('lote'));
+
+  // Individual
+  const $tipo = document.getElementById('tipo');
+  const $nome = document.getElementById('nome');
+  const $dep = document.getElementById('dependentes');
+  const $sal = document.getElementById('salario');
+
+  const $out = document.getElementById('out');
+  const $mem = document.getElementById('memBody');
+
+  function renderIndividual(res){
+    const colaborador = res.nome || 'Colaborador';
+    const bruto = Number(res.salario_bruto) || 0;
+    const dep = Number(res.dependentes) || 0;
+    document.getElementById('k_ir25').textContent = fmtBRL(res.ir_2025);
+    document.getElementById('k_ir25_s').textContent = `Base: ${fmtBRL(res.base_irrf)} • Aliq: ${fmtPct(res.aliquota)} • Parcela: ${fmtBRL(res.deducao_ir)}`;
+
+    document.getElementById('k_ir26').textContent = fmtBRL(res.ir_2026);
+    document.getElementById('k_ir26_s').textContent = `Redução: ${fmtBRL(res.reducao_reforma)} • Benefício: ${res.tipo_beneficio ? 'Tipo '+res.tipo_beneficio : 'Nenhum'}`;
+
+    const gain = res.ganho_mensal;
+    document.getElementById('k_gain').textContent = fmtBRL(gain);
+    document.getElementById('k_gain_y').textContent = fmtBRL(gain*13.33);
+
+    // Memória (espelha a do original)
+    let rows='';
+    rows += tr('Rendimento Tributável (Bruto)', fmtBRL(res.salario_bruto));
+
+    if(res.usou_simplificado){
+      rows += tr('(-) Desconto Simplificado (substitui INSS e Dependentes)', fmtBRL(res.deducao_simplificada * -1));
+      rows += tr('Comparativo (INSS + Dependentes) somaria', fmtBRL((res.inss_real + res.deducao_dependentes) * -1), false);
+    } else {
+      rows += tr('(-) INSS', fmtBRL(res.inss_real * -1));
+      rows += tr(`(-) Dependentes (${res.dependentes})`, fmtBRL(res.deducao_dependentes * -1));
+    }
+
+    rows += tr('(=) Base de Cálculo IRRF', fmtBRL(res.base_irrf));
+    rows += tr('Alíquota aplicada', `${(res.aliquota*100).toFixed(1)}%`, false);
+    rows += tr('Parcela a deduzir (tabela)', fmtBRL(res.deducao_ir));
+    rows += tr('IRRF (Regra 2025)', fmtBRL(res.ir_2025));
+    rows += tr('Redução Reforma 2026', fmtBRL(res.reducao_reforma));
+    rows += tr('IRRF (Reforma 2026)', fmtBRL(res.ir_2026));
+    rows += tr('Líquido estimado (2025)', fmtBRL(res.salario_liquido_2025));
+    rows += tr('Líquido estimado (2026)', fmtBRL(res.salario_liquido_2026));
+
+    $mem.innerHTML = rows;
+    $out.style.display = 'block';
+    document.getElementById('reportNoteInd').innerHTML =
+      `<strong>Demonstrativo final</strong>${colaborador} com rendimento bruto de <strong>${fmtBRL(bruto)}</strong>, ${dep} dependente(s) e comparação entre as regras de 2025 e 2026. O valor mensal estimado de economia é de <strong>${fmtBRL(gain)}</strong>.`;
+    document.getElementById('btnPrint').disabled = false;
+  }
+
+  document.getElementById('btnCalc').addEventListener('click', ()=>{
+    showWarn('notice','');
+    const bruto = parseMoneyBR($sal.value);
+    const dep = parseInt($dep.value||'0',10) || 0;
+    const tipo = $tipo.value;
+    const nome = ($nome.value||'').trim();
+
+    if(!bruto || bruto<=0){
+      showWarn('notice','Informe um salário/rendimento bruto válido.');
+      return;
+    }
+
+    const res = calcularSimulacao(bruto, dep, tipo, nome);
+    renderIndividual(res);
+  });
+
+  document.getElementById('btnClear').addEventListener('click', ()=>{
+    $tipo.value='CLT';
+    $nome.value='';
+    $dep.value='0';
+    $sal.value='';
+    $out.style.display='none';
+    document.getElementById('btnPrint').disabled=true;
+    showWarn('notice','');
+  });
+
+  document.getElementById('btnPrint').addEventListener('click', ()=>window.print());
+
+  // Lote
+  const $lote = document.getElementById('lote');
+  const $outL = document.getElementById('outLote');
+  const $bodyL = document.getElementById('l_body');
+
+  function renderLote(rows){
+    const total = rows.reduce((acc,r)=>acc + (Number(r.ganho_mensal)||0), 0);
+    document.getElementById('l_count').textContent = String(rows.length);
+    document.getElementById('l_total').textContent = fmtBRL(total);
+    document.getElementById('l_total_y').textContent = fmtBRL(total*13.33);
+
+    $bodyL.innerHTML = rows.map(r=>{
+      return `\n<tr>\n  <td>${(r.nome||'').replace(/</g,'&lt;')}</td>\n  <td class="num">${fmtBRL(r.salario_bruto)}</td>\n  <td class="num">${r.dependentes}</td>\n  <td class="num">${fmtBRL(r.ir_2025)}</td>\n  <td class="num">${fmtBRL(r.ir_2026)}</td>\n  <td class="num"><strong>${fmtBRL(r.ganho_mensal)}</strong></td>\n</tr>`;
+    }).join('');
+
+    $outL.style.display='block';
+    document.getElementById('reportNoteLote').innerHTML =
+      `<strong>Demonstrativo final</strong>Foram processados <strong>${rows.length}</strong> registro(s) válidos. A economia mensal consolidada estimada é de <strong>${fmtBRL(total)}</strong>, com projeção anual aproximada de <strong>${fmtBRL(total*13.33)}</strong>.`;
+    document.getElementById('btnLotePrint').disabled = false;
+  }
+
+  document.getElementById('btnLote').addEventListener('click', ()=>{
+    showWarn('noticeLote','');
+    const txt = ($lote.value||'').trim();
+    if(!txt){
+      showWarn('noticeLote','Cole pelo menos uma linha no formato: Nome, Salário, Dependentes.');
+      return;
+    }
+    const rows = parseLote(txt);
+    if(!rows.length){
+      showWarn('noticeLote','Nenhuma linha válida encontrada. Verifique salários (> 0) e separadores.');
+      return;
+    }
+    renderLote(rows);
+  });
+
+  document.getElementById('btnLoteClear').addEventListener('click', ()=>{
+    $lote.value='';
+    $outL.style.display='none';
+    document.getElementById('btnLotePrint').disabled = true;
+    showWarn('noticeLote','');
+  });
+
+  document.getElementById('btnLotePrint').addEventListener('click', ()=>window.print());
+</script>
+</body>
+</html>
+
+
+
+

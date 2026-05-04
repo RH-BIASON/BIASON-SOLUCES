@@ -1,0 +1,790 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>BIASON — Adicional Noturno</title>
+<style>
+:root{
+  --bg:#f6f8fc; --card:#ffffff; --text:#0f172a; --muted:#475569;
+  --brand:#0b3b7a; --brand2:#0f5aa6; --border:#e2e8f0;
+  --ok:#16a34a; --warn:#f59e0b; --err:#ef4444;
+  --shadow: 0 10px 25px rgba(2,6,23,.08);
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.topbar{background:linear-gradient(180deg,var(--brand),#072a55);color:#fff;padding:16px 20px}
+.topbar .title{display:flex;align-items:baseline;gap:10px;font-weight:800;letter-spacing:.4px}
+.topbar small{opacity:.9;font-weight:600}
+.container{max-width:1100px;margin:22px auto;padding:0 18px}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
+.card .hd{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.card .hd h2{margin:0;font-size:16px}
+.badge{font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff}
+.card .bd{padding:16px 18px}
+.help{margin:0;color:var(--muted);line-height:1.45;font-size:13px}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+label{font-size:12px;color:var(--muted);font-weight:700}
+input,select{height:40px;border:1px solid var(--border);border-radius:10px;padding:0 12px;font-size:14px;background:#fff;outline:none}
+input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 4px rgba(59,130,246,.15)}
+.row{display:flex;gap:10px}
+.row > *{flex:1}
+.actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 14px;font-weight:800;cursor:pointer}
+.btn{background:linear-gradient(180deg,var(--brand2),#0b4f90);color:#fff;border:none}
+.btn:active{transform:translateY(1px)}
+.btn-outline{background:#fff}
+.note{margin-top:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);font-size:13px;color:var(--muted)}
+.note.ok{border-color:rgba(22,163,74,.35);background:rgba(22,163,74,.08)}
+.note.warn{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.08)}
+.note.err{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08);color:#7f1d1d}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--border);border-radius:14px}
+.tbl th,.tbl td{padding:10px 10px;border-bottom:1px solid var(--border);font-size:13px;text-align:left}
+.tbl th{background:#f8fafc;color:#0f172a;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.tbl tr:last-child td{border-bottom:none}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.kpi{border:1px solid var(--border);border-radius:14px;padding:12px;background:#fff}
+.kpi .k{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.kpi .v{margin-top:6px;font-size:18px;font-weight:900}
+.reportCard{
+  margin-top:16px;
+  border:1px dashed rgba(11,61,145,.24);
+  border-radius:18px;
+  padding:18px;
+  background:linear-gradient(180deg, rgba(247,251,255,.95), #fff);
+}
+.reportEyebrow{
+  display:inline-flex;
+  align-items:center;
+  min-height:30px;
+  padding:0 12px;
+  border-radius:999px;
+  background:rgba(11,61,145,.08);
+  border:1px solid rgba(11,61,145,.12);
+  color:#0b3d91;
+  font-size:12px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.reportTitle{margin:12px 0 6px;font-size:28px;line-height:1.05;letter-spacing:-.03em;color:#081a24}
+.reportLead{margin:0 0 16px;color:#526173;font-size:14px;line-height:1.55}
+.reportGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.reportItem{border:1px solid var(--border);border-radius:16px;padding:14px 16px;background:#fff}
+.reportItem span{display:block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0a6f85;margin-bottom:8px}
+.reportItem strong{display:block;font-size:24px;line-height:1.15;letter-spacing:-.03em;color:#081a24}
+.reportItem small{display:block;margin-top:6px;color:#526173;font-size:12px;line-height:1.45}
+.reportNote{margin:12px 0 0;padding:14px 16px;border-radius:16px;background:rgba(11,61,145,.06);border:1px solid rgba(11,61,145,.10);color:#234;font-size:13px;line-height:1.6}
+.screenOnly{}
+@media (max-width: 920px){.grid{grid-template-columns:1fr}.form{grid-template-columns:1fr}}
+@media (max-width: 920px){.reportGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width: 640px){.reportGrid{grid-template-columns:1fr}}
+</style>
+<style id="biason-polish">
+  body{
+    background:
+      radial-gradient(circle at top right, rgba(0,126,167,.10), transparent 24%),
+      linear-gradient(180deg, #eef4f9 0%, #f6f8fb 28%, #f4f7fb 100%);
+    color:#0b1b2a;
+  }
+  .topbar{
+    position:sticky;
+    top:0;
+    z-index:20;
+    padding:20px 22px;
+    background:
+      radial-gradient(circle at top right, rgba(255,255,255,.16), transparent 24%),
+      linear-gradient(135deg, #081a24, #0b3d91 68%, #0a6f85);
+    box-shadow:0 18px 40px -28px rgba(8,26,36,.7);
+  }
+  .topbar .title{
+    max-width:1200px;
+    margin:0 auto;
+    gap:12px;
+    font-size:0;
+    line-height:1;
+  }
+  .topbar .title::before{
+    content:"BIASON";
+    font-size:20px;
+    font-weight:800;
+    letter-spacing:.02em;
+    color:#fff;
+  }
+  .topbar .title small{
+    font-size:28px;
+    font-weight:800;
+    letter-spacing:-.03em;
+    color:#fff;
+  }
+  .container{max-width:1200px;margin:14px auto;padding:0 18px 28px}
+  .hero{
+    max-width:1200px;
+    margin:18px auto 0;
+    padding:0 18px;
+  }
+  .hero__card{
+    border:1px solid rgba(15,23,42,.10);
+    border-radius:22px;
+    background:
+      radial-gradient(circle at top right, rgba(0,126,167,.08), transparent 26%),
+      linear-gradient(145deg, #ffffff, #f4f9fc 58%, #eef6fb);
+    box-shadow:0 24px 48px -30px rgba(8,26,36,.32);
+    padding:22px 24px;
+  }
+  .hero__eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 12px;
+    border-radius:999px;
+    background:rgba(8,26,36,.06);
+    color:#081a24;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+  }
+  .hero__title{
+    margin:12px 0 8px;
+    font-size:32px;
+    line-height:1.05;
+    letter-spacing:-.03em;
+    color:#081a24;
+    font-weight:800;
+  }
+  .hero__lead{
+    margin:0;
+    max-width:62ch;
+    color:#526173;
+    font-size:14px;
+    line-height:1.5;
+  }
+  .card{
+    border-radius:20px;
+    box-shadow:0 24px 48px -30px rgba(8,26,36,.32);
+  }
+  .grid{
+    grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr);
+    gap:18px;
+  }
+  .card .hd{padding:18px 20px}
+  .card .hd h2{font-size:22px;letter-spacing:-.02em;color:#081a24}
+  .card .hd{
+    background:linear-gradient(180deg,#fbfdff,#f7fbfd);
+  }
+  .card .bd{padding:18px 20px}
+  .help{line-height:1.55}
+  .form{gap:14px;margin-top:16px}
+  label{
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#5b6b7a;
+  }
+  input,select{height:44px;border-radius:14px}
+  input,select{
+    border-color:rgba(15,23,42,.12);
+  }
+  input:focus,select:focus{
+    border-color:rgba(0,126,167,.45);
+    box-shadow:0 0 0 4px rgba(0,126,167,.12);
+  }
+  button{height:44px;border-radius:14px}
+  .btn{
+    background:linear-gradient(180deg,#0284c7 0%, #0369a1 100%);
+    box-shadow:0 12px 24px -18px rgba(0,126,167,.55);
+  }
+  .btn-outline{
+    border-color:rgba(15,23,42,.12);
+    color:#0b1b2a;
+    font-weight:800;
+  }
+  .tbl{border-radius:16px}
+  .tbl th{
+    background:#f8fbfd;
+    color:#5b6b7a;
+    font-size:12px;
+    letter-spacing:.08em;
+  }
+  .kpi{border-radius:16px;box-shadow:0 18px 28px -26px rgba(8,26,36,.3)}
+  .kpi .v{
+    font-size:26px;
+    letter-spacing:-.03em;
+    color:#081a24;
+  }
+  .note{
+    border-radius:16px;
+  }
+  .emptyState{
+    margin-bottom:14px;
+    padding:14px;
+    border:1px dashed rgba(0,126,167,.28);
+    border-radius:16px;
+    background:#f8fbfd;
+  }
+  .emptyState strong{
+    display:block;
+    margin-bottom:6px;
+    color:#081a24;
+  }
+  .emptyState p{
+    margin:0;
+    color:#526173;
+    font-size:13px;
+    line-height:1.5;
+  }
+  @media (max-width: 720px){
+    .topbar{padding:18px 16px}
+    .topbar .title small{font-size:24px}
+    .hero{padding:0 16px}
+    .hero__card{padding:18px}
+    .hero__title{font-size:28px}
+    .container{padding:0 16px 24px}
+  }
+  @media (max-width: 920px){
+    .grid{grid-template-columns:1fr}
+  }
+</style>
+<script>document.title='BIASON | Adicional Noturno';</script>
+<style id="biason-hub-return">
+  .hubReturnBar{position:fixed;right:18px;bottom:18px;z-index:120;display:flex}
+  .hubReturnBtn{min-height:44px;padding:0 14px;border-radius:14px;border:1px solid rgba(15,23,42,.12);background:#fff;color:#081a24;font:700 13px Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;cursor:pointer;box-shadow:0 16px 30px -24px rgba(8,26,36,.55)}
+  .hubReturnBtn:hover{transform:translateY(-1px);background:#f8fbfd}
+  @page{size:A4;margin:12mm}
+  @media print{body{background:#fff!important}.hubReturnBar{display:none!important}.card,.tableWrap,.panel,.kpi,.summary-item,.total-box,.verdict-box,.chart-container,.preview,.hero__card{box-shadow:none!important;border-color:rgba(15,23,42,.18)!important}}
+</style>
+<script id="biason-hub-return-script">
+  (function(){
+    function biasonGoHub(){
+      try{
+        if(window.top && window.top !== window){
+          window.top.postMessage({type:'BIASON_BACK_TO_HUB'}, '*');
+          return;
+        }
+      }catch(err){}
+      try{ window.location.href = new URL('dashboard_unico_ok5_atualizado.html', window.location.href).href; }
+      catch(err){ window.location.href = 'dashboard_unico_ok5_atualizado.html'; }
+    }
+    document.addEventListener('DOMContentLoaded', function(){
+      if(document.querySelector('.hubReturnBar')) return;
+      var wrap = document.createElement('div');
+      wrap.className = 'hubReturnBar';
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'hubReturnBtn';
+      btn.textContent = 'Voltar ao Hub';
+      btn.addEventListener('click', biasonGoHub);
+      wrap.appendChild(btn);
+      document.body.appendChild(wrap);
+    });
+    window.biasonGoHub = biasonGoHub;
+  })();
+</script>
+<style id="biason-fine-polish">
+  html{scroll-behavior:smooth}
+  ::selection{background:rgba(0,126,167,.18);color:#081a24}
+  *{scrollbar-width:thin;scrollbar-color:rgba(0,126,167,.55) rgba(15,23,42,.08)}
+  *::-webkit-scrollbar{width:10px;height:10px}
+  *::-webkit-scrollbar-track{background:rgba(15,23,42,.06);border-radius:999px}
+  *::-webkit-scrollbar-thumb{background:linear-gradient(180deg, rgba(0,126,167,.72), rgba(8,26,36,.56));border-radius:999px;border:2px solid rgba(255,255,255,.68)}
+  a,button,.btn,.button,.cta-button,input,select,textarea,summary{
+    transition:box-shadow .18s ease,border-color .18s ease,background-color .18s ease,color .18s ease,transform .18s ease,opacity .18s ease;
+  }
+  a:focus-visible,button:focus-visible,.btn:focus-visible,.button:focus-visible,.cta-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{
+    outline:none;
+    border-color:rgba(0,126,167,.55) !important;
+    box-shadow:0 0 0 4px rgba(0,126,167,.18) !important;
+  }
+  .card,.kpi,.result-card,.tableWrap,.chart-container,.dropzone,.help,.sidebar,.hero,.panel,.base-box,.modalPanel{
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background-color .18s ease;
+  }
+  .tableWrap table tbody tr,.inputs-table tbody tr,table tbody tr{transition:background-color .18s ease}
+  .tableWrap table tbody tr:hover td,.inputs-table tbody tr:hover td,table tbody tr:hover td{background:rgba(0,126,167,.04)}
+  .emptyState{
+    border-style:dashed !important;
+    background:linear-gradient(180deg, rgba(0,126,167,.05), rgba(255,255,255,.96)) !important;
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .hero,.sidebar,.card,.kpi,.result-card,.base-box,.tableWrap,.dropzone,.chart-container{
+      animation:biasonFadeUp .34s ease both;
+    }
+  }
+  @keyframes biasonFadeUp{
+    from{opacity:0;transform:translateY(8px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  @media print{
+    *::-webkit-scrollbar{display:none}
+  }
+</style>
+<style id="biason-report-print">
+  @media print{
+    .biasonShellHeader,.hero,.hubReturnBar,.screenOnly{display:none !important}
+    .container{max-width:none !important;margin:0 !important;padding:0 !important}
+    .grid{display:block !important}
+    .card{box-shadow:none !important;border:0 !important}
+    .card .bd{padding:0 !important}
+    .reportCard{margin-top:0 !important;padding:0 !important;border:0 !important;background:#fff !important}
+    .reportGrid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+    .reportItem,.reportNote,.tbl{break-inside:avoid}
+  }
+</style>
+<style id="biason-header-standard">
+  .biasonShellHeader{
+    position:sticky;
+    top:0;
+    z-index:40;
+    padding:0 !important;
+    background:linear-gradient(90deg,#0b3d91 0%, #123f8f 62%, #0a7b8f 100%) !important;
+    color:#fff !important;
+    box-shadow:0 14px 28px -20px rgba(8,26,36,.65) !important;
+    border:none !important;
+  }
+  .biasonShellHeader__inner{
+    max-width:1360px;
+    margin:0 auto;
+    min-height:68px;
+    padding:0 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader__left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-width:0;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader__brand{
+    color:#fff;
+    font-size:17px;
+    line-height:1;
+    font-weight:900;
+    letter-spacing:.02em;
+  }
+  .biasonShellHeader__divider{
+    color:rgba(255,255,255,.5);
+    font-weight:700;
+    line-height:1;
+  }
+  .biasonShellHeader__tool{
+    color:#fff;
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.01em;
+  }
+  .biasonShellHeader__crumb{
+    display:inline-flex;
+    align-items:center;
+    min-height:30px;
+    padding:0 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.20);
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .biasonShellHeader__crumb strong{color:#fff;font-weight:800}
+  .biasonShellHeader__right,
+  .biasonShellHeader .right{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader .btn,
+  .biasonShellHeader .btn-small,
+  .biasonShellHeader button{
+    border-radius:12px;
+  }
+  .biasonShellHeader .brand,
+  .biasonShellHeader .brand__mark,
+  .biasonShellHeader .brand__name,
+  .biasonShellHeader .brand__sub,
+  .biasonShellHeader .pill,
+  .biasonShellHeader .title,
+  .biasonShellHeader .topbar__eyebrow,
+  .biasonShellHeader .topbar__title,
+  .biasonShellHeader .topbar__sub{
+    all:unset;
+  }
+  .biasonShellHeader::before,
+  .biasonShellHeader::after{
+    content:none !important;
+    display:none !important;
+  }
+  @media (max-width:760px){
+    .biasonShellHeader__inner{min-height:64px;padding:10px 12px}
+    .biasonShellHeader__left{gap:10px}
+    .biasonShellHeader__brand{font-size:16px}
+    .biasonShellHeader__tool{font-size:12px}
+    .biasonShellHeader__crumb{font-size:11px;padding:0 10px}
+  }
+</style>
+</head>
+<body>
+    <header class="topbar biasonShellHeader">
+    <div class="biasonShellHeader__inner">
+      <div class="biasonShellHeader__left">
+        <div class="biasonShellHeader__brand">BIASON</div>
+        <div class="biasonShellHeader__divider">|</div>
+        <div class="biasonShellHeader__tool">Adicional Noturno</div>
+        <div class="biasonShellHeader__crumb">Página: Simulação</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="grid">
+      <section class="card screenOnly">
+        <div class="hd">
+          <h2>Dados do funcionário</h2>
+          <span class="badge">Urbano 20% • Rural 25%</span>
+        </div>
+        <div class="bd">
+          <p class="help">
+            Informe o salário, horas mensais e a quantidade de horas trabalhadas no período noturno.
+            Se você informar as horas em <b>tempo “diurno/relógio”</b>, eu converto para <b>hora noturna reduzida (52m30s)</b> no caso urbano.
+            Para <b>rural</b>, não aplico hora reduzida e uso adicional padrão de 25%.
+          </p>
+
+          <div class="form">
+            <div class="field">
+              <label>Salário bruto</label>
+              <input id="slr_bruto" inputmode="decimal" placeholder="R$ 0,00">
+            </div>
+
+            <div class="field">
+              <label>Horas contratuais/mensais</label>
+              <input id="hora_contra" inputmode="numeric" placeholder="Ex.: 220">
+            </div>
+
+            <div class="field">
+              <label>Tipo de hora informada</label>
+              <select id="tipo_hora">
+                <option value="diurna">Diurna (relógio) — converter para noturna</option>
+                <option value="noturna">Noturna (já convertida)</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Empregado rural?</label>
+              <select id="rural">
+                <option value="nao">Não</option>
+                <option value="sim">Sim</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Horas trabalhadas (h)</label>
+              <div class="row">
+                <input id="hora_dia_trab" inputmode="numeric" placeholder="Ex.: 8">
+                <input id="minutos" inputmode="numeric" placeholder="min">
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Percentual do adicional</label>
+              <input id="perc_adic" inputmode="numeric" placeholder="Ex.: 20">
+            </div>
+
+            <div class="field">
+              <label>Dias úteis no mês</label>
+              <input id="dia_util" inputmode="numeric" placeholder="Ex.: 22">
+            </div>
+
+            <div class="field">
+              <label>Domingos/feriados no mês</label>
+              <input id="feriado" inputmode="numeric" placeholder="Ex.: 8">
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn" id="bt_calcular" type="button">Calcular</button>
+            <button class="btn-outline" id="bt_limpar" type="button">Limpar</button>
+            <button class="btn-outline" id="bt_imprimir" type="button">Imprimir demonstrativo</button>
+          </div>
+
+          <div id="status" class="note" style="display:none"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="hd screenOnly">
+          <h2>Resultado</h2>
+        </div>
+        <div class="bd">
+          <div id="resultEmpty" class="emptyState screenOnly">
+            <strong>Antes de calcular</strong>
+            <p>Preencha salario, horas e dias do mes para ver o adicional noturno, o valor de DSR e a hora considerada no calculo.</p>
+          </div>
+          <table class="tbl screenOnly">
+            <thead>
+              <tr>
+                <th>Item</th><th>Valor</th>
+              </tr>
+            </thead>
+            <tbody id="resBody">
+              <tr><td colspan="2" style="color:#64748b">Preencha os dados e clique em Calcular.</td></tr>
+            </tbody>
+          </table>
+
+          <div class="kpis screenOnly">
+            <div class="kpi">
+              <div class="k">Total adicional (sem DSR)</div>
+              <div class="v" id="kpi_total">—</div>
+            </div>
+            <div class="kpi">
+              <div class="k">Horas noturnas (consideradas)</div>
+              <div class="v" id="kpi_horas">—</div>
+            </div>
+          </div>
+
+          <div class="note warn screenOnly" style="margin-top:12px">
+            *Observação: este cálculo segue a lógica padrão da ferramenta-base: urbano com hora reduzida (52m30s) quando horas informadas estão “diurnas/relógio” e rural sem hora reduzida.
+          </div>
+
+          <section class="reportCard" id="reportCard">
+            <span class="reportEyebrow">Demonstrativo final</span>
+            <h3 class="reportTitle">Demonstrativo do adicional noturno</h3>
+            <p class="reportLead">Resumo consolidado para conferência do valor do adicional, reflexo em DSR e total estimado do período informado.</p>
+
+            <div class="reportGrid">
+              <article class="reportItem">
+                <span>Base salarial</span>
+                <strong id="reportSalario">R$ 0,00</strong>
+                <small>Remuneração mensal usada na simulação.</small>
+              </article>
+              <article class="reportItem">
+                <span>Horas consideradas</span>
+                <strong id="reportHoras">0,00</strong>
+                <small>Quantidade de horas noturnas aplicadas no cálculo.</small>
+              </article>
+              <article class="reportItem">
+                <span>Adicional sem DSR</span>
+                <strong id="reportAdicional">R$ 0,00</strong>
+                <small>Valor do adicional noturno sem reflexo semanal.</small>
+              </article>
+              <article class="reportItem">
+                <span>Total com DSR</span>
+                <strong id="reportTotal">R$ 0,00</strong>
+                <small>Valor estimado do adicional com o reflexo informado.</small>
+              </article>
+            </div>
+
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Composição</th>
+                  <th>Valor</th>
+                </tr>
+              </thead>
+              <tbody id="reportBody">
+                <tr><td>Salário base</td><td><b>R$ 0,00</b></td></tr>
+                <tr><td>Horas consideradas</td><td><b>0,00</b></td></tr>
+                <tr><td>Adicional sem DSR</td><td><b>R$ 0,00</b></td></tr>
+                <tr><td>Reflexo de DSR</td><td><b>R$ 0,00</b></td></tr>
+                <tr><td>Total estimado</td><td><b>R$ 0,00</b></td></tr>
+              </tbody>
+            </table>
+
+            <p class="reportNote" id="reportNote">Preencha os dados do cálculo para gerar o demonstrativo final do adicional noturno.</p>
+          </section>
+        </div>
+      </section>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const $ = (id)=>document.getElementById(id);
+  const fmtBRL = (n)=> {
+    if(!isFinite(n)) return "—";
+    return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  };
+  const fmtNum = (n, d=2)=> isFinite(n) ? n.toLocaleString('pt-BR',{minimumFractionDigits:d, maximumFractionDigits:d}) : "—";
+
+  function parseMoneyBR(v){
+    v = String(v||"").trim();
+    if(!v) return NaN;
+    v = v.replace(/R\$\s?/g,'').replace(/\./g,'').replace(',', '.');
+    const n = Number(v);
+    return isFinite(n) ? n : NaN;
+  }
+  function parseIntSafe(v){
+    const n = Number(String(v||"").replace(/\D+/g,''));
+    return isFinite(n)? n : NaN;
+  }
+  function showStatus(kind, msg){
+    const el=$('status');
+    el.className='note '+kind;
+    el.textContent=msg;
+    el.style.display='block';
+  }
+  function clearStatus(){ $('status').style.display='none'; $('status').textContent=''; }
+  function resetReport(){
+    $('reportSalario').textContent = 'R$ 0,00';
+    $('reportHoras').textContent = '0,00';
+    $('reportAdicional').textContent = 'R$ 0,00';
+    $('reportTotal').textContent = 'R$ 0,00';
+    $('reportBody').innerHTML = [
+      ['Salário base','R$ 0,00'],
+      ['Horas consideradas','0,00'],
+      ['Adicional sem DSR','R$ 0,00'],
+      ['Reflexo de DSR','R$ 0,00'],
+      ['Total estimado','R$ 0,00']
+    ].map(r=>`<tr><td>${r[0]}</td><td><b>${r[1]}</b></td></tr>`).join('');
+    $('reportNote').textContent = 'Preencha os dados do cálculo para gerar o demonstrativo final do adicional noturno.';
+  }
+  function renderReport(model){
+    $('reportSalario').textContent = fmtBRL(model.salario);
+    $('reportHoras').textContent = fmtNum(model.horasNoturnas,2);
+    $('reportAdicional').textContent = fmtBRL(model.totalAdicional);
+    $('reportTotal').textContent = fmtBRL(model.totalComDSR);
+    $('reportBody').innerHTML = [
+      ['Salário base', fmtBRL(model.salario)],
+      ['Horas mensais contratuais', fmtNum(model.horasMensais,0)],
+      ['Horas informadas', model.horasInformadas],
+      ['Percentual do adicional', fmtNum(model.perc,0)+'%'],
+      ['Valor da hora base', fmtBRL(model.valorHora)],
+      ['Hora com adicional', fmtBRL(model.valorHoraComAdic)],
+      ['Horas noturnas consideradas', fmtNum(model.horasNoturnas,2)],
+      ['Adicional sem DSR', fmtBRL(model.totalAdicional)],
+      ['Reflexo de DSR', fmtBRL(model.valorDSR)],
+      ['Total estimado com DSR', fmtBRL(model.totalComDSR)]
+    ].map(r=>`<tr><td>${r[0]}</td><td><b>${r[1]}</b></td></tr>`).join('');
+    $('reportNote').textContent = model.observacao;
+  }
+
+  function syncPerc(){
+    const rural = $('rural').value === 'sim';
+    const perc = $('perc_adic');
+    if(!perc.value){
+      perc.value = rural ? "25" : "20";
+    }
+    // se rural, sugerir 25 automaticamente sempre que trocar para sim
+    if(rural){ perc.value = "25"; }
+    else if(perc.value === "25"){ perc.value = "20"; }
+  }
+
+  $('rural').addEventListener('change', syncPerc);
+
+  $('bt_limpar').addEventListener('click', ()=>{
+    ['slr_bruto','hora_contra','hora_dia_trab','minutos','dia_util','feriado','perc_adic'].forEach(id=>$(id).value="");
+    $('tipo_hora').value="diurna";
+    $('rural').value="nao";
+    $('resBody').innerHTML='<tr><td colspan="2" style="color:#64748b">Preencha os dados e clique em Calcular.</td></tr>';
+    $('resultEmpty').style.display='block';
+    $('kpi_total').textContent='—';
+    $('kpi_horas').textContent='—';
+    resetReport();
+    clearStatus();
+  });
+
+  $('bt_imprimir').addEventListener('click', ()=> window.print());
+
+  $('bt_calcular').addEventListener('click', ()=>{
+    clearStatus();
+    const salario = parseMoneyBR($('slr_bruto').value);
+    const horasMensais = Number(String($('hora_contra').value||"").replace(',', '.'));
+    const h = parseIntSafe($('hora_dia_trab').value);
+    const m = parseIntSafe($('minutos').value||"0");
+    const diasUteis = parseIntSafe($('dia_util').value);
+    const feriados = parseIntSafe($('feriado').value);
+    const rural = $('rural').value === 'sim';
+    let perc = Number(String($('perc_adic').value||"").replace('%','').replace(',', '.'));
+    const tipoHora = $('tipo_hora').value;
+
+    if(!isFinite(salario) || salario<=0) return showStatus('err','Informe um salário bruto válido.');
+    if(!isFinite(horasMensais) || horasMensais<=0) return showStatus('err','Informe as horas mensais/contratuais.');
+    if(!isFinite(h) || h<0 || !isFinite(m) || m<0 || m>59) return showStatus('err','Informe horas e minutos trabalhados corretamente.');
+    if(!isFinite(diasUteis) || diasUteis<=0) return showStatus('err','Informe os dias úteis do mês.');
+    if(!isFinite(feriados) || feriados<0) return showStatus('err','Informe domingos/feriados do mês.');
+    if(!isFinite(perc) || perc<=0) perc = rural ? 25 : 20;
+    const domingosFeriados = feriados;
+
+    const totalMin = (h*60) + (m||0);
+
+    // Horas noturnas consideradas:
+    // - Se tipoHora = noturna, já está convertida (60 min/h)
+    // - Se tipoHora = diurna (relógio) e NÃO rural, converte por hora reduzida 52m30s (52.5 min/h)
+    // - Se rural, não usa hora reduzida (60 min/h)
+    let horasNoturnas;
+    if(tipoHora === 'noturna' || rural){
+      horasNoturnas = totalMin / 60;
+    }else{
+      horasNoturnas = totalMin / 52.5; // 52m30s
+    }
+
+    const valorHora = salario / horasMensais;
+    const fator = perc/100;
+
+    const valorHoraComAdic = valorHora * (1 + fator);
+
+    const valorAdicionalHora = valorHora * fator;
+    const totalAdicional = valorAdicionalHora * horasNoturnas;
+    const valorDSR = (diasUteis>0 ? (totalAdicional / diasUteis) * domingosFeriados : 0);
+    const totalComDSR = totalAdicional + valorDSR;
+
+    $('resultEmpty').style.display='none';
+    $('kpi_total').textContent = fmtBRL(totalAdicional);
+    $('kpi_horas').textContent = fmtNum(horasNoturnas,2);
+
+    const rows = [
+      ['Salário bruto', fmtBRL(salario)],
+      ['Horas mensais', fmtNum(horasMensais,0)],
+      ['Horas informadas', `${String(h||0).padStart(2,'0')}:${String(m||0).padStart(2,'0')} (${tipoHora === 'diurna' ? 'diurna/relógio' : 'noturna'})`],
+      ['Percentual adicional', fmtNum(perc,0)+'%'],
+      ['Valor hora', fmtBRL(valorHora)],
+      ['Horas noturnas consideradas', fmtNum(horasNoturnas,2)],
+      ['Valor do adicional noturno (por hora)', fmtBRL(valorAdicionalHora)],
+      ['Total do adicional (sem DSR)', fmtBRL(totalAdicional)],
+      ['Valor RSR/DSR', fmtBRL(valorDSR)],
+      ['Valor da hora com adicional', fmtBRL(valorHoraComAdic)],
+      ['Total geral (com DSR)', fmtBRL(totalComDSR)],
+    ];
+
+    $('resBody').innerHTML = rows.map(r=>`<tr><td>${r[0]}</td><td><b>${r[1]}</b></td></tr>`).join('');
+    renderReport({
+      salario,
+      horasMensais,
+      horasNoturnas,
+      totalAdicional,
+      totalComDSR,
+      valorDSR,
+      valorHora,
+      valorHoraComAdic,
+      perc,
+      horasInformadas: `${String(h||0).padStart(2,'0')}:${String(m||0).padStart(2,'0')} (${tipoHora === 'diurna' ? 'diurna/relógio' : 'noturna'})`,
+      observacao: rural
+        ? 'Cálculo realizado no cenário rural, sem aplicação de hora reduzida. O total considera o percentual informado e o reflexo em DSR.'
+        : (tipoHora === 'diurna'
+            ? 'As horas informadas em relógio foram convertidas para hora noturna reduzida (52m30s) antes da apuração do adicional e do DSR.'
+            : 'As horas informadas já foram tratadas como noturnas convertidas, mantendo o cálculo direto do adicional e do reflexo em DSR.')
+    });
+    showStatus('ok','Cálculo concluído.');
+  });
+
+  // init
+  syncPerc();
+  resetReport();
+})();
+</script>
+
+</body>
+</html>
+
+
+
+

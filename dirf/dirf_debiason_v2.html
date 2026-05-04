@@ -1,0 +1,836 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <title>BIASON | DIRF / IRPF em lote</title>
+  <style>
+    /*
+     * Estilos gerais da aplicação
+     * A página foi desenhada para desktop com um visual limpo e moderno.  
+     * Todos os estilos e scripts estão embutidos para que o arquivo funcione
+     * diretamente com file:// sem necessidade de servidor ou build.
+     */
+    :root {
+      font-family: Arial, Helvetica, sans-serif;
+      color: #333;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f0f2f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      font-size: 24px;
+      margin-top: 0;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      background: #fafafa;
+    }
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      color: #444;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .hint{
+      grid-column: 1 / -1;
+      padding: 10px 12px;
+      border: 1px dashed #bbb;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+    .hint label{
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      line-height: 1.25;
+      flex-wrap: wrap;
+    }
+    .hint input[type="checkbox"]{
+      margin-top: 2px;
+      flex: 0 0 auto;
+    }
+    .hint b{ white-space: nowrap; }
+    .hint small{ display:block; margin-top:6px; color:#555; }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 4px;
+    }
+    input[type="text"],
+    input[type="date"],
+    textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    .drop-zone {
+      border: 2px dashed #007bff;
+      padding: 30px;
+      text-align: center;
+      border-radius: 6px;
+      background: #f5f9ff;
+      color: #555;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .drop-zone.hover {
+      background: #e8f3ff;
+      border-color: #0056b3;
+    }
+    .file-list {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .file-list ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+    .file-list li {
+      margin-bottom: 4px;
+      list-style: disc;
+    }
+    .messages {
+      margin-top: 10px;
+      color: #a94442;
+      background: #f2dede;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ebccd1;
+      display: none;
+      white-space: pre-line;
+    }
+    .messages.show {
+      display: block;
+    }
+    .btn {
+      display: inline-block;
+      margin: 5px 10px 0 0;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      background: #007bff;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s ease;
+    }
+    .btn:hover:not(:disabled) {
+      background: #0056b3;
+    }
+    .btn:disabled {
+      background: #888;
+      cursor: not-allowed;
+    }
+    .preview {
+      border: 1px solid #888;
+      padding: 20px;
+      margin-top: 20px;
+      background: white;
+      border-radius: 4px;
+      font-size: 12px;
+      /* Evitar quebras horizontais na impressão */
+      overflow-x: auto;
+    }
+    /* Tabelas do comprovante com bordas similares ao modelo oficial */
+    .comprovante-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 4px;
+      table-layout: fixed;
+    }
+    .comprovante-table th,
+    .comprovante-table td {
+      border: 1px solid #000;
+      padding: 4px 6px;
+      font-size: 11px;
+      vertical-align: top;
+    }
+    .comprovante-table .heading {
+      background: #f0f0f0;
+      font-weight: bold;
+    }
+    .comprovante-table .small-note {
+      font-size: 9px;
+    }
+    .debug {
+      white-space: pre-wrap;
+      background: #f8f9fa;
+      border: 1px solid #ced4da;
+      padding: 10px;
+      margin-top: 10px;
+      display: none;
+      font-family: monospace;
+      max-height: 300px;
+      overflow: auto;
+      font-size: 13px;
+    }
+    /* Ocultar elementos na impressão */
+    @media print {
+      body {
+        background: white;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .container {
+        box-shadow: none;
+        border: none;
+      }
+      .preview {
+        border: none;
+        padding: 0;
+      }
+    }
+  
+    /* Helpers */
+    .upper { text-transform: uppercase; }
+    .mono { font-variant-numeric: tabular-nums; }
+
+    /* Cabeçalho estilo Receita (apenas no comprovante gerado) */
+    .rfb-header td { vertical-align: middle; }
+    .rfb-logo-cell { width: 85px; text-align: center; }
+    .rfb-logo-cell img { height: 58px; width: auto; display: inline-block; }
+    .rfb-center { text-align: center; font-weight: bold; }
+    .rfb-right { width: 190px; text-align: center; font-weight: bold; }
+    .preview {
+      max-width: 860px;
+      margin: 20px auto 0;
+      overflow-x: visible;
+    }
+    .comprovante {
+      color: #000;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .comprovante-table {
+      margin-bottom: 6px;
+      break-inside: avoid;
+    }
+    .comprovante-table .heading {
+      background: #e6e6e6;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .rfb-header td {
+      padding: 6px 8px;
+    }
+    .rfb-logo-cell {
+      width: 80px;
+    }
+    .rfb-logo-cell img {
+      max-height: 56px;
+    }
+    .rfb-center {
+      line-height: 1.2;
+    }
+    .rfb-right {
+      width: 120px;
+      vertical-align: middle;
+    }
+    .dirf-header-org {
+      margin-bottom: 6px;
+      font-size: 10px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .dirf-header-title {
+      font-size: 12px;
+      line-height: 1.25;
+      text-transform: uppercase;
+    }
+    .dirf-field-label {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .dirf-field-value {
+      display: block;
+      min-height: 16px;
+      font-size: 11px;
+      font-weight: bold;
+      word-break: break-word;
+    }
+    .dirf-money-head {
+      width: 110px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .dirf-money-col {
+      width: 110px;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .dirf-money {
+      display: inline-block;
+      min-width: 72px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .dirf-note-cell {
+      font-size: 10px;
+      line-height: 1.45;
+      min-height: 44px;
+      padding-top: 6px !important;
+      padding-bottom: 6px !important;
+    }
+    .dirf-note-line {
+      display: block;
+      min-height: 15px;
+    }
+    .dirf-note-line + .dirf-note-line {
+      margin-top: 3px;
+    }
+    .dirf-inline-note {
+      display: block;
+      margin-top: 4px;
+      font-size: 10px;
+      font-weight: normal;
+    }
+    .signature-row td {
+      height: 58px;
+      vertical-align: bottom;
+    }
+    .signature-value {
+      display: block;
+      min-height: 30px;
+    }
+    .comprovante-footer td {
+      font-size: 9.5px;
+      text-align: left;
+    }
+
+    /* Ajustes de impressão para caber em 1 página */
+    @media print {
+      @page { size: A4; margin: 10mm; }
+      body { background: white; }
+      .container { margin: 0; padding: 0; max-width: none; }
+      .preview { margin-top: 0; }
+      .comprovante-table th,
+      .comprovante-table td { font-size: 10.5px; padding: 3px 5px; }
+      .rfb-header td { padding: 5px 6px; }
+      .dirf-header-title { font-size: 11px; }
+      h1 { display: none !important; } /* título de tela */
+    }
+
+  </style>
+  <link rel="stylesheet" href="dirf_batch.css">
+  <style id="biason-batch-polish">
+    :root{
+      --brand:#081a24;
+      --brand-2:#0b3d91;
+      --accent:#007ea7;
+      --accent-hover:#006586;
+      --bg:#f4f7fb;
+      --line:rgba(15,23,42,.10);
+      --shadow-lg:0 24px 48px -30px rgba(8,26,36,.48);
+      --radius-lg:20px;
+    }
+    html{scroll-behavior:smooth}
+    body{
+      font-family:'Inter', Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(0,126,167,.10), transparent 24%),
+        linear-gradient(180deg, #eef4f9 0%, #f6f8fb 28%, var(--bg) 100%);
+      color:#0b1b2a;
+    }
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:25;
+      padding:22px 24px;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,.16), transparent 24%),
+        linear-gradient(135deg, #081a24, #0b3d91 68%, #0a6f85);
+      box-shadow:0 18px 40px -28px rgba(8,26,36,.7);
+    }
+    .biasonShellHeader__inner{max-width:1280px;margin:0 auto}
+    .biasonShellHeader__left{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .biasonShellHeader__brand{font-size:18px;font-weight:900;letter-spacing:.08em;color:#fff}
+    .biasonShellHeader__divider{color:rgba(255,255,255,.4);font-weight:700}
+    .biasonShellHeader__tool{font-size:13px;font-weight:800;color:#fff;letter-spacing:.06em;text-transform:uppercase}
+    .biasonShellHeader__crumb{
+      display:inline-flex;
+      align-items:center;
+      min-height:30px;
+      padding:0 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.20);
+      background:rgba(255,255,255,.12);
+      color:#fff;
+      font-size:12px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+    .container{
+      max-width:1280px;
+      margin:18px auto 0;
+      padding:0 24px 32px;
+      background:transparent;
+      border-radius:0;
+      box-shadow:none;
+    }
+    .container > h1{display:none}
+    .screenIntro{
+      padding:22px 24px;
+      margin-bottom:16px;
+      border:1px solid var(--line);
+      border-radius:22px;
+      background:
+        radial-gradient(circle at top right, rgba(0,126,167,.08), transparent 26%),
+        linear-gradient(145deg, #ffffff, #f4f9fc 58%, #eef6fb);
+      box-shadow:var(--shadow-lg);
+    }
+    .screenIntro__eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 12px;
+      border-radius:999px;
+      background:rgba(8,26,36,.06);
+      color:var(--brand);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    .screenIntro h1{
+      display:block;
+      margin:12px 0 8px;
+      text-align:left;
+      font-size:clamp(28px,3vw,34px);
+      line-height:1.05;
+      font-weight:800;
+      letter-spacing:-.03em;
+      color:var(--brand);
+    }
+    .screenIntro__lead{
+      margin:0;
+      max-width:62ch;
+      color:#526173;
+      font-size:14px;
+      line-height:1.5;
+    }
+    .card{
+      border:1px solid var(--line);
+      border-radius:var(--radius-lg);
+      padding:20px;
+      margin-bottom:16px;
+      background:rgba(255,255,255,.94);
+      box-shadow:var(--shadow-lg);
+    }
+    .card h2{
+      color:var(--brand);
+      font-size:22px;
+      letter-spacing:-.02em;
+      margin-bottom:12px;
+    }
+    .grid{
+      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+      gap:14px;
+    }
+    label{
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#5b6b7a;
+      margin-bottom:6px;
+    }
+    input[type="text"],
+    input[type="date"],
+    textarea,
+    select{
+      min-height:46px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      color:#0b1b2a;
+      font-family:'Inter', Arial, Helvetica, sans-serif;
+      font-size:14px;
+    }
+    textarea{min-height:110px}
+    input[type="file"]{
+      width:100%;
+      min-height:46px;
+      padding:7px 10px;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      color:#526173;
+      font:600 13px 'Inter', Arial, Helvetica, sans-serif;
+      box-sizing:border-box;
+    }
+    input[type="file"]::file-selector-button{
+      margin-right:10px;
+      border:none;
+      border-radius:10px;
+      padding:10px 12px;
+      background:#081a24;
+      color:#fff;
+      font:700 12px 'Inter', Arial, Helvetica, sans-serif;
+      cursor:pointer;
+    }
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    textarea:focus,
+    select:focus,
+    input[type="file"]:focus{
+      outline:none;
+      border-color:rgba(0,126,167,.45);
+      box-shadow:0 0 0 4px rgba(0,126,167,.12);
+    }
+    .drop-zone{
+      border-radius:20px;
+      border-color:rgba(0,126,167,.35);
+      background:
+        radial-gradient(circle at top right, rgba(0,126,167,.08), transparent 28%),
+        linear-gradient(180deg, #f9fcff, #f3f8fb);
+      min-height:180px;
+      display:grid;
+      place-items:center;
+      padding:22px;
+      color:#526173;
+      font-weight:600;
+    }
+    .drop-zone.hover{
+      background:#edf8fc;
+      border-color:rgba(0,126,167,.75);
+    }
+    .file-list{
+      margin-top:12px;
+      padding:12px 14px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#fbfdff;
+    }
+    .messages{
+      margin-top:16px;
+      border-radius:16px;
+      padding:12px 14px;
+      font-weight:700;
+      border-color:rgba(185,28,28,.18);
+      background:#fff1f2;
+      color:#b42318;
+    }
+    .actionsRow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:16px;
+    }
+    .btn{
+      min-height:46px;
+      margin:0;
+      padding:0 16px;
+      border-radius:14px;
+      background:#007ea7;
+      font-weight:800;
+      font-family:'Inter', Arial, Helvetica, sans-serif;
+      box-shadow:0 12px 24px -18px rgba(0,126,167,.55);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+    .btn:hover:not(:disabled){background:#006586}
+    .btn:disabled{
+      background:#9fb7c3;
+      box-shadow:none;
+      cursor:not-allowed;
+    }
+    .preview{
+      max-width:none;
+      margin-top:18px;
+      padding:20px;
+      border:1px solid var(--line);
+      border-radius:20px;
+      box-shadow:var(--shadow-lg);
+      background:rgba(255,255,255,.92);
+    }
+    .debug{
+      border-radius:18px;
+      border-color:var(--line);
+      background:#081a24;
+      color:#e4f3f9;
+      padding:16px;
+    }
+    @media (max-width: 720px){
+      .topbar{padding:18px 16px}
+      .container{padding:0 16px 24px}
+      .screenIntro,
+      .card,
+      .preview{padding:18px}
+      .actionsRow .btn{width:100%}
+    }
+    @media print{
+      body{background:#fff!important}
+      .topbar,
+      .screenIntro{display:none!important}
+      .card,
+      .preview{box-shadow:none!important;border-color:rgba(15,23,42,.18)!important}
+    }
+</style>
+  <script>document.title='BIASON | DIRF / IRPF em lote';</script>
+  <style id="biason-hub-return">
+    .hubReturnBar{position:fixed;right:18px;bottom:18px;z-index:120;display:flex}
+    .hubReturnBtn{min-height:44px;padding:0 14px;border-radius:14px;border:1px solid rgba(15,23,42,.12);background:#fff;color:#081a24;font:700 13px Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;cursor:pointer;box-shadow:0 16px 30px -24px rgba(8,26,36,.55)}
+    .hubReturnBtn:hover{transform:translateY(-1px);background:#f8fbfd}
+    @page{size:A4;margin:12mm}
+    @media print{body{background:#fff!important}.hubReturnBar{display:none!important}.card,.preview,.screenIntro{box-shadow:none!important;border-color:rgba(15,23,42,.18)!important}}
+  </style>
+  <script id="biason-hub-return-script">
+    (function(){
+      function resolveHubUrl(){
+        const path = String(window.location.pathname || '').replace(/\\/g, '/').toLowerCase();
+        const target = path.includes('/biason_hub_cliente/dirf/')
+          ? '../BIASON_Hub_Cliente.html'
+          : '../BIASON_Hub_Cliente/BIASON_Hub_Cliente.html';
+        try{
+          return new URL(target, window.location.href).href;
+        }catch(err){
+          return target;
+        }
+      }
+      function biasonGoHub(){
+        try{
+          if(window.top && window.top !== window){
+            window.top.postMessage({type:'BIASON_BACK_TO_HUB'}, '*');
+            return;
+          }
+        }catch(err){}
+        window.location.href = resolveHubUrl();
+      }
+      document.addEventListener('DOMContentLoaded', function(){
+        if(document.querySelector('.hubReturnBar')) return;
+        const wrap = document.createElement('div');
+        wrap.className = 'hubReturnBar';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'hubReturnBtn';
+        btn.textContent = 'Voltar ao Hub';
+        btn.addEventListener('click', biasonGoHub);
+        wrap.appendChild(btn);
+        document.body.appendChild(wrap);
+      });
+      window.biasonGoHub = biasonGoHub;
+    })();
+  </script>
+</head>
+<body>
+  <header class="topbar no-print biasonShellHeader">
+    <div class="biasonShellHeader__inner">
+      <div class="biasonShellHeader__left">
+        <div class="biasonShellHeader__brand">BIASON</div>
+        <div class="biasonShellHeader__divider">|</div>
+        <div class="biasonShellHeader__tool">DIRF / IRPF em lote</div>
+        <div class="biasonShellHeader__crumb">Página: Lote</div>
+      </div>
+    </div>
+  </header>
+  <div class="container">
+    <h1>BIASON DIRF — Comprovante IRPF em lote</h1>
+    <div class="card no-print manual-card">
+      <h2>Manual de uso</h2>
+      <div class="manual-tabs" role="tablist" aria-label="Manual da ferramenta">
+        <button type="button" class="manual-tab is-active" data-manual-tab="como" aria-selected="true">Como usar</button>
+        <button type="button" class="manual-tab" data-manual-tab="zip" aria-selected="false">Padrão do ZIP</button>
+        <button type="button" class="manual-tab" data-manual-tab="excel" aria-selected="false">Padrão do Excel</button>
+      </div>
+      <div class="manual-panels">
+        <section class="manual-panel is-active" data-manual-panel="como">
+          <div class="manual-columns">
+            <div>
+              <h3>Passo a passo</h3>
+              <ol class="manual-list">
+                <li>Carregue a planilha de funcionários em `.xlsx`, `.xls` ou `.csv`.</li>
+                <li>Carregue o ZIP com os XMLs S-5002 ou vários XMLs avulsos.</li>
+                <li>Confira os dados do comprovante: fonte pagadora, ano-calendário, responsável e observações.</li>
+                <li>Clique em `Gerar comprovante`.</li>
+                <li>Use a aba `Comprovantes` para imprimir os formulários e a aba `Relatório de pendências` para conferir quem ficou sem XML ou sem linha na planilha.</li>
+                <li>Se quiser, use `Exportar relatório Excel` para baixar as pendências em `.xlsx`.</li>
+              </ol>
+            </div>
+            <div>
+              <h3>Regras importantes</h3>
+              <ul class="manual-list">
+                <li>O matching recomendado é `Automático (CPF, depois nome)`.</li>
+                <li>Se a base tiver CPF correto na planilha e no XML, o casamento mais confiável será por CPF.</li>
+                <li>Funcionário sem XML só aparece no relatório se estiver na planilha.</li>
+                <li>XML sem linha na planilha aparece na aba `Relatório de pendências`.</li>
+                <li>O relatório de pendências também pode ser impresso ou exportado para Excel.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+        <section class="manual-panel" data-manual-panel="zip">
+          <div class="manual-columns">
+            <div>
+              <h3>Formato aceito</h3>
+              <ul class="manual-list">
+                <li>ZIP com uma pasta por funcionário e os XMLs mensais dentro.</li>
+                <li>ZIP com XMLs soltos também funciona.</li>
+                <li>O ideal é ter 1 XML por mês por funcionário.</li>
+                <li>O nome do arquivo ajuda, mas o CPF dentro do XML é o principal identificador.</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Exemplo recomendado</h3>
+              <pre class="manual-code">CALCADOS DEVES/
+  JOAO DA SILVA/
+    012025_JOAO DA SILVA.xml
+    022025_JOAO DA SILVA.xml
+    032025_JOAO DA SILVA.xml
+  MARIA DE SOUZA/
+    012025_MARIA DE SOUZA.xml
+    022025_MARIA DE SOUZA.xml</pre>
+            </div>
+          </div>
+          <p class="manual-note">Dica: mesmo que o nome da pasta ou do arquivo varie, a ferramenta consegue usar o CPF do XML. O padrão `MMYYYY_NOME.xml` continua sendo o mais seguro para organização.</p>
+        </section>
+        <section class="manual-panel" data-manual-panel="excel">
+          <div class="manual-columns">
+            <div>
+              <h3>Estrutura recomendada</h3>
+              <ul class="manual-list">
+                <li>Use a primeira linha como cabeçalho.</li>
+                <li>Deixe 1 funcionário por linha.</li>
+                <li>Colunas preferidas: `Nome`, `CPF` e `Matrícula` ou `Cód Epr`.</li>
+                <li>Não use células mescladas.</li>
+                <li>Evite linhas em branco no meio da base.</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Exemplo de cabeçalho</h3>
+              <pre class="manual-code">Nome | CPF | Matrícula
+JOAO DA SILVA | 12345678901 | 1001
+MARIA DE SOUZA | 98765432100 | 1002</pre>
+            </div>
+          </div>
+          <p class="manual-note">Importante: a ferramenta lê a primeira aba da planilha. Se o arquivo tiver várias abas, deixe a lista final de funcionários na primeira aba e mantenha esse mesmo padrão de colunas.</p>
+        </section>
+      </div>
+    </div>
+    <div class="card no-print">
+      <h2>Upload de XMLs S‑5002</h2>
+      <div class="batch-input-grid">
+        <div>
+          <label for="employeeSheet">Planilha de funcionários (.xlsx, .xls ou .csv)</label>
+          <input type="file" id="employeeSheet" accept=".xlsx,.xls,.csv" />
+        </div>
+        <div>
+          <label for="xmlBundle">XMLs S‑5002 ou ZIP com XMLs</label>
+          <input type="file" id="xmlBundle" accept=".zip,.xml" multiple />
+        </div>
+        <div>
+          <label for="matchField">Critério de matching</label>
+          <select id="matchField">
+            <option value="auto">Automático (CPF, depois nome)</option>
+            <option value="cpf">CPF</option>
+            <option value="matricula">Matrícula / código</option>
+            <option value="nome">Nome</option>
+          </select>
+        </div>
+      </div>
+      <div class="drop-grid">
+        <div id="sheetDropZone" class="drop-zone">Clique ou arraste a planilha de funcionários aqui</div>
+        <div id="xmlDropZone" class="drop-zone">Clique ou arraste os XMLs do ano (01..12) aqui</div>
+      </div>
+      <div id="fileList" class="file-list"></div>
+    </div>
+
+    <div class="card no-print">
+      <h2>Dados do Comprovante</h2>
+      <div class="grid">
+        <div>
+          <label for="pagadoraNome">Fonte Pagadora — Nome</label>
+          <input type="text" id="pagadoraNome" />
+        </div>
+        <div>
+          <label for="pagadoraInsc">Fonte Pagadora — CNPJ/CPF</label>
+          <input type="text" id="pagadoraInsc" />
+        </div>
+        <div>
+          <label for="natureza">Natureza do rendimento</label>
+          <input type="text" id="natureza" value="Trabalhador Assalariado" />
+        </div>
+        <div>
+          <label for="anoCal">Ano‑calendário</label>
+          <input type="text" id="anoCal" maxlength="4" />
+        </div>
+        <div>
+          <label for="dataEmissao">Data de emissão</label>
+          <input type="date" id="dataEmissao" />
+        </div>
+        <div>
+          <label for="responsavel">Responsável — Nome</label>
+          <input type="text" id="responsavel" />
+        </div>
+        <div>
+          <label for="responsavelCPF">Responsável — CPF</label>
+          <input type="text" id="responsavelCPF" />
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <label for="infoCompl">Informações complementares</label>
+          <textarea id="infoCompl"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="actionsRow no-print">
+      <button id="generateBtn" class="btn">Gerar comprovante</button>
+      <button id="printBtn" class="btn" disabled>Imprimir / Salvar PDF</button>
+      <button id="exportReportBtn" class="btn" disabled>Exportar relatório Excel</button>
+      <button id="clearBtn" class="btn">Limpar</button>
+      <button id="debugBtn" class="btn">Debug</button>
+    </div>
+
+    <div id="messages" class="messages no-print"></div>
+    <div id="debugPanel" class="debug"></div>
+    <div id="previewTabs" class="preview-tabs no-print" hidden>
+      <button type="button" class="preview-tab is-active" data-preview-tab="comprovantes" aria-selected="true">Comprovantes</button>
+      <button type="button" class="preview-tab" data-preview-tab="relatorio" aria-selected="false">Relatório de pendências</button>
+    </div>
+    <div id="preview" class="preview"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="dirf_batch.js"></script>
+</body>
+</html>
+
+

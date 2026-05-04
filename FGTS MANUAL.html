@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BIASON | FGTS Digital Manual</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --brand:#0b3d91;
+      --brand-dark:#081a24;
+      --accent:#0a7b8f;
+      --bg:#f4f7fb;
+      --surface:#ffffff;
+      --line:rgba(15,23,42,.10);
+      --text:#0b1b2a;
+      --muted:#526173;
+      --radius:20px;
+      --shadow:0 24px 48px -30px rgba(8,26,36,.48);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:'Inter',Arial,sans-serif;color:var(--text);background:radial-gradient(circle at top right, rgba(0,126,167,.10), transparent 24%),linear-gradient(180deg,#eef4f9 0%,#f6f8fb 28%,var(--bg) 100%)}
+    .shell-header{position:sticky;top:0;z-index:30;background:linear-gradient(90deg,#0b3d91 0%, #123f8f 62%, #0a7b8f 100%);color:#fff;box-shadow:0 14px 28px -20px rgba(8,26,36,.65)}
+    .shell-header__inner{max-width:1360px;min-height:68px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+    .brand{font-size:17px;font-weight:900;letter-spacing:.02em}.divider{opacity:.5;font-weight:800}.tool-title{font-size:13px;font-weight:800}
+    .crumb{display:inline-flex;align-items:center;min-height:30px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.20);background:rgba(255,255,255,.12);font-size:12px;font-weight:700}
+    main{max-width:1380px;margin:18px auto 0;padding:0 18px 36px;display:grid;grid-template-columns:minmax(320px,370px) minmax(0,1fr);gap:20px}
+    .card{background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:24px;min-width:0}
+    .guide{position:sticky;top:88px;align-self:start;background:linear-gradient(180deg, rgba(8,26,36,.03), rgba(0,126,167,.05));padding-bottom:26px}
+    .card h2{margin:0 0 14px;font-size:clamp(22px,2.3vw,28px);line-height:1.1;letter-spacing:-.02em;color:var(--brand-dark)}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;min-height:28px;padding:0 11px;margin-bottom:14px;border-radius:999px;background:#eef7fb;color:var(--accent);border:1px solid rgba(0,126,167,.14);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+    .guide section+section{margin-top:18px}.guide h3{margin:0 0 8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--accent)}
+    .guide p,.guide li,.muted{color:var(--muted);line-height:1.6;font-size:13px}.guide ul{margin:0;padding-left:18px}
+    .hero-note{margin-top:18px;padding:16px 16px;border:1px dashed rgba(0,126,167,.26);border-radius:18px;background:linear-gradient(180deg, rgba(0,126,167,.06), rgba(255,255,255,.98))}.hero-note strong{display:block;margin-bottom:7px;color:var(--brand-dark);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+    .tool-layout{display:grid;gap:18px}.panel{border:1px solid var(--line);border-radius:20px;background:#fff;padding:18px 18px 16px;box-shadow:0 20px 30px -28px rgba(8,26,36,.28)}.panel h3{margin:0 0 12px;font-size:16px;color:var(--brand-dark);letter-spacing:-.02em}
+    .form-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:14px}
+    label{display:block;margin-bottom:6px;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.02em}
+    input{width:100%;min-height:46px;border:1px solid rgba(15,23,42,.12);border-radius:14px;background:#fff;padding:10px 12px;font:500 14px 'Inter',Arial,sans-serif;color:var(--text)}
+    input:focus{outline:none;border-color:rgba(0,126,167,.45);box-shadow:0 0 0 4px rgba(0,126,167,.12)} input[disabled]{background:#f3f6fa;color:#6b7788}
+    .btn-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+    button{min-height:46px;border:none;border-radius:14px;padding:0 16px;cursor:pointer;font:800 14px 'Inter',Arial,sans-serif;transition:transform .18s ease,box-shadow .18s ease,background-color .18s ease} button:hover{transform:translateY(-1px)}
+    .btn-primary{background:#007ea7;color:#fff;box-shadow:0 12px 24px -18px rgba(0,126,167,.55)} .btn-primary:hover{background:#006586}
+    .btn-secondary{background:#eef4f8;color:#08203b;border:1px solid rgba(15,23,42,.10)} .btn-danger{background:#fff4f4;color:#991b1b;border:1px solid rgba(220,38,38,.15)}
+    .kpis{display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px}.kpi{border:1px solid var(--line);border-radius:16px;padding:14px;background:linear-gradient(180deg, rgba(8,26,36,.01), rgba(0,126,167,.03))}
+    .kpi .label{color:var(--muted);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}.kpi .value{margin-top:8px;font-size:24px;font-weight:900;letter-spacing:-.03em;color:var(--brand-dark)}
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.6)} table{width:100%;border-collapse:separate;border-spacing:0;min-width:840px}
+    thead th{position:sticky;top:0;z-index:1;background:#f8fbfd;color:#0b3d91;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:12px 10px;border-bottom:1px solid var(--line);text-align:left}
+    tbody td{padding:10px;border-bottom:1px solid rgba(15,23,42,.08);vertical-align:middle;background:#fff} tbody tr:hover td{background:rgba(0,126,167,.04)} tbody tr:last-child td{border-bottom:none}
+    .small{font-size:12px;color:var(--muted)} .inline-actions{display:flex;gap:8px;flex-wrap:wrap}.mini-btn{min-height:36px;padding:0 10px;border-radius:12px;font-size:12px;font-weight:800}
+    .msg{display:none;margin-top:14px;border-radius:16px;padding:12px 14px;font-size:13px;font-weight:700}.msg.ok{display:block;background:rgba(34,197,94,.10);color:#166534;border:1px solid rgba(34,197,94,.35)}.msg.warn{display:block;background:rgba(245,158,11,.10);color:#92400e;border:1px solid rgba(245,158,11,.35)}.msg.bad{display:block;background:rgba(239,68,68,.10);color:#7f1d1d;border:1px solid rgba(239,68,68,.35)}
+    pre{margin:0;border-radius:18px;border:1px solid rgba(15,23,42,.10);background:linear-gradient(180deg,#081a24,#0d2232);color:#e4f3f9;padding:18px;font:12px/1.6 'Courier New',monospace;white-space:pre-wrap;max-height:360px;overflow:auto;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+    .footnote{margin-top:12px;color:var(--muted);font-size:12px;line-height:1.55}.muted-box{padding:14px 16px;border:1px dashed rgba(0,126,167,.25);border-radius:16px;background:#f8fbfd;color:var(--muted);font-size:13px;line-height:1.6}.preview-panel{margin-top:18px;background:linear-gradient(180deg,#fbfdff,#f4f9fc);border-color:rgba(0,126,167,.16)}.preview-panel h3{display:flex;align-items:center;justify-content:space-between;gap:12px}.preview-pill{display:inline-flex;align-items:center;min-height:28px;padding:0 10px;border-radius:999px;background:rgba(8,26,36,.06);color:#365066;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+    @media (max-width:1024px){main{grid-template-columns:1fr}.guide{position:static;top:auto}} @media (max-width:720px){.shell-header__inner{min-height:64px;padding:10px 12px}main{padding:0 12px 24px}.card{padding:18px}.btn-row button{width:100%}}
+  </style>
+</head>
+<body>
+  <header class="shell-header">
+    <div class="shell-header__inner">
+      <div class="brand">BIASON</div>
+      <div class="divider">|</div>
+      <div class="tool-title">FGTS Digital</div>
+      <div class="crumb">Página: Preenchimento Manual</div>
+    </div>
+  </header>
+
+  <main>
+    <aside class="guide card">
+      <div class="eyebrow">Manual</div>
+      <h2>Gerador Manual de TXT FGTS</h2>
+      <section>
+        <h3>Como usar</h3>
+        <ul>
+          <li>Preencha os dados fixos do trabalhador e do empregador.</li>
+          <li>Adicione as competências manualmente ou gere um intervalo automático.</li>
+          <li>Informe a remuneração mensal e, quando existir, a remuneração de 13º.</li>
+          <li>Clique em <strong>Gerar TXT</strong> para baixar e visualizar o conteúdo.</li>
+        </ul>
+      </section>
+      <section>
+        <h3>Lógica do arquivo</h3>
+        <p>Esta versão foi feita para <strong>preenchimento manual</strong>. Você informa diretamente as competências e os valores que devem ir para <strong>remuneração</strong> e <strong>remuneração 13º</strong> no layout do FGTS Digital.</p>
+      </section>
+      <section>
+        <h3>Quando usar</h3>
+        <p>Ideal para recomposição histórica, acertos retroativos e geração rápida de arquivos TXT quando você já conhece os valores corretos.</p>
+      </section>
+      <div class="hero-note"><strong>Padrão já ajustado</strong>Categoria fixa em <strong>101</strong>, com foco em envio de remuneração no layout que você vem usando.</div>
+    </aside>
+
+    <section class="tool-layout">
+      <div class="card">
+        <div class="eyebrow">Dados fixos</div>
+        <h2>Cadastro do vínculo</h2>
+        <div class="panel">
+          <h3>Informações do cabeçalho</h3>
+          <div class="form-grid">
+            <div><label for="empregador">CNPJ base do empregador</label><input id="empregador" type="text" placeholder="Ex.: 49387603"></div>
+            <div><label for="cpf">CPF do trabalhador</label><input id="cpf" type="text" placeholder="Ex.: 10972118608"></div>
+            <div><label for="admissao">Data de admissão</label><input id="admissao" type="text" placeholder="DD-MM-AAAA"></div>
+            <div><label for="matricula">Matrícula / eSocial</label><input id="matricula" type="text" placeholder="Ex.: 34"></div>
+            <div><label for="categoria">Categoria</label><input id="categoria" type="text" value="101" disabled></div>
+            <div><label for="nomeRef">Nome de referência (opcional)</label><input id="nomeRef" type="text" placeholder="Só para controle visual"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Gerar intervalo automático</h3>
+          <div class="form-grid">
+            <div><label for="compIni">Competência inicial</label><input id="compIni" type="text" placeholder="MM-AAAA"></div>
+            <div><label for="compFim">Competência final</label><input id="compFim" type="text" placeholder="MM-AAAA"></div>
+            <div><label for="valorMensal">Remuneração mensal padrão</label><input id="valorMensal" type="text" placeholder="Ex.: 400,00"></div>
+            <div><label for="valor13">Remuneração 13º para dezembro</label><input id="valor13" type="text" placeholder="Ex.: 200,00"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-primary" id="btnGerarIntervalo" type="button">Gerar intervalo</button>
+            <button class="btn-secondary" id="btnAdicionarLinha" type="button">Adicionar competência manual</button>
+            <button class="btn-danger" id="btnLimparLinhas" type="button">Limpar competências</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Resumo</h3>
+          <div class="kpis">
+            <div class="kpi"><div class="label">Competências</div><div class="value" id="kpiCompetencias">0</div></div>
+            <div class="kpi"><div class="label">Com 13º</div><div class="value" id="kpi13">0</div></div>
+            <div class="kpi"><div class="label">Total remuneração</div><div class="value" id="kpiTotal">0,00</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">Lançamentos</div>
+        <h2>Competências manuais</h2>
+        <div class="muted-box">Preencha diretamente a remuneração principal e, quando necessário, a remuneração de 13º. Você pode editar qualquer linha antes de gerar o TXT.</div>
+        <div class="table-wrap" style="margin-top:16px;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:70px;">#</th>
+                <th style="width:160px;">Competência</th>
+                <th>Remuneração</th>
+                <th>Remuneração 13º</th>
+                <th>Observação</th>
+                <th style="width:120px;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyRows"></tbody>
+          </table>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" id="btnGerarTxt" type="button">Gerar TXT</button>
+          <button class="btn-secondary" id="btnCopiarTxt" type="button">Copiar TXT</button>
+          <button class="btn-secondary" id="btnBaixarCsv" type="button">Baixar CSV das linhas</button>
+        </div>
+        <div id="msg" class="msg"></div>
+        <div class="panel preview-panel" style="margin-top: 18px;">
+          <h3><span>Prévia do TXT</span><span class="preview-pill">Saída pronta</span></h3>
+          <pre id="out">—</pre>
+          <div class="footnote">Formato gerado: <strong>1;empregador;cpf;admissao;matricula;</strong> e depois uma linha por competência no padrão <strong>2;MM-AAAA;101;remuneração;remuneração13;</strong>.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const $ = (id) => document.getElementById(id);
+      const tbody = $("tbodyRows");
+      let generatedTxt = "";
+      const sanitizeDigits = (v) => String(v || "").replace(/\D+/g, "");
+      const normalizeMoney = (v) => {
+        let s = String(v || "").trim();
+        if(!s) return "";
+        s = s.replace(/\./g, "").replace(",", ".");
+        const n = Number(s);
+        return Number.isFinite(n) ? n.toFixed(2).replace(".", ",") : "";
+      };
+      const moneyToNumber = (v) => {
+        const s = String(v || "").trim().replace(/\./g, "").replace(",", ".");
+        const n = Number(s);
+        return Number.isFinite(n) ? n : 0;
+      };
+      const fmtMoney = (n) => Number(n || 0).toFixed(2).replace(".", ",");
+      const compToNum = (comp) => {
+        const m = /^(\d{2})-(\d{4})$/.exec(String(comp || "").trim());
+        if(!m) return null;
+        const mm = Number(m[1]), yy = Number(m[2]);
+        if(mm < 1 || mm > 12) return null;
+        return yy * 100 + mm;
+      };
+      const numToComp = (num) => String(num % 100).padStart(2, "0") + "-" + String(Math.floor(num / 100));
+      const addMonths = (num, d) => {
+        let y = Math.floor(num / 100), m = num % 100;
+        m += d;
+        while(m > 12){ m -= 12; y++; }
+        while(m < 1){ m += 12; y--; }
+        return y * 100 + m;
+      };
+      function showMsg(kind, text){ const el = $("msg"); el.className = "msg " + kind; el.innerHTML = text; }
+      function clearMsg(){ const el = $("msg"); el.className = "msg"; el.innerHTML = ""; }
+      function getRowData(tr){
+        return {
+          comp: tr.querySelector('.inp-comp').value.trim(),
+          rem: normalizeMoney(tr.querySelector('.inp-rem').value),
+          rem13: normalizeMoney(tr.querySelector('.inp-13').value),
+          obs: tr.querySelector('.inp-obs').value.trim()
+        };
+      }
+      function refreshTable(){
+        const rows = [...tbody.querySelectorAll('tr')];
+        let total = 0, qtd13 = 0;
+        rows.forEach((tr, i) => {
+          tr.querySelector('.row-index').textContent = String(i + 1).padStart(2, '0');
+          const data = getRowData(tr);
+          total += moneyToNumber(data.rem) + moneyToNumber(data.rem13);
+          if(moneyToNumber(data.rem13) > 0) qtd13++;
+        });
+        $('kpiCompetencias').textContent = rows.length;
+        $('kpi13').textContent = qtd13;
+        $('kpiTotal').textContent = fmtMoney(total);
+      }
+      function makeRow(data = {}){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="small row-index"></td>
+          <td><input type="text" class="inp-comp" placeholder="MM-AAAA" value="${data.comp || ''}"></td>
+          <td><input type="text" class="inp-rem" placeholder="0,00" value="${data.rem || ''}"></td>
+          <td><input type="text" class="inp-13" placeholder="0,00" value="${data.rem13 || ''}"></td>
+          <td><input type="text" class="inp-obs" placeholder="Opcional" value="${data.obs || ''}"></td>
+          <td><div class="inline-actions"><button type="button" class="mini-btn btn-secondary btn-dup">Duplicar</button><button type="button" class="mini-btn btn-danger btn-del">Excluir</button></div></td>`;
+        tbody.appendChild(tr);
+        tr.querySelector('.btn-del').addEventListener('click', () => { tr.remove(); refreshTable(); });
+        tr.querySelector('.btn-dup').addEventListener('click', () => { makeRow(getRowData(tr)); refreshTable(); });
+        tr.querySelectorAll('input').forEach(inp => {
+          inp.addEventListener('input', refreshTable);
+          inp.addEventListener('blur', () => { if(inp.classList.contains('inp-rem') || inp.classList.contains('inp-13')) inp.value = normalizeMoney(inp.value); refreshTable(); });
+        });
+        refreshTable();
+      }
+      function getRows(){ return [...tbody.querySelectorAll('tr')].map(getRowData); }
+      function sortRowsByCompetencia(){
+        const rows = getRows().slice().sort((a,b) => (compToNum(a.comp)||0) - (compToNum(b.comp)||0));
+        tbody.innerHTML = '';
+        rows.forEach(makeRow);
+        refreshTable();
+      }
+      function validateHeader(){
+        const emp = sanitizeDigits($('empregador').value), cpf = sanitizeDigits($('cpf').value), adm = $('admissao').value.trim(), mat = $('matricula').value.trim();
+        if(!(emp.length === 8 || emp.length === 11)) return 'Informe um CNPJ base válido com 8 dígitos ou código compatível com 11 dígitos.';
+        if(cpf.length !== 11) return 'Informe um CPF válido com 11 dígitos.';
+        if(!/^\d{2}-\d{2}-\d{4}$/.test(adm)) return 'Informe a data de admissão no formato DD-MM-AAAA.';
+        if(!mat) return 'Informe a matrícula / eSocial.';
+        return '';
+      }
+      function validateRows(rows){
+        if(!rows.length) return 'Adicione pelo menos uma competência.';
+        const seen = new Set();
+        for(const row of rows){
+          if(!compToNum(row.comp)) return `Competência inválida: ${row.comp || '(vazia)'}. Use MM-AAAA.`;
+          if(seen.has(row.comp)) return `Competência duplicada: ${row.comp}.`;
+          seen.add(row.comp);
+          if(!row.rem && !row.rem13) return `A competência ${row.comp} está sem remuneração.`;
+        }
+        return '';
+      }
+      function buildTxt(){
+        clearMsg();
+        sortRowsByCompetencia();
+        const headerError = validateHeader();
+        if(headerError){ showMsg('bad', headerError); return ''; }
+        const rows = getRows();
+        const rowError = validateRows(rows);
+        if(rowError){ showMsg('bad', rowError); return ''; }
+        const emp = sanitizeDigits($('empregador').value), cpf = sanitizeDigits($('cpf').value), adm = $('admissao').value.trim(), mat = $('matricula').value.trim();
+        const lines = [`1;${emp};${cpf};${adm};${mat};`];
+        rows.forEach(row => lines.push(`2;${row.comp};101;${normalizeMoney(row.rem) || ''};${normalizeMoney(row.rem13) || ''};`));
+        generatedTxt = lines.join('\r\n');
+        $('out').textContent = generatedTxt;
+        showMsg('ok', 'TXT gerado com sucesso.');
+        return generatedTxt;
+      }
+      function downloadText(filename, text, type='text/plain;charset=utf-8'){
+        const blob = new Blob([text], {type});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      }
+      function gerarIntervalo(){
+        clearMsg();
+        const ini = $('compIni').value.trim(), fim = $('compFim').value.trim(), valorMensal = normalizeMoney($('valorMensal').value), valor13 = normalizeMoney($('valor13').value);
+        const nIni = compToNum(ini), nFim = compToNum(fim);
+        if(!nIni || !nFim) return showMsg('bad', 'Informe competência inicial e final no formato MM-AAAA.');
+        if(nIni > nFim) return showMsg('bad', 'A competência inicial não pode ser maior que a final.');
+        if(!valorMensal) return showMsg('bad', 'Informe a remuneração mensal padrão.');
+        tbody.innerHTML = '';
+        for(let cur = nIni; cur <= nFim; cur = addMonths(cur, 1)){
+          const comp = numToComp(cur), mes = Number(comp.slice(0,2)), isDez = mes === 12;
+          makeRow({ comp, rem: isDez && valor13 ? valor13 : valorMensal, rem13: isDez && valor13 ? valor13 : '', obs: isDez && valor13 ? 'Dezembro com 13º' : '' });
+        }
+        refreshTable();
+        showMsg('ok', 'Intervalo gerado com sucesso.');
+      }
+      function baixarCsv(){
+        const rows = getRows();
+        if(!rows.length) return showMsg('warn', 'Não há linhas para exportar.');
+        const csv = ['competencia;remuneracao;remuneracao_13;observacao', ...rows.map(r => [r.comp, r.rem || '', r.rem13 || '', (r.obs || '').replace(/;/g, ',')].join(';'))].join('\r\n');
+        downloadText('FGTS_manual_linhas.csv', csv, 'text/csv;charset=utf-8');
+        showMsg('ok', 'CSV das linhas baixado.');
+      }
+      $('btnAdicionarLinha').addEventListener('click', () => makeRow());
+      $('btnLimparLinhas').addEventListener('click', () => { tbody.innerHTML = ''; refreshTable(); generatedTxt = ''; $('out').textContent = '—'; clearMsg(); });
+      $('btnGerarIntervalo').addEventListener('click', gerarIntervalo);
+      $('btnGerarTxt').addEventListener('click', () => {
+        const txt = buildTxt();
+        if(!txt) return;
+        const cpf = sanitizeDigits($('cpf').value) || 'cpf';
+        const nome = ($('nomeRef').value || 'manual').trim().replace(/[^\w\-]+/g, '_');
+        downloadText(`FGTS_manual_${nome}_${cpf}.txt`, txt);
+      });
+      $('btnCopiarTxt').addEventListener('click', async () => {
+        if(!generatedTxt){ const txt = buildTxt(); if(!txt) return; }
+        try{ await navigator.clipboard.writeText(generatedTxt); showMsg('ok', 'TXT copiado.'); }
+        catch{ showMsg('warn', 'Não foi possível copiar automaticamente. Copie manualmente da prévia.'); }
+      });
+      $('btnBaixarCsv').addEventListener('click', baixarCsv);
+      makeRow();
+      refreshTable();
+    })();
+  </script>
+</body>
+</html>

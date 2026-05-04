@@ -1,0 +1,1235 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>De Biason | Calculadora de Custo de Funcionário (CLT)</title>
+  <!--
+    Esta página implementa uma versão reimaginada da “Calculadora de Custo de
+    Funcionário (CLT)” seguindo o Design System unificado da marca De Biason.
+    Toda a lógica de cálculo original foi preservada para que os resultados
+    permaneçam idênticos ao da ferramenta base. A interface foi redesenhada
+    para oferecer uma experiência consistente com as demais ferramentas,
+    utilizando a mesma paleta de cores, tipografia, sombras e raios de borda.
+    Comentários no código explicam as seções principais e pontos de ajuste.
+  -->
+  <!-- Importa a fonte Inter para uma tipografia moderna e legível -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /*
+      === Design System De Biason ===
+      Definição de cores, bordas e sombras de acordo com a paleta enviada.
+      Ajuste os valores aqui para refletir as cores oficiais da marca.
+    */
+    :root {
+      --color-brand: #003f8c;        /* azul escuro para cabeçalhos e identidade */
+      --color-accent: #007593;       /* azul petróleo para CTAs */
+      --color-background: #f2f4f7;   /* off‑white para fundos */
+      --color-surface: #ffffff;      /* branco para cartões */
+      --color-text-primary: #08203b; /* cinza azulado para textos principais */
+      --color-text-secondary: #445b78;/* cor neutra para descrições */
+      --color-border: #e0e4eb;       /* borda sutil */
+      --radius: 12px;                /* raio de borda padrão */
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.1); /* sombra leve */
+      --font-family: 'Inter', Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      background-color: var(--color-background);
+      color: var(--color-text-primary);
+    }
+    h1, h2, h3 {
+      margin: 0;
+    }
+    /* Cabeçalho principal com marca e título da ferramenta */
+    header {
+      background-color: var(--color-brand);
+      color: #fff;
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow);
+    }
+    header .brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    /* Layout principal: duas colunas (guia e calculadora) */
+    main {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    /* Cartões reutilizáveis */
+    .card {
+      background-color: var(--color-surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .card h2 {
+      color: var(--color-brand);
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    /* Guia de utilização */
+    .guide section + section {
+      margin-top: 1rem;
+    }
+    .guide h3 {
+      font-size: 1rem;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+    }
+    .guide p, .guide li {
+      color: var(--color-text-secondary);
+      font-size: 0.875rem;
+    }
+    .guide ul {
+      padding-left: 1.25rem;
+      margin: 0;
+    }
+    .guide li {
+      margin-bottom: 0.5rem;
+    }
+    /* Calculadora: organização de campos em grid */
+    .calculator {
+      flex: 2;
+    }
+    .section {
+      margin-bottom: 1.5rem;
+    }
+    .section h3 {
+      font-size: 1rem;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.25rem;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background-color: var(--color-surface);
+      font-family: var(--font-family);
+      font-size: 0.875rem;
+      color: var(--color-text-primary);
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--color-brand);
+      box-shadow: 0 0 0 3px rgba(0, 63, 140, 0.1);
+    }
+    input[readonly] {
+      background-color: #f0f4f8;
+      color: var(--color-text-secondary);
+    }
+    /* Botões de chamada para ação */
+    .cta-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .cta-button {
+      padding: 0.7rem 1.25rem;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .cta-primary {
+      background-color: var(--color-accent);
+      color: #fff;
+    }
+    .cta-secondary {
+      background-color: var(--color-border);
+      color: var(--color-text-primary);
+    }
+    .cta-primary:hover {
+      background-color: #005f74;
+    }
+    .cta-secondary:hover {
+      background-color: #d0d4dc;
+    }
+    /* Resultados */
+    .results {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .total-box {
+      padding: 1rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background-color: #eff3f9;
+    }
+    .total-box h3 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--color-brand);
+    }
+    .total-box p {
+      margin: 0.5rem 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-accent);
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .chip {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background-color: var(--color-surface);
+      padding: 0.4rem 0.6rem;
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+    }
+    .chip strong {
+      color: var(--color-accent);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+    }
+    th, td {
+      padding: 0.5rem 0.5rem;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 0.8rem;
+    }
+    th {
+      text-align: left;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      font-weight: 600;
+    }
+    td.val {
+      text-align: right;
+      white-space: nowrap;
+      font-family: monospace;
+      color: var(--color-text-primary);
+    }
+    .footnote {
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      margin-top: 1rem;
+      line-height: 1.4;
+    }
+    /* Relatório para impressão */
+    #pdfReport {
+      display: none;
+      background: #fff;
+      color: #0f172a;
+      padding: 1.4rem;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    #pdfReport .pdf-badge{
+      display:inline-flex;
+      align-items:center;
+      min-height:24px;
+      padding:0 10px;
+      border-radius:999px;
+      background:rgba(11,61,145,.08);
+      color:#0b3d91;
+      font-size:0.62rem;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:0.45rem;
+    }
+    #pdfReport h1 {
+      font-size: 1.45rem;
+      margin: 0 0 0.5rem;
+      color: #0b3d91;
+      letter-spacing: -0.02em;
+    }
+    #pdfReport h2 {
+      font-size: 0.9rem;
+      margin: 1rem 0 0.45rem;
+      color: #081a24;
+      border-bottom: 1px solid #dbe7f3;
+      padding-bottom: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    #pdfReport .meta {
+      font-size: 0.76rem;
+      color: #475569;
+      margin-bottom: 0.8rem;
+      line-height: 1.55;
+      padding: 0.75rem 0.85rem;
+      border: 1px solid #dbe7f3;
+      border-radius: 12px;
+      background: #f8fbff;
+    }
+    #pdfReport .summary{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:0.6rem;
+      margin:0 0 0.9rem;
+    }
+    #pdfReport .summary__item{
+      padding:0.7rem 0.8rem;
+      border:1px solid #dbe7f3;
+      border-radius:12px;
+      background:#fff;
+    }
+    #pdfReport .summary__item span{
+      display:block;
+      margin-bottom:0.25rem;
+      font-size:0.62rem;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:#64748b;
+    }
+    #pdfReport .summary__item strong{
+      display:block;
+      font-size:0.96rem;
+      color:#081a24;
+    }
+    #pdfReport table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+      border:1px solid #dbe7f3;
+    }
+    #pdfReport th, #pdfReport td {
+      border: 1px solid #dbe7f3;
+      padding: 0.42rem 0.55rem;
+      font-size: 0.75rem;
+      color: #111;
+    }
+    #pdfReport th {
+      background: #f7fbfd;
+      text-align: left;
+      color:#5b6b7a;
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+    }
+    #pdfReport td:last-child {
+      text-align: right;
+      white-space: nowrap;
+      font-family: monospace;
+    }
+    #pdfReport .tot {
+      margin-top: 0.85rem;
+      padding: 0.9rem 1rem;
+      border: 1px solid #bfdbfe;
+      border-left:4px solid #0284c7;
+      background: #eff6ff;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+    #pdfReport .tot strong {
+      font-size: 1.08rem;
+      color:#081a24;
+    }
+    #pdfReport .obs{
+      margin-top:0.7rem;
+      font-size:0.72rem;
+      color:#556273;
+      line-height:1.45;
+    }
+    @media print {
+      body {
+        background: #fff !important;
+        color: #111 !important;
+        padding: 0 !important;
+      }
+      header, main {
+        display: none !important;
+      }
+      #pdfReport {
+        display: block !important;
+      }
+      @page {
+        size: A4;
+        margin: 12mm;
+      }
+    }
+  </style>
+  <style id="biason-polish">
+    :root{
+      --biason-brand:#081a24;
+      --biason-accent:#007ea7;
+      --biason-bg:#f4f7fb;
+      --biason-line:rgba(15,23,42,.10);
+      --biason-shadow:0 24px 48px -30px rgba(8,26,36,.48);
+      --biason-radius:20px;
+    }
+    body{
+      background:
+        radial-gradient(circle at top right, rgba(0,126,167,.10), transparent 24%),
+        linear-gradient(180deg, #eef4f9 0%, #f6f8fb 28%, var(--biason-bg) 100%);
+      color:#0b1b2a;
+    }
+    header{
+      position:sticky;
+      top:0;
+      z-index:20;
+      padding:22px 24px;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,.16), transparent 24%),
+        linear-gradient(135deg, #081a24, #0b3d91 68%, #0a6f85);
+      box-shadow:0 18px 40px -28px rgba(8,26,36,.7);
+    }
+    header::before{
+      content:"BIASON \2022 Custos e folha";
+      display:block;
+      max-width:1280px;
+      margin:0 auto;
+      color:rgba(255,255,255,.86);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    header::after{
+      content:"Estrutura mais limpa para ler encargos, beneficios, provisoes e total do custo CLT com menos ruido visual.";
+      display:block;
+      max-width:1280px;
+      margin:8px auto 0;
+      color:rgba(255,255,255,.78);
+      font-size:14px;
+      line-height:1.5;
+    }
+    header .brand{
+      display:block;
+      max-width:1280px;
+      margin:12px auto 0;
+      font-size:0;
+      line-height:1;
+    }
+    header .brand::before{
+      content:"Custo CLT";
+      font-size:clamp(28px,3vw,34px);
+      font-weight:800;
+      letter-spacing:-.03em;
+      color:#fff;
+    }
+    main{
+      display:grid;
+      grid-template-columns:minmax(290px,330px) minmax(0,1fr);
+      gap:18px;
+      max-width:1280px;
+      margin:18px auto 0;
+      padding:0 24px 32px;
+    }
+    main > *{min-width:0}
+    .card{
+      border-radius:var(--biason-radius);
+      border:1px solid var(--biason-line);
+      box-shadow:var(--biason-shadow);
+      padding:22px;
+      background:rgba(255,255,255,.94);
+    }
+    .guide{
+      position:sticky;
+      top:110px;
+      background:linear-gradient(180deg, rgba(8,26,36,.02), rgba(0,126,167,.04));
+    }
+    .card h2{
+      color:var(--biason-brand);
+      font-size:clamp(22px,2.4vw,28px);
+      letter-spacing:-.02em;
+      margin-bottom:14px;
+    }
+    .guide h3,
+    .section h3{
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight:800;
+      color:#0a6f85;
+      margin-bottom:8px;
+    }
+    .guide p,
+    .guide li,
+    .footnote{
+      line-height:1.6;
+      color:#526173;
+    }
+    .section{
+      padding:18px;
+      border:1px solid var(--biason-line);
+      border-radius:18px;
+      background:#fbfdff;
+    }
+    input,
+    select{
+      min-height:46px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      color:#0b1b2a;
+    }
+    input:focus,
+    select:focus{
+      border-color:rgba(0,126,167,.45);
+      box-shadow:0 0 0 4px rgba(0,126,167,.12);
+    }
+    .cta-buttons{
+      gap:12px;
+      margin:18px 0;
+    }
+    .cta-button{
+      min-height:46px;
+      padding:0 16px;
+      border-radius:14px;
+      font-size:14px;
+      font-weight:800;
+      box-shadow:0 12px 24px -18px rgba(0,126,167,.45);
+    }
+    .cta-primary{background:#007ea7;color:#fff}
+    .cta-secondary{background:#eef3f7;color:#0b1b2a}
+    .results{gap:14px}
+    .total-box{
+      border-radius:20px;
+      border:1px solid var(--biason-line);
+      background:linear-gradient(180deg, #fbfdff, #f3f8fb);
+      box-shadow:0 18px 30px -26px rgba(8,26,36,.4);
+      padding:18px;
+    }
+    .total-box p{
+      font-size:32px;
+      letter-spacing:-.03em;
+      color:var(--biason-brand);
+    }
+    .chips{gap:10px}
+    .chip{
+      border-radius:999px;
+      padding:8px 12px;
+      border:1px solid rgba(15,23,42,.10);
+      background:#fff;
+      font-size:12px;
+      color:#526173;
+    }
+    table{
+      border:1px solid var(--biason-line);
+      border-radius:18px;
+      overflow:hidden;
+      background:#fff;
+    }
+    th,td{padding:12px 14px}
+    th{
+      background:#f7fbfd;
+      color:#5b6b7a;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.08em;
+    }
+    @media (max-width: 1024px){
+      main{grid-template-columns:1fr}
+      .guide{position:static;top:auto}
+    }
+    @media (max-width: 720px){
+      header{padding:18px 16px}
+      main{padding:0 16px 24px}
+      .card,.section,.total-box{padding:18px}
+      .cta-button{width:100%}
+    }
+  </style>
+  <script>document.title='BIASON | Custo CLT';</script>
+  <style id="biason-hub-return">
+    .hubReturnBar{position:fixed;right:18px;bottom:18px;z-index:120;display:flex}
+    .hubReturnBtn{min-height:44px;padding:0 14px;border-radius:14px;border:1px solid rgba(15,23,42,.12);background:#fff;color:#081a24;font:700 13px Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;cursor:pointer;box-shadow:0 16px 30px -24px rgba(8,26,36,.55)}
+    .hubReturnBtn:hover{transform:translateY(-1px);background:#f8fbfd}
+    @page{size:A4;margin:12mm}
+    @media print{body{background:#fff!important}.hubReturnBar{display:none!important}.card,.total-box,.tableWrap,.panel,.kpi,.summary-item,.verdict-box,.chart-container,.preview,table{box-shadow:none!important;border-color:rgba(15,23,42,.18)!important}}
+  </style>
+  <script id="biason-hub-return-script">
+    (function(){
+      function biasonGoHub(){
+        try{
+          if(window.top && window.top !== window){
+            window.top.postMessage({type:'BIASON_BACK_TO_HUB'}, '*');
+            return;
+          }
+        }catch(err){}
+        try{ window.location.href = new URL('dashboard_unico_ok5_atualizado.html', window.location.href).href; }
+        catch(err){ window.location.href = 'dashboard_unico_ok5_atualizado.html'; }
+      }
+      document.addEventListener('DOMContentLoaded', function(){
+        if(document.querySelector('.hubReturnBar')) return;
+        var wrap = document.createElement('div');
+        wrap.className = 'hubReturnBar';
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'hubReturnBtn';
+        btn.textContent = 'Voltar ao Hub';
+        btn.addEventListener('click', biasonGoHub);
+        wrap.appendChild(btn);
+        document.body.appendChild(wrap);
+      });
+      window.biasonGoHub = biasonGoHub;
+    })();
+  </script>
+<style id="biason-fine-polish">
+  html{scroll-behavior:smooth}
+  ::selection{background:rgba(0,126,167,.18);color:#081a24}
+  *{scrollbar-width:thin;scrollbar-color:rgba(0,126,167,.55) rgba(15,23,42,.08)}
+  *::-webkit-scrollbar{width:10px;height:10px}
+  *::-webkit-scrollbar-track{background:rgba(15,23,42,.06);border-radius:999px}
+  *::-webkit-scrollbar-thumb{background:linear-gradient(180deg, rgba(0,126,167,.72), rgba(8,26,36,.56));border-radius:999px;border:2px solid rgba(255,255,255,.68)}
+  a,button,.btn,.button,.cta-button,input,select,textarea,summary{
+    transition:box-shadow .18s ease,border-color .18s ease,background-color .18s ease,color .18s ease,transform .18s ease,opacity .18s ease;
+  }
+  a:focus-visible,button:focus-visible,.btn:focus-visible,.button:focus-visible,.cta-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{
+    outline:none;
+    border-color:rgba(0,126,167,.55) !important;
+    box-shadow:0 0 0 4px rgba(0,126,167,.18) !important;
+  }
+  .card,.kpi,.result-card,.tableWrap,.chart-container,.dropzone,.help,.sidebar,.hero,.panel,.base-box,.modalPanel{
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background-color .18s ease;
+  }
+  .tableWrap table tbody tr,.inputs-table tbody tr,table tbody tr{transition:background-color .18s ease}
+  .tableWrap table tbody tr:hover td,.inputs-table tbody tr:hover td,table tbody tr:hover td{background:rgba(0,126,167,.04)}
+  .emptyState{
+    border-style:dashed !important;
+    background:linear-gradient(180deg, rgba(0,126,167,.05), rgba(255,255,255,.96)) !important;
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .hero,.sidebar,.card,.kpi,.result-card,.base-box,.tableWrap,.dropzone,.chart-container{
+      animation:biasonFadeUp .34s ease both;
+    }
+  }
+  @keyframes biasonFadeUp{
+    from{opacity:0;transform:translateY(8px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  @media print{
+    *::-webkit-scrollbar{display:none}
+  }
+</style>
+<style id="biason-header-standard">
+  .biasonShellHeader{
+    position:sticky;
+    top:0;
+    z-index:40;
+    padding:0 !important;
+    background:linear-gradient(90deg,#0b3d91 0%, #123f8f 62%, #0a7b8f 100%) !important;
+    color:#fff !important;
+    box-shadow:0 14px 28px -20px rgba(8,26,36,.65) !important;
+    border:none !important;
+  }
+  .biasonShellHeader__inner{
+    max-width:1360px;
+    margin:0 auto;
+    min-height:68px;
+    padding:0 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader__left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-width:0;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader__brand{
+    color:#fff;
+    font-size:17px;
+    line-height:1;
+    font-weight:900;
+    letter-spacing:.02em;
+  }
+  .biasonShellHeader__divider{
+    color:rgba(255,255,255,.5);
+    font-weight:700;
+    line-height:1;
+  }
+  .biasonShellHeader__tool{
+    color:#fff;
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.01em;
+  }
+  .biasonShellHeader__crumb{
+    display:inline-flex;
+    align-items:center;
+    min-height:30px;
+    padding:0 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.20);
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .biasonShellHeader__crumb strong{color:#fff;font-weight:800}
+  .biasonShellHeader__right,
+  .biasonShellHeader .right{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader .btn,
+  .biasonShellHeader .btn-small,
+  .biasonShellHeader button{
+    border-radius:12px;
+  }
+  .biasonShellHeader .brand,
+  .biasonShellHeader .brand__mark,
+  .biasonShellHeader .brand__name,
+  .biasonShellHeader .brand__sub,
+  .biasonShellHeader .pill,
+  .biasonShellHeader .title,
+  .biasonShellHeader .topbar__eyebrow,
+  .biasonShellHeader .topbar__title,
+  .biasonShellHeader .topbar__sub{
+    all:unset;
+  }
+  .biasonShellHeader::before,
+  .biasonShellHeader::after{
+    content:none !important;
+    display:none !important;
+  }
+  @media (max-width:760px){
+    .biasonShellHeader__inner{min-height:64px;padding:10px 12px}
+    .biasonShellHeader__left{gap:10px}
+    .biasonShellHeader__brand{font-size:16px}
+    .biasonShellHeader__tool{font-size:12px}
+    .biasonShellHeader__crumb{font-size:11px;padding:0 10px}
+  }
+</style>
+</head>
+<body>
+    <header class="biasonShellHeader">
+    <div class="biasonShellHeader__inner">
+      <div class="biasonShellHeader__left">
+        <div class="biasonShellHeader__brand">BIASON</div>
+        <div class="biasonShellHeader__divider">|</div>
+        <div class="biasonShellHeader__tool">Custo de Funcionário</div>
+        <div class="biasonShellHeader__crumb">Página: Cálculo</div>
+      </div>
+    </div>
+  </header>
+  <main>
+    <!-- Coluna esquerda: guia de utilização -->
+    <div class="card guide">
+      <h2>Guia de Utilização De Biason</h2>
+      <section>
+        <h3>O que preencher</h3>
+        <ul>
+          <li>Escolha o regime de contribuição (geral, simples ou manual).</li>
+          <li>Informe o <strong>salário base</strong> bruto mensal do funcionário.</li>
+          <li>Preencha os <strong>adicionais salariais</strong>: DSR sobre variáveis, horas extras, adicional noturno, insalubridade/periculosidade, comissões e outros.</li>
+          <li>Informe os <strong>benefícios mensais</strong>: vale refeição, plano de saúde, valor total de vale transporte, desconto no vale transporte e outros benefícios.</li>
+          <li>Ajuste os percentuais de <strong>INSS patronal</strong>, <strong>FGTS</strong>, <strong>RAT</strong> e <strong>terceiros</strong>, se necessário.</li>
+        </ul>
+      </section>
+      <section>
+        <h3>Lógica da ferramenta</h3>
+        <p>
+          A calculadora soma o salário base aos adicionais salariais para formar a <em>base remuneratória</em>.
+          Sobre essa base aplicam‑se os percentuais de INSS, FGTS, RAT e terceiros para calcular os encargos.
+          Além disso, calcula‑se a provisão do 13º salário (1/12 da base remuneratória) e de férias com um terço (1/12 × 4/3).
+          Benefícios como vale refeição, vale transporte suportado pela empresa, plano de saúde e outros são adicionados.
+          Por fim, os encargos sobre essas provisões são somados para obter o <strong>custo total mensal estimado</strong>.
+        </p>
+      </section>
+      <section>
+        <h3>Interpretação</h3>
+        <p>
+          O resultado principal apresenta o custo total mensal do funcionário, já incluindo encargos e provisões.
+          O chip de acréscimo mostra quanto o custo total representa em relação ao salário base.
+          A tabela detalha cada componente (salário, adicionais, encargos, provisões, benefícios),
+          permitindo uma análise minuciosa.
+          Utilize o botão “Imprimir demonstrativo” para gerar um PDF executivo com os dados
+          considerados e o custo mensal estimado.
+        </p>
+      </section>
+    </div>
+    <!-- Coluna direita: calculadora -->
+    <div class="card calculator">
+      <h2>Dados do Funcionário</h2>
+      <!-- Seção regime e salário -->
+      <div class="section">
+        <h3>Salário base e regime</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="regime">Regime (define INSS patronal)</label>
+            <select id="regime">
+              <option value="geral">Geral – INSS patronal 20%</option>
+              <option value="simples">Simples – INSS patronal 0% na folha*</option>
+              <option value="manual">Manual – definir INSS%</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="salario">Salário base (bruto mensal)</label>
+            <input id="salario" type="number" step="0.01" value="" placeholder="Ex.: 3000,00" />
+          </div>
+        </div>
+        <p class="footnote" style="margin-top:0.5rem;">*No Simples, em muitos casos o INSS patronal já está no DAS; pode variar conforme atividade/anexo.</p>
+      </div>
+      <!-- Seção adicionais salariais -->
+      <div class="section">
+        <h3>Adicionais salariais</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="dsr">DSR sobre variáveis</label>
+            <input id="dsr" type="number" step="0.01" value="0" />
+          </div>
+          <div class="form-group">
+            <label for="horasExtras">Horas extras</label>
+            <input id="horasExtras" type="number" step="0.01" value="0" />
+          </div>
+          <div class="form-group">
+            <label for="noturno">Adicional noturno</label>
+            <input id="noturno" type="number" step="0.01" value="0" />
+          </div>
+          <div class="form-group">
+            <label for="insalPeric">Insalubridade / Periculosidade</label>
+            <input id="insalPeric" type="number" step="0.01" value="0" />
+          </div>
+          <div class="form-group">
+            <label for="comissoes">Comissões</label>
+            <input id="comissoes" type="number" step="0.01" value="0" />
+          </div>
+          <div class="form-group">
+            <label for="outrosSalariais">Outros adicionais salariais</label>
+            <input id="outrosSalariais" type="number" step="0.01" value="0" />
+          </div>
+        </div>
+      </div>
+      <!-- Seção benefícios -->
+      <div class="section">
+        <h3>Benefícios / Custos mensais</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="vr">Vale refeição</label>
+            <input id="vr" type="number" step="0.01" value="0" />
+          </div>
+          <div class="form-group">
+            <label for="plano">Plano de saúde</label>
+            <input id="plano" type="number" step="0.01" value="0" />
+          </div>
+          <div class="form-group">
+            <label for="vtTotal">Vale transporte total</label>
+            <input id="vtTotal" type="number" step="0.01" value="0" />
+          </div>
+          <div class="form-group">
+            <label for="vtDesconto">Desconto do empregado no VT</label>
+            <input id="vtDesconto" type="number" step="0.01" value="0" />
+            <div class="footnote">
+              Sugestão usual: até 6% do salário base.
+              <button type="button" id="btnSugereVT" class="cta-button cta-secondary" style="margin-top:0.25rem;">Aplicar 6%</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="outrosBeneficios">Outros benefícios</label>
+            <input id="outrosBeneficios" type="number" step="0.01" value="0" />
+          </div>
+          <div class="form-group">
+            <label for="vtEmpresa">Custo de VT suportado pela empresa</label>
+            <input id="vtEmpresa" type="text" readonly value="0,00" />
+            <div class="footnote">Fórmula: max(0, VT total − desconto do empregado).</div>
+          </div>
+        </div>
+      </div>
+      <!-- Seção percentuais -->
+      <div class="section">
+        <h3>Percentuais (encargos)</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="inss">INSS patronal (%)</label>
+            <input id="inss" type="number" step="0.01" value="20" />
+            <div class="footnote">Padrão: 20% (regime geral). No Simples, selecione o regime para zerar.</div>
+          </div>
+          <div class="form-group">
+            <label for="fgts">FGTS (%)</label>
+            <input id="fgts" type="number" step="0.01" value="8" />
+            <div class="footnote">Padrão: 8%.</div>
+          </div>
+          <div class="form-group">
+            <label for="rat">RAT (%)</label>
+            <input id="rat" type="number" step="0.01" value="0" />
+            <div class="footnote">Geralmente entre 1% e 3%.</div>
+          </div>
+          <div class="form-group">
+            <label for="terceiros">Terceiros (%)</label>
+            <input id="terceiros" type="number" step="0.01" value="0" />
+            <div class="footnote">Pode chegar a 5,8%, conforme enquadramento.</div>
+          </div>
+        </div>
+      </div>
+      <!-- Ações -->
+      <div class="cta-buttons">
+        <button id="btnCalc" class="cta-button cta-primary">Calcular</button>
+        <button id="btnReset" class="cta-button cta-secondary">Limpar</button>
+        <button id="btnPDF" class="cta-button cta-primary">Imprimir demonstrativo</button>
+      </div>
+      <!-- Resultados -->
+      <div class="results">
+        <div class="total-box">
+          <h3>Custo total estimado</h3>
+          <p id="custoTotal">R$ 0,00</p>
+          <div class="chips">
+            <span class="chip">Acréscimo vs salário base: <strong id="pctSobreSal">0,00%</strong></span>
+            <span class="chip">Base remuneratória: <strong id="chipBaseRem">R$ 0,00</strong></span>
+            <span class="chip">Benefícios/custos: <strong id="chipBenef">R$ 0,00</strong></span>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th class="val">Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                Salário base
+                <div class="footnote">Valor fixo informado</div>
+              </td>
+              <td class="val" id="rSal">R$ 0,00</td>
+            </tr>
+            <tr>
+              <td>
+                Adicionais salariais (total)
+                <div class="footnote">DSR, HE, noturno, insal/peric, comissões, outros</div>
+              </td>
+              <td class="val" id="rAddSal">R$ 0,00</td>
+            </tr>
+            <tr>
+              <td>
+                Base remuneratória para encargos
+                <div class="footnote">Salário base + adicionais salariais</div>
+              </td>
+              <td class="val" id="rBaseRem">R$ 0,00</td>
+            </tr>
+            <tr>
+              <td>Encargos (INSS + FGTS + RAT + Terceiros)</td>
+              <td class="val" id="rEnc">R$ 0,00</td>
+            </tr>
+            <tr>
+              <td>Provisão 13º (1/12 da base remuneratória)</td>
+              <td class="val" id="r13">R$ 0,00</td>
+            </tr>
+            <tr>
+              <td>Provisão Férias + 1/3 (sobre base remuneratória)</td>
+              <td class="val" id="rFerias">R$ 0,00</td>
+            </tr>
+            <tr>
+              <td>
+                Encargos sobre provisão
+                <div class="footnote">Aplicados sobre 13º + férias provisões</div>
+              </td>
+              <td class="val" id="rEncProv">R$ 0,00</td>
+            </tr>
+            <tr>
+              <td>
+                Benefícios / custos mensais
+                <div class="footnote">VR + VT empresa + Plano + Outros benefícios</div>
+              </td>
+              <td class="val" id="rBenef">R$ 0,00</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="footnote" id="note">
+          Esta calculadora fornece uma <strong>estimativa</strong> de custo mensal. Não contempla particularidades como
+          convenções coletivas, adicionais variáveis não informados, desoneração, rescisões, afastamentos, etc.
+        </div>
+      </div>
+    </div>
+  </main>
+  <!-- Relatório oculto para impressão (irá aparecer ao imprimir) -->
+  <section id="pdfReport" aria-hidden="true">
+    <div class="pdf-badge">Demonstrativo final</div>
+    <h1>BIASON | Demonstrativo de custo mensal do colaborador</h1>
+    <div class="meta" id="pdfMeta"></div>
+    <div class="summary">
+      <div class="summary__item">
+        <span>Base remuneratória</span>
+        <strong id="pdfSummaryBase">R$ 0,00</strong>
+      </div>
+      <div class="summary__item">
+        <span>Encargos totais</span>
+        <strong id="pdfSummaryEncargos">R$ 0,00</strong>
+      </div>
+      <div class="summary__item">
+        <span>Benefícios mensais</span>
+        <strong id="pdfSummaryBeneficios">R$ 0,00</strong>
+      </div>
+      <div class="summary__item">
+        <span>Custo total estimado</span>
+        <strong id="pdfSummaryTotal">R$ 0,00</strong>
+      </div>
+    </div>
+    <h2>Dados considerados</h2>
+    <table>
+      <tbody id="pdfInputs"></tbody>
+    </table>
+    <h2>Percentuais aplicados</h2>
+    <table>
+      <tbody id="pdfRates"></tbody>
+    </table>
+    <h2>Composição do custo mensal</h2>
+    <table>
+      <tbody id="pdfCalc"></tbody>
+    </table>
+    <div class="tot" id="pdfTotalBox"></div>
+    <div class="obs">
+      Observação: Este demonstrativo apresenta uma estimativa mensal com base nos dados informados.
+      Convenções coletivas, incidências específicas, benefícios contratuais e regras internas podem alterar o resultado final.
+    </div>
+  </section>
+  <!-- Scripts para lógica de cálculo. Mantêm a mesma lógica da versão original. -->
+  <script>
+    // Acessa rapidamente elementos pelo id
+    const $ = (id) => document.getElementById(id);
+
+    // Converte entrada para número, tratando vírgulas e valores não numéricos
+    function num(v) {
+      const n = Number(String(v ?? '').replace(',', '.'));
+      return Number.isFinite(n) ? n : 0;
+    }
+    // Formata para moeda brasileira (Real)
+    function brl(v) {
+      return (v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+    // Formata percentuais com duas casas decimais
+    function pct(v) {
+      return (v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+    }
+    // Garante que um valor não seja negativo
+    function clampMin0(n) { return Math.max(0, n); }
+
+    // Ajusta campo de INSS com base no regime selecionado
+    function setINSSByRegime() {
+      const reg = $('regime').value;
+      const inss = $('inss');
+      if (reg === 'geral') {
+        inss.value = '20';
+        inss.disabled = true;
+      } else if (reg === 'simples') {
+        inss.value = '0';
+        inss.disabled = true;
+      } else {
+        inss.disabled = false;
+      }
+    }
+
+    // Obtém todos os dados preenchidos e calcula valores intermediários
+    function getState() {
+      const salario = clampMin0(num($('salario').value));
+      const dsr = clampMin0(num($('dsr').value));
+      const horasExtras = clampMin0(num($('horasExtras').value));
+      const noturno = clampMin0(num($('noturno').value));
+      const insalPeric = clampMin0(num($('insalPeric').value));
+      const comissoes = clampMin0(num($('comissoes').value));
+      const outrosSalariais = clampMin0(num($('outrosSalariais').value));
+      const adicionaisSalariais = dsr + horasExtras + noturno + insalPeric + comissoes + outrosSalariais;
+      const baseRemuneratoria = salario + adicionaisSalariais;
+      const vr = clampMin0(num($('vr').value));
+      const plano = clampMin0(num($('plano').value));
+      const vtTotal = clampMin0(num($('vtTotal').value));
+      const vtDesconto = clampMin0(num($('vtDesconto').value));
+      const outrosBeneficios = clampMin0(num($('outrosBeneficios').value));
+      const vtEmpresa = Math.max(0, vtTotal - vtDesconto);
+      const inss = clampMin0(num($('inss').value)) / 100;
+      const fgts = clampMin0(num($('fgts').value)) / 100;
+      const rat = clampMin0(num($('rat').value)) / 100;
+      const terceiros = clampMin0(num($('terceiros').value)) / 100;
+      const beneficios = vr + plano + vtEmpresa + outrosBeneficios;
+      const encargos = baseRemuneratoria * (inss + fgts + rat + terceiros);
+      const prov13 = baseRemuneratoria / 12;
+      const provFerias = (baseRemuneratoria / 12) * (4/3);
+      // Encargos incidem sobre provisões (13º + férias)
+      const encargosSobreProvisao = (prov13 + provFerias) * (inss + fgts + rat + terceiros);
+      const total = baseRemuneratoria + encargos + prov13 + provFerias + encargosSobreProvisao + beneficios;
+      const pctSobreSalarioBase = salario > 0 ? ((total / salario) - 1) : 0;
+      const pctSobreBaseRem = baseRemuneratoria > 0 ? ((total / baseRemuneratoria) - 1) : 0;
+      return {
+        regime: $('regime').value,
+        salario,
+        dsr, horasExtras, noturno, insalPeric, comissoes, outrosSalariais,
+        adicionaisSalariais, baseRemuneratoria,
+        vr, plano, vtTotal, vtDesconto, vtEmpresa, outrosBeneficios, beneficios,
+        inss, fgts, rat, terceiros,
+        encargos, prov13, provFerias, encargosSobreProvisao, total,
+        pctSobreSalarioBase, pctSobreBaseRem
+      };
+    }
+
+    // Atualiza a interface com os cálculos
+    function calc() {
+      const s = getState();
+      // atualiza campo VT suportado pela empresa
+      $('vtEmpresa').value = s.vtEmpresa.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // atualiza total e chips
+      $('custoTotal').textContent = brl(s.total);
+      $('pctSobreSal').textContent = (s.pctSobreSalarioBase * 100).toFixed(2).replace('.', ',') + '%';
+      $('chipBaseRem').textContent = brl(s.baseRemuneratoria);
+      $('chipBenef').textContent = brl(s.beneficios);
+      // atualiza valores da tabela
+      $('rSal').textContent = brl(s.salario);
+      $('rAddSal').textContent = brl(s.adicionaisSalariais);
+      $('rBaseRem').textContent = brl(s.baseRemuneratoria);
+      $('rEnc').textContent = brl(s.encargos);
+      $('r13').textContent = brl(s.prov13);
+      $('rFerias').textContent = brl(s.provFerias);
+      $('rEncProv').textContent = brl(s.encargosSobreProvisao);
+      $('rBenef').textContent = brl(s.beneficios);
+      // aviso no rodapé
+      if (s.salario <= 0) {
+        $('note').innerHTML = '<span style="color:#ef4444; font-weight:600;">Informe o salário base para calcular corretamente.</span> A calculadora é uma estimativa mensal.';
+      } else {
+        $('note').innerHTML = 'Esta calculadora fornece uma <strong>estimativa</strong> de custo mensal. Não contempla particularidades como convenções coletivas, adicionais variáveis não informados, desoneração, rescisões, afastamentos, etc.';
+      }
+      return s;
+    }
+
+    // Aplica sugestão de desconto de VT de 6% sobre o salário base
+    function aplicarSugestaoVT6() {
+      const salario = clampMin0(num($('salario').value));
+      const descontoSugerido = salario * 0.06;
+      $('vtDesconto').value = descontoSugerido.toFixed(2);
+      calc();
+    }
+
+    // Gera linha para tabela no relatório PDF
+    function tr(k, v) {
+      return `<tr><th style="width:70%">${k}</th><td>${v}</td></tr>`;
+    }
+    // Converte valor de regime para texto legível
+    function regimeLabel(v) {
+      if (v === 'geral') return 'Geral';
+      if (v === 'simples') return 'Simples (INSS patronal zerado na folha)';
+      return 'Manual';
+    }
+    // Monta o conteúdo do relatório PDF baseado no estado atual
+    function buildPdfReport() {
+      const s = calc();
+      const now = new Date();
+      const dataHora = now.toLocaleString('pt-BR');
+      $('pdfMeta').innerHTML =
+        `Gerado em: <strong>${dataHora}</strong><br>` +
+        `Regime selecionado: <strong>${regimeLabel(s.regime)}</strong><br>` +
+        `Leitura executiva: <strong>base remuneratória, encargos, provisões e benefícios mensais</strong>.`;
+      $('pdfSummaryBase').textContent = brl(s.baseRemuneratoria);
+      $('pdfSummaryEncargos').textContent = brl(s.encargos + s.encargosSobreProvisao);
+      $('pdfSummaryBeneficios').textContent = brl(s.beneficios);
+      $('pdfSummaryTotal').textContent = brl(s.total);
+      $('pdfInputs').innerHTML = [
+        tr('Salário base', brl(s.salario)),
+        tr('DSR sobre variáveis', brl(s.dsr)),
+        tr('Horas extras', brl(s.horasExtras)),
+        tr('Adicional noturno', brl(s.noturno)),
+        tr('Insalubridade / Periculosidade', brl(s.insalPeric)),
+        tr('Comissões', brl(s.comissoes)),
+        tr('Outros adicionais salariais', brl(s.outrosSalariais)),
+        tr('Total de adicionais salariais', brl(s.adicionaisSalariais)),
+        tr('Base remuneratória (salário + adicionais)', brl(s.baseRemuneratoria)),
+        tr('Vale refeição', brl(s.vr)),
+        tr('Vale transporte total', brl(s.vtTotal)),
+        tr('Desconto do empregado no VT', brl(s.vtDesconto)),
+        tr('VT suportado pela empresa', brl(s.vtEmpresa)),
+        tr('Plano de saúde', brl(s.plano)),
+        tr('Outros benefícios', brl(s.outrosBeneficios)),
+      ].join('');
+      $('pdfRates').innerHTML = [
+        tr('INSS patronal', pct(s.inss * 100)),
+        tr('FGTS', pct(s.fgts * 100)),
+        tr('RAT', pct(s.rat * 100)),
+        tr('Terceiros', pct(s.terceiros * 100)),
+      ].join('');
+      $('pdfCalc').innerHTML = [
+        tr('Encargos (INSS + FGTS + RAT + Terceiros)', brl(s.encargos)),
+        tr('Provisão 13º (1/12)', brl(s.prov13)),
+        tr('Provisão Férias + 1/3', brl(s.provFerias)),
+        tr('Encargos sobre provisões', brl(s.encargosSobreProvisao)),
+        tr('Benefícios / custos mensais', brl(s.beneficios)),
+      ].join('');
+      $('pdfTotalBox').innerHTML =
+        `<strong>Custo total estimado: ${brl(s.total)}</strong><br>` +
+        `Acréscimo sobre o salário base: ${(s.pctSobreSalarioBase * 100).toFixed(2).replace('.', ',')}%<br>` +
+        `Acréscimo sobre a base remuneratória: ${(s.pctSobreBaseRem * 100).toFixed(2).replace('.', ',')}%`;
+    }
+
+    // Quando a página carrega, define evento de mudança de regime e calcula valores iniciais
+    window.addEventListener('DOMContentLoaded', () => {
+      setINSSByRegime();
+      calc();
+      // atualiza INSS automaticamente ao mudar regime
+      $('regime').addEventListener('change', () => {
+        setINSSByRegime();
+        calc();
+      });
+      // calcula em tempo real quando campos são alterados
+      [
+        'salario','dsr','horasExtras','noturno','insalPeric','comissoes','outrosSalariais',
+        'vr','plano','vtTotal','vtDesconto','outrosBeneficios','inss','fgts','rat','terceiros'
+      ].forEach(id => {
+        $(id).addEventListener('input', calc);
+      });
+      // botão sugestão VT
+      $('btnSugereVT').addEventListener('click', aplicarSugestaoVT6);
+      // botão calcular
+      $('btnCalc').addEventListener('click', (e) => {
+        e.preventDefault();
+        calc();
+      });
+      // botão limpar
+      $('btnReset').addEventListener('click', (e) => {
+        e.preventDefault();
+        // reseta todos os inputs para valores padrão
+        $('salario').value = '';
+        ['dsr','horasExtras','noturno','insalPeric','comissoes','outrosSalariais','vr','plano','vtTotal','vtDesconto','outrosBeneficios'].forEach(id => $(id).value = '0');
+        $('regime').value = 'geral';
+        setINSSByRegime();
+        $('fgts').value = '8';
+        $('rat').value = '0';
+        $('terceiros').value = '0';
+        calc();
+      });
+      // botão imprimir relatório
+      $('btnPDF').addEventListener('click', (e) => {
+        e.preventDefault();
+        buildPdfReport();
+        // aciona a janela de impressão do navegador
+        window.print();
+      });
+    });
+  </script>
+</body>
+</html>
+
+
+
+

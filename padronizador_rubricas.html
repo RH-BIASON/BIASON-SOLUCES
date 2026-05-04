@@ -1,0 +1,937 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>BIASON — Padronizador de Rubricas</title>
+<style id="biason-accessibility">
+  :root{ color-scheme: light; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{ font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important; margin:0; background:#f6f8fb; color:#0f172a; }
+  *,*::before,*::after{ box-sizing:border-box; }
+  :focus-visible{ outline:3px solid rgba(2,132,199,.35); outline-offset:2px; border-radius:10px; }
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; } }
+</style>
+<style>
+  /* Visual "padrão Biason" leve, sem redesenhar agressivo */
+  .topbar{
+    position:sticky; top:0; z-index:10;
+    background:linear-gradient(180deg,#0b3a6e 0%, #0a2f59 100%);
+    color:#fff;
+    padding:14px 18px;
+    box-shadow:0 10px 30px rgba(2,6,23,.12);
+  }
+  .topbar__row{display:flex; align-items:center; justify-content:space-between; gap:14px; max-width:1200px; margin:0 auto;}
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand__mark{width:34px; height:34px; border-radius:12px; background:rgba(255,255,255,.16); display:grid; place-items:center;}
+  .brand__name{font-weight:800; letter-spacing:.06em;}
+  .brand__sub{font-size:12px; opacity:.85; margin-top:2px}
+  .pill{font-size:12px; padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18)}
+  main{max-width:1200px; margin:18px auto 40px; padding:0 18px;}
+  .grid{display:grid; grid-template-columns: 1fr 1fr; gap:14px;}
+  @media (max-width: 980px){ .grid{grid-template-columns:1fr;} }
+  .card{
+    background:#fff; border:1px solid rgba(148,163,184,.35);
+    border-radius:18px; box-shadow:0 12px 30px rgba(2,6,23,.06);
+    padding:16px;
+  }
+  .card h2{margin:0 0 6px; font-size:18px}
+  .muted{color:#64748b; font-size:13px; line-height:1.45}
+  .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+  .btn{
+    appearance:none; border:1px solid rgba(2,132,199,.25);
+    background:linear-gradient(180deg,#0284c7 0%, #0369a1 100%);
+    color:#fff; padding:10px 12px; border-radius:12px; cursor:pointer; font-weight:700;
+    box-shadow:0 10px 22px rgba(2,132,199,.18);
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn--ghost{
+    background:#fff; color:#0b3a6e; border:1px solid rgba(148,163,184,.45);
+    box-shadow:none; font-weight:700;
+  }
+  .btn--danger{ background:linear-gradient(180deg,#ef4444 0%, #dc2626 100%); border-color: rgba(239,68,68,.25) }
+  .field{display:grid; gap:6px; margin-top:10px}
+  label{font-size:12px; color:#0f172a; font-weight:700}
+  input[type="text"], select{
+    width:100%; padding:10px 12px; border-radius:12px; border:1px solid rgba(148,163,184,.5);
+    background:#fff; outline:none;
+  }
+  .drop{
+    border:2px dashed rgba(2,132,199,.28);
+    border-radius:16px; padding:14px; background:#f8fbff;
+  }
+  .drop.drag{ background:#eef8ff; border-color: rgba(2,132,199,.45); }
+  .kpi{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+  .kpi__item{flex:1; min-width:170px; background:#f8fafc; border:1px solid rgba(148,163,184,.35); border-radius:14px; padding:10px}
+  .kpi__label{font-size:12px; color:#64748b; font-weight:700}
+  .kpi__value{font-size:20px; font-weight:900; margin-top:4px}
+  table{width:100%; border-collapse:separate; border-spacing:0; margin-top:10px}
+  th,td{padding:10px 10px; border-bottom:1px solid rgba(148,163,184,.25); font-size:13px; vertical-align:top}
+  th{color:#334155; text-align:left; font-weight:800; background:#f8fafc; position:sticky; top:0}
+  .tableWrap{max-height:320px; overflow:auto; border-radius:14px; border:1px solid rgba(148,163,184,.28)}
+  .warn{padding:10px 12px; border-radius:14px; background:#fff7ed; border:1px solid rgba(251,146,60,.35); color:#9a3412; font-size:13px}
+  .ok{padding:10px 12px; border-radius:14px; background:#ecfdf5; border:1px solid rgba(16,185,129,.28); color:#065f46; font-size:13px}
+  .small{font-size:12px; color:#64748b}
+  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+</style>
+<style id="biason-polish">
+  body{
+    background:
+      radial-gradient(circle at top right, rgba(0,126,167,.10), transparent 24%),
+      linear-gradient(180deg, #eef4f9 0%, #f6f8fb 28%, #f4f7fb 100%) !important;
+    color:#0b1b2a;
+  }
+  .topbar{
+    padding:16px 18px;
+    background:
+      radial-gradient(circle at top right, rgba(255,255,255,.16), transparent 24%),
+      linear-gradient(135deg, #081a24, #0b3d91 68%, #0a6f85);
+    box-shadow:0 18px 40px -28px rgba(8,26,36,.7);
+  }
+  .topbar__row{max-width:1240px}
+  .brand__name{font-size:18px;letter-spacing:.02em}
+  .brand__sub{font-size:13px}
+  .pill{
+    padding:7px 12px;
+    background:rgba(255,255,255,.10);
+    border-color:rgba(255,255,255,.16);
+  }
+  main{
+    max-width:1240px;
+    margin:14px auto 36px;
+    padding:0 18px;
+  }
+  .hero{
+    border:1px solid rgba(15,23,42,.10);
+    border-radius:22px;
+    background:
+      radial-gradient(circle at top right, rgba(0,126,167,.08), transparent 26%),
+      linear-gradient(145deg, #ffffff, #f4f9fc 58%, #eef6fb);
+    box-shadow:0 24px 48px -30px rgba(8,26,36,.32);
+    padding:22px 24px;
+    margin-bottom:16px;
+  }
+  .hero__eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 12px;
+    border-radius:999px;
+    background:rgba(8,26,36,.06);
+    color:#081a24;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+  }
+  .hero__title{
+    margin:12px 0 8px;
+    font-size:32px;
+    line-height:1.05;
+    letter-spacing:-.03em;
+    color:#081a24;
+    font-weight:800;
+  }
+  .hero__lead{
+    margin:0;
+    max-width:66ch;
+    color:#526173;
+    font-size:14px;
+    line-height:1.5;
+  }
+  .grid{gap:16px}
+  .card{
+    border-radius:22px;
+    padding:20px;
+    box-shadow:0 24px 48px -30px rgba(8,26,36,.32);
+  }
+  .card h2{
+    font-size:24px;
+    letter-spacing:-.02em;
+    color:#081a24;
+    margin-bottom:8px;
+  }
+  .muted{
+    color:#526173;
+    font-size:13px;
+    line-height:1.55;
+  }
+  .drop{
+    border-radius:18px;
+    padding:16px;
+    background:
+      radial-gradient(circle at top right, rgba(0,126,167,.08), transparent 28%),
+      linear-gradient(180deg, #f9fcff, #f3f8fb);
+    border-color:rgba(0,126,167,.30);
+  }
+  .drop.drag{
+    background:#edf8fc;
+    border-color:rgba(0,126,167,.65);
+  }
+  .kpi{gap:12px}
+  .kpi__item{
+    min-width:150px;
+    border-radius:16px;
+    padding:12px;
+    background:#fbfdff;
+    box-shadow:0 18px 28px -26px rgba(8,26,36,.28);
+  }
+  .kpi__label{
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#5b6b7a;
+    font-weight:800;
+  }
+  .kpi__value{
+    font-size:24px;
+    letter-spacing:-.03em;
+    color:#081a24;
+  }
+  .field{gap:8px;margin-top:12px}
+  label{
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#5b6b7a;
+  }
+  input[type="text"], select{
+    min-height:46px;
+    border-radius:14px;
+    border-color:rgba(15,23,42,.12);
+  }
+  input[type="text"]:focus, select:focus{
+    outline:none;
+    border-color:rgba(0,126,167,.45);
+    box-shadow:0 0 0 4px rgba(0,126,167,.12);
+  }
+  .btn{
+    min-height:44px;
+    border-radius:14px;
+    padding:0 14px;
+    font-weight:800;
+    box-shadow:0 12px 24px -18px rgba(0,126,167,.45);
+  }
+  .btn--ghost{box-shadow:none}
+  .tableWrap{
+    border-radius:16px;
+    border-color:rgba(15,23,42,.10);
+    background:#fff;
+  }
+  th{
+    background:#f8fbfd;
+    color:#5b6b7a;
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .warn,.ok{
+    border-radius:16px;
+  }
+  @media (max-width: 720px){
+    .topbar{padding:14px 16px}
+    main{padding:0 16px}
+    .hero{padding:18px}
+    .hero__title{font-size:28px}
+    .card{padding:18px}
+  }
+</style>
+<script>document.title='BIASON | Padronizador de Rubricas';</script>
+<style id="biason-hub-return">
+  .hubReturnBar{position:fixed;right:18px;bottom:18px;z-index:120;display:flex}
+  .hubReturnBtn{min-height:44px;padding:0 14px;border-radius:14px;border:1px solid rgba(15,23,42,.12);background:#fff;color:#081a24;font:700 13px Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;cursor:pointer;box-shadow:0 16px 30px -24px rgba(8,26,36,.55)}
+  .hubReturnBtn:hover{transform:translateY(-1px);background:#f8fbfd}
+  @page{size:A4;margin:12mm}
+  @media print{body{background:#fff!important}.hubReturnBar{display:none!important}.card,.tableWrap,.panel,.kpi,.summary-item,.total-box,.verdict-box,.chart-container,.preview,.hero{box-shadow:none!important;border-color:rgba(15,23,42,.18)!important}}
+</style>
+<script id="biason-hub-return-script">
+  (function(){
+    function biasonGoHub(){
+      try{
+        if(window.top && window.top !== window){
+          window.top.postMessage({type:'BIASON_BACK_TO_HUB'}, '*');
+          return;
+        }
+      }catch(err){}
+      try{ window.location.href = new URL('dashboard_unico_ok5_atualizado.html', window.location.href).href; }
+      catch(err){ window.location.href = 'dashboard_unico_ok5_atualizado.html'; }
+    }
+    document.addEventListener('DOMContentLoaded', function(){
+      if(document.querySelector('.hubReturnBar')) return;
+      var wrap = document.createElement('div');
+      wrap.className = 'hubReturnBar';
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'hubReturnBtn';
+      btn.textContent = 'Voltar ao Hub';
+      btn.addEventListener('click', biasonGoHub);
+      wrap.appendChild(btn);
+      document.body.appendChild(wrap);
+    });
+    window.biasonGoHub = biasonGoHub;
+  })();
+</script>
+<style id="biason-fine-polish">
+  html{scroll-behavior:smooth}
+  ::selection{background:rgba(0,126,167,.18);color:#081a24}
+  *{scrollbar-width:thin;scrollbar-color:rgba(0,126,167,.55) rgba(15,23,42,.08)}
+  *::-webkit-scrollbar{width:10px;height:10px}
+  *::-webkit-scrollbar-track{background:rgba(15,23,42,.06);border-radius:999px}
+  *::-webkit-scrollbar-thumb{background:linear-gradient(180deg, rgba(0,126,167,.72), rgba(8,26,36,.56));border-radius:999px;border:2px solid rgba(255,255,255,.68)}
+  a,button,.btn,.button,.cta-button,input,select,textarea,summary{
+    transition:box-shadow .18s ease,border-color .18s ease,background-color .18s ease,color .18s ease,transform .18s ease,opacity .18s ease;
+  }
+  a:focus-visible,button:focus-visible,.btn:focus-visible,.button:focus-visible,.cta-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{
+    outline:none;
+    border-color:rgba(0,126,167,.55) !important;
+    box-shadow:0 0 0 4px rgba(0,126,167,.18) !important;
+  }
+  .card,.kpi,.result-card,.tableWrap,.chart-container,.dropzone,.help,.sidebar,.hero,.panel,.base-box,.modalPanel{
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background-color .18s ease;
+  }
+  .tableWrap table tbody tr,.inputs-table tbody tr,table tbody tr{transition:background-color .18s ease}
+  .tableWrap table tbody tr:hover td,.inputs-table tbody tr:hover td,table tbody tr:hover td{background:rgba(0,126,167,.04)}
+  .emptyState{
+    border-style:dashed !important;
+    background:linear-gradient(180deg, rgba(0,126,167,.05), rgba(255,255,255,.96)) !important;
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .hero,.sidebar,.card,.kpi,.result-card,.base-box,.tableWrap,.dropzone,.chart-container{
+      animation:biasonFadeUp .34s ease both;
+    }
+  }
+  @keyframes biasonFadeUp{
+    from{opacity:0;transform:translateY(8px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  @media print{
+    *::-webkit-scrollbar{display:none}
+  }
+</style>
+<style id="biason-header-standard">
+  .biasonShellHeader{
+    position:sticky;
+    top:0;
+    z-index:40;
+    padding:0 !important;
+    background:linear-gradient(90deg,#0b3d91 0%, #123f8f 62%, #0a7b8f 100%) !important;
+    color:#fff !important;
+    box-shadow:0 14px 28px -20px rgba(8,26,36,.65) !important;
+    border:none !important;
+  }
+  .biasonShellHeader__inner{
+    max-width:1360px;
+    margin:0 auto;
+    min-height:68px;
+    padding:0 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader__left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-width:0;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader__brand{
+    color:#fff;
+    font-size:17px;
+    line-height:1;
+    font-weight:900;
+    letter-spacing:.02em;
+  }
+  .biasonShellHeader__divider{
+    color:rgba(255,255,255,.5);
+    font-weight:700;
+    line-height:1;
+  }
+  .biasonShellHeader__tool{
+    color:#fff;
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.01em;
+  }
+  .biasonShellHeader__crumb{
+    display:inline-flex;
+    align-items:center;
+    min-height:30px;
+    padding:0 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.20);
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .biasonShellHeader__crumb strong{color:#fff;font-weight:800}
+  .biasonShellHeader__right,
+  .biasonShellHeader .right{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .biasonShellHeader .btn,
+  .biasonShellHeader .btn-small,
+  .biasonShellHeader button{
+    border-radius:12px;
+  }
+  .biasonShellHeader .brand,
+  .biasonShellHeader .brand__mark,
+  .biasonShellHeader .brand__name,
+  .biasonShellHeader .brand__sub,
+  .biasonShellHeader .pill,
+  .biasonShellHeader .title,
+  .biasonShellHeader .topbar__eyebrow,
+  .biasonShellHeader .topbar__title,
+  .biasonShellHeader .topbar__sub{
+    all:unset;
+  }
+  .biasonShellHeader::before,
+  .biasonShellHeader::after{
+    content:none !important;
+    display:none !important;
+  }
+  @media (max-width:760px){
+    .biasonShellHeader__inner{min-height:64px;padding:10px 12px}
+    .biasonShellHeader__left{gap:10px}
+    .biasonShellHeader__brand{font-size:16px}
+    .biasonShellHeader__tool{font-size:12px}
+    .biasonShellHeader__crumb{font-size:11px;padding:0 10px}
+  }
+</style>
+</head>
+<body>
+    <header class="topbar biasonShellHeader">
+    <div class="biasonShellHeader__inner">
+      <div class="biasonShellHeader__left">
+        <div class="biasonShellHeader__brand">BIASON</div>
+        <div class="biasonShellHeader__divider">|</div>
+        <div class="biasonShellHeader__tool">Padronizador de Rubricas</div>
+        <div class="biasonShellHeader__crumb">Página: Preparação</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <section class="card">
+        <h2>1) Importar arquivo</h2>
+        <p class="muted">Envie sua planilha de rubricas “bagunçada”. Eu preparo um <b>CSV no padrão</b> esperado pela ferramenta <b>Tabela de Rubricas</b>.</p>
+
+        <div id="drop" class="drop" role="button" tabindex="0" aria-label="Área para arrastar e soltar arquivo">
+          <div class="row" style="justify-content:space-between">
+            <div>
+              <div style="font-weight:900">Arraste o arquivo aqui</div>
+              <div class="small">ou clique para selecionar (recomendado: <b>CSV</b>). XLSX: se não abrir, exporte como CSV.</div>
+            </div>
+            <button class="btn btn--ghost" id="pickBtn" type="button">Selecionar arquivo</button>
+          </div>
+          <div class="small" style="margin-top:8px">
+            Arquivo: <span class="mono" id="fileName">—</span>
+          </div>
+        </div>
+
+        <input id="fileInput" type="file" accept=".csv,.xlsx,.xls" style="display:none"/>
+
+        <div class="kpi">
+          <div class="kpi__item"><div class="kpi__label">Linhas detectadas</div><div class="kpi__value" id="kpiRows">—</div></div>
+          <div class="kpi__item"><div class="kpi__label">Colunas detectadas</div><div class="kpi__value" id="kpiCols">—</div></div>
+          <div class="kpi__item"><div class="kpi__label">Delimitador</div><div class="kpi__value" id="kpiDelim">—</div></div>
+        </div>
+
+        <div id="xlsxWarn" class="warn" style="display:none; margin-top:12px">
+          Este arquivo parece ser <b>Excel (.xlsx/.xls)</b>. Esta ferramenta funciona melhor com <b>CSV</b>.<br/>
+          Se não carregar corretamente, abra no Excel e use <b>Salvar como → CSV (separado por ponto e vírgula)</b>.
+        </div>
+
+        <div id="statusBox" style="margin-top:12px"></div>
+      </section>
+
+      <section class="card">
+        <h2>2) Mapear colunas</h2>
+        <p class="muted">Confirme quais colunas do seu arquivo correspondem ao padrão. Eu tento mapear automaticamente.</p>
+
+        <div class="field">
+          <label for="mapId">id (identificador)</label>
+          <select id="mapId"></select>
+        </div>
+        <div class="field">
+          <label for="mapNome">nome (descrição da rubrica)</label>
+          <select id="mapNome"></select>
+        </div>
+        <div class="field">
+          <label for="mapCod">cod (código/natureza)</label>
+          <select id="mapCod"></select>
+        </div>
+        <div class="field">
+          <label for="mapInss">inss</label>
+          <select id="mapInss"></select>
+        </div>
+        <div class="field">
+          <label for="mapIrrf">irrf</label>
+          <select id="mapIrrf"></select>
+        </div>
+        <div class="field">
+          <label for="mapFgts">fgts</label>
+          <select id="mapFgts"></select>
+        </div>
+
+        <div class="row" style="margin-top:12px">
+          <button class="btn" id="buildBtn" type="button">Gerar CSV padrão</button>
+          <button class="btn btn--ghost" id="downloadBtn" type="button" disabled>Baixar CSV</button>
+          <button class="btn btn--ghost" id="openRubricasBtn" type="button" disabled>Abrir “Tabela de Rubricas”</button>
+          <button class="btn btn--danger" id="resetBtn" type="button">Limpar</button>
+        </div>
+
+        <div class="small" style="margin-top:10px">
+          Saída no padrão: <span class="mono">id,nome,cod,inss,irrf,fgts</span>
+        </div>
+
+        <div class="tableWrap" style="margin-top:12px">
+          <table aria-label="Prévia do CSV padronizado">
+            <thead>
+              <tr>
+                <th>id</th><th>nome</th><th>cod</th><th>inss</th><th>irrf</th><th>fgts</th>
+              </tr>
+            </thead>
+            <tbody id="previewBody">
+              <tr><td colspan="6" class="muted">Envie um arquivo para ver a prévia.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="qualityBox" style="margin-top:12px"></div>
+      </section>
+    </div>
+  </main>
+
+<script>
+async function ensureXLSX(){
+  if(window.XLSX) return true;
+  return new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    s.src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+    s.async=true;
+    s.onload=()=>resolve(true);
+    s.onerror=()=>reject(new Error("Não foi possível carregar o leitor de Excel. Verifique sua internet ou exporte o arquivo como CSV (separado por ponto e vírgula)."));
+    document.head.appendChild(s);
+  });
+}
+async function parseXlsxFile(file){
+  await ensureXLSX();
+  const data = new Uint8Array(await file.arrayBuffer());
+  const wb = XLSX.read(data, {type:'array'});
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+  const head = (rows.shift()||[]).map(h=>String(h||'').trim());
+  const body = rows
+    .filter(r=>r && r.some(c=>String(c).trim()!==''))
+    .map(r=>{
+      const obj={};
+      head.forEach((h,i)=>{ if(h) obj[h]= (r[i]===undefined? '' : String(r[i]).trim()); });
+      return obj;
+    });
+  return {head, rows: body, delim: 'XLSX'};
+}
+</script>
+<script>
+(function(){
+  const drop = document.getElementById('drop');
+  const pickBtn = document.getElementById('pickBtn');
+  const fileInput = document.getElementById('fileInput');
+  const fileName = document.getElementById('fileName');
+  const xlsxWarn = document.getElementById('xlsxWarn');
+
+  const kpiRows = document.getElementById('kpiRows');
+  const kpiCols = document.getElementById('kpiCols');
+  const kpiDelim = document.getElementById('kpiDelim');
+  const statusBox = document.getElementById('statusBox');
+  const qualityBox = document.getElementById('qualityBox');
+
+  const map = {
+    id: document.getElementById('mapId'),
+    nome: document.getElementById('mapNome'),
+    cod: document.getElementById('mapCod'),
+    inss: document.getElementById('mapInss'),
+    irrf: document.getElementById('mapIrrf'),
+    fgts: document.getElementById('mapFgts'),
+  };
+
+  const buildBtn = document.getElementById('buildBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const openRubricasBtn = document.getElementById('openRubricasBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const previewBody = document.getElementById('previewBody');
+
+  let rawRows = null;     // array of objects
+  let headers = [];       // normalized header list
+  let outCsv = null;      // string
+  let outFile = null;     // File
+
+  function setStatus(kind, html){
+    statusBox.innerHTML = `<div class="${kind}">${html}</div>`;
+  }
+  function setQuality(kind, html){
+    qualityBox.innerHTML = html ? `<div class="${kind}">${html}</div>` : '';
+  }
+
+  function norm(s){
+    return String(s ?? '')
+      .trim()
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')   // remove acentos
+      .replace(/[^a-z0-9]+/g,' ')
+      .trim();
+  }
+
+  function guessDelimiter(text){
+    const sample = text.slice(0, 6000);
+    const counts = { ';':0, ',':0, '\t':0, '|':0 };
+    for (const d of Object.keys(counts)){
+      counts[d] = (sample.match(new RegExp(d === '\t' ? '\\t' : '\\' + d, 'g')) || []).length;
+    }
+    // prefer ; in pt-BR exports
+    const best = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0];
+    return best;
+  }
+
+  function splitLine(line, delim){
+    // CSV simples (sem 100% de RFC), com aspas
+    const out=[];
+    let cur='', inQ=false;
+    for (let i=0;i<line.length;i++){
+      const ch=line[i];
+      if (ch === '"'){
+        if (inQ && line[i+1] === '"'){ cur+='"'; i++; }
+        else inQ = !inQ;
+      } else if (!inQ && ch === delim){
+        out.push(cur); cur='';
+      } else {
+        cur+=ch;
+      }
+    }
+    out.push(cur);
+    return out;
+  }
+
+  function parseCsv(text){
+    const delim = guessDelimiter(text);
+    const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l=>l.trim().length);
+    if (!lines.length) throw new Error('Arquivo vazio.');
+    const head = splitLine(lines[0], delim).map(h=>h.trim());
+    const rows=[];
+    for (let i=1;i<lines.length;i++){
+      const cols = splitLine(lines[i], delim);
+      const obj={};
+      for (let c=0;c<head.length;c++){
+        obj[head[c]] = (cols[c] ?? '').trim();
+      }
+      rows.push(obj);
+    }
+    return {delim, head, rows};
+  }
+
+  function setOptions(selectEl, head){
+    selectEl.innerHTML = '';
+    const opt0 = document.createElement('option');
+    opt0.value = '';
+    opt0.textContent = '— selecione —';
+    selectEl.appendChild(opt0);
+    head.forEach(h=>{
+      const opt = document.createElement('option');
+      opt.value = h;
+      opt.textContent = h;
+      selectEl.appendChild(opt);
+    });
+  }
+
+  function bestMatch(head, candidates){
+    // retorna header que melhor encaixa em candidatos
+    const headNorm = head.map(h=>({h, n:norm(h)}));
+    const candNorm = candidates.map(c=>norm(c));
+    let best = {h:'', score: -1};
+    for (const item of headNorm){
+      let score = 0;
+      for (const c of candNorm){
+        if (!c) continue;
+        if (item.n === c) score += 7;
+        if (item.n.includes(c)) score += 4;
+        // tokens
+        const tokens = c.split(' ');
+        for (const t of tokens){
+          if (t && item.n.includes(t)) score += 1;
+        }
+      }
+      if (score > best.score){ best = {h:item.h, score}; }
+    }
+    return best.score > 0 ? best.h : '';
+  }
+
+  function autoMap(head){
+    map.id.value   = bestMatch(head, ['id','identificador','codigo id','id rubrica']);
+    map.nome.value = bestMatch(head, ['nome','descricao','descrição','rubrica','evento','nome rubrica','verba']);
+    map.cod.value  = bestMatch(head, ['cod','codigo','código','cod rubrica','cod evento','natureza','cod natureza']);
+    map.inss.value = bestMatch(head, ['inss','inc inss','incidencia inss','previdencia']);
+    map.irrf.value = bestMatch(head, ['irrf','inc irrf','incidencia irrf','imposto renda','ir']);
+    map.fgts.value = bestMatch(head, ['fgts','inc fgts','incidencia fgts']);
+  }
+
+  function buildMappingUI(){
+    const head = (typeof headers !== 'undefined' && Array.isArray(headers)) ? headers : [];
+    // populate selects
+    setOptions(map.id, head);
+    setOptions(map.nome, head);
+    setOptions(map.cod, head);
+    setOptions(map.inss, head);
+    setOptions(map.irrf, head);
+    setOptions(map.fgts, head);
+
+    // bind change handlers once
+    if (!map.id.dataset.bound){
+      [map.id,map.nome,map.cod,map.inss,map.irrf,map.fgts].forEach(sel=>{
+        sel.addEventListener('change', ()=>{
+          renderPreview();
+          setQuality();
+        });
+        sel.dataset.bound = '1';
+      });
+    }
+    // try to auto map
+    autoMap(head);
+    setQuality();
+  }
+
+
+  function cleanBoolLike(v){
+    const s = norm(v);
+    if (!s) return '';
+    if (['sim','s','1','true','t','x','ok'].includes(s)) return '1';
+    if (['nao','não','n','0','false','f'].includes(s)) return '0';
+    return v;
+  }
+
+  function buildStandard(){
+    if (!rawRows || !rawRows.length) throw new Error('Envie um arquivo primeiro.');
+    const picks = {
+      id: map.id.value, nome: map.nome.value, cod: map.cod.value,
+      inss: map.inss.value, irrf: map.irrf.value, fgts: map.fgts.value
+    };
+    // obrigatórios mínimos: nome/cod (id pode ser vazio)
+    if (!picks.nome && !picks.cod) throw new Error('Selecione pelo menos “nome” ou “cod” para gerar o padrão.');
+
+    const out = [];
+    const dupCheck = new Set();
+    let missing = 0, dups = 0;
+
+    for (const r of rawRows){
+      const row = {
+        id:   picks.id   ? (r[picks.id] ?? '').trim() : '',
+        nome: picks.nome ? (r[picks.nome] ?? '').trim() : '',
+        cod:  picks.cod  ? (r[picks.cod] ?? '').trim() : '',
+        inss: picks.inss ? cleanBoolLike((r[picks.inss] ?? '').trim()) : '',
+        irrf: picks.irrf ? cleanBoolLike((r[picks.irrf] ?? '').trim()) : '',
+        fgts: picks.fgts ? cleanBoolLike((r[picks.fgts] ?? '').trim()) : '',
+      };
+
+      const key = (row.id || row.cod || row.nome).toLowerCase();
+      if (!key) missing++;
+      if (key){
+        if (dupCheck.has(key)) dups++;
+        dupCheck.add(key);
+      }
+      out.push(row);
+    }
+
+    // monta CSV com ; (padrão BR) e aspas quando necessário
+    function csvEscape(val){
+      const s = String(val ?? '');
+      if (/[;"\n\r]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+      return s;
+    }
+    const header = ['id','nome','cod','inss','irrf','fgts'];
+    const lines = [header.join(';')];
+    for (const r of out){
+      lines.push(header.map(k=>csvEscape(r[k])).join(';'));
+    }
+    outCsv = lines.join('\n');
+
+    // preview
+    previewBody.innerHTML = '';
+    const max = Math.min(12, out.length);
+    for (let i=0;i<max;i++){
+      const tr=document.createElement('tr');
+      header.forEach(k=>{
+        const td=document.createElement('td');
+        td.textContent = out[i][k];
+        tr.appendChild(td);
+      });
+      previewBody.appendChild(tr);
+    }
+    if (out.length > max){
+      const tr=document.createElement('tr');
+      const td=document.createElement('td');
+      td.colSpan=6;
+      td.className='muted';
+      td.textContent = `… mais ${out.length - max} linhas`;
+      tr.appendChild(td);
+      previewBody.appendChild(tr);
+    }
+
+    // qualidade
+    const msgs=[];
+    if (missing) msgs.push(`<b>${missing}</b> linhas sem id/cod/nome (verifique).`);
+    if (dups) msgs.push(`<b>${dups}</b> possíveis duplicadas por id/cod/nome.`);
+    setQuality(msgs.length ? 'warn' : 'ok', msgs.length ? msgs.join('<br/>') : 'CSV padronizado gerado com sucesso.');
+
+    // habilita ações
+    downloadBtn.disabled = false;
+    openRubricasBtn.disabled = false;
+
+    // file para enviar ao hub
+    const blob = new Blob([outCsv], {type:'text/csv;charset=utf-8'});
+    outFile = new File([blob], 'rubricas_padronizadas.csv', {type:'text/csv;charset=utf-8'});
+  }
+
+  function downloadCsv(){
+    if (!outCsv) return;
+    const blob = new Blob([outCsv], {type:'text/csv;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=url;
+    a.download='rubricas_padronizadas.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1500);
+  }
+
+  async function openRubricasWithFile(){
+    if (!outFile) return;
+    // envia para o parent (hub) abrir rubricas e injetar arquivo
+    const ab = await outFile.arrayBuffer();
+    const bytes = new Uint8Array(ab);
+    let binary = '';
+    const chunk = 0x8000;
+    for (let i=0;i<bytes.length;i+=chunk){
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
+    }
+    const b64 = btoa(binary);
+    window.parent.postMessage({
+      type: 'BIASON_OPEN_TOOL_WITH_FILE',
+      tool: 'rubricas',
+      filename: outFile.name,
+      mime: outFile.type || 'text/csv',
+      b64
+    }, '*');
+    setStatus('ok', 'Abrindo “Tabela de Rubricas” com o CSV padronizado…');
+  }
+
+  function resetAll(){
+    rawRows=null; headers=[]; outCsv=null; outFile=null;
+    fileInput.value='';
+    fileName.textContent='—';
+    kpiRows.textContent='—'; kpiCols.textContent='—'; kpiDelim.textContent='—';
+    xlsxWarn.style.display='none';
+    setStatus('warn', 'Envie um arquivo para começar.');
+    setQuality('', '');
+    previewBody.innerHTML = '<tr><td colspan="6" class="muted">Envie um arquivo para ver a prévia.</td></tr>';
+    Object.values(map).forEach(sel=> sel.innerHTML = '<option value="">— selecione —</option>');
+    downloadBtn.disabled = true;
+    openRubricasBtn.disabled = true;
+  }
+
+  async function handleFile(file){
+    resetAll();
+    if (!file) return;
+
+    fileName.textContent = file.name;
+    const ext = (file.name.split('.').pop()||'').toLowerCase();
+    if (ext === 'xlsx' || ext === 'xls'){
+      xlsxWarn.style.display = 'block';
+      setStatus('warn', 'Arquivo Excel detectado. Lendo a primeira aba…');
+      try{
+        const parsedX = await parseXlsxFile(file);
+        headers = parsedX.head;
+        rawRows = parsedX.rows;
+
+        kpiRows.textContent = String(rawRows.length);
+        kpiCols.textContent = String(headers.length);
+        kpiDelim.textContent = 'XLSX';
+
+        buildMappingUI();
+        renderPreview();
+        setStatus('ok', 'Excel carregado. Agora mapeie as colunas e gere o CSV padrão.');
+      }catch(err){
+        console.error(err);
+        setStatus('err', (err && err.message) ? err.message : 'Não consegui ler este Excel. Exporte como CSV e reenvie.');
+      }
+      return;
+    }
+
+    try{
+      const text = await file.text();
+      const parsed = parseCsv(text);
+      headers = parsed.head;
+      rawRows = parsed.rows;
+
+      kpiRows.textContent = String(rawRows.length);
+      kpiCols.textContent = String(headers.length);
+      kpiDelim.textContent = parsed.delim === '\t' ? 'TAB' : parsed.delim;
+
+      // preencher selects
+      Object.values(map).forEach(sel=> setOptions(sel, headers));
+      autoMap(headers);
+
+      setStatus('ok', 'Arquivo carregado. Confirme o mapeamento e clique em “Gerar CSV padrão”.');
+    }catch(e){
+      setStatus('warn', 'Não consegui ler o arquivo. Verifique se é CSV e tente novamente.');
+      console.error(e);
+    }
+  }
+
+  // DnD
+  drop.addEventListener('click', ()=> fileInput.click());
+  drop.addEventListener('keydown', (e)=> { if (e.key === 'Enter' || e.key === ' ') fileInput.click(); });
+  pickBtn.addEventListener('click', (e)=> { e.stopPropagation(); fileInput.click(); });
+
+  ['dragenter','dragover'].forEach(ev=>{
+    drop.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); drop.classList.add('drag'); });
+  });
+  ['dragleave','drop'].forEach(ev=>{
+    drop.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); drop.classList.remove('drag'); });
+  });
+  drop.addEventListener('drop', (e)=>{
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  });
+
+  fileInput.addEventListener('change', ()=>{
+    const f = fileInput.files && fileInput.files[0];
+    if (f) handleFile(f);
+  });
+
+  buildBtn.addEventListener('click', ()=>{
+    try{ buildStandard(); }
+    catch(e){ setQuality('warn', e.message || 'Não foi possível gerar.'); }
+  });
+  downloadBtn.addEventListener('click', downloadCsv);
+  openRubricasBtn.addEventListener('click', openRubricasWithFile);
+  resetBtn.addEventListener('click', resetAll);
+
+  resetAll();
+})();
+</script>
+</body>
+</html>
+
+
+
+
