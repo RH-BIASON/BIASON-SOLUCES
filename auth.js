@@ -21,7 +21,7 @@
       name: "RH Biason",
       email: "rh@biason.com.br",
       hash: "0679a3c2098a02d90589beebdf7b00d5a746a8b346e06e4769c82d96aee1b71d",
-      scopes: ["hub"],
+      scopes: ["hub", "dirf", "rubricas"],
     },
     {
       name: "DIRF / IRPF",
