@@ -23,6 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
     :root{
       --brand:#0b3d91;
@@ -189,7 +190,7 @@
 
     .grid{
       display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
+      grid-template-columns:repeat(4,minmax(0,1fr));
       gap:16px;
       align-items:stretch;
     }
@@ -204,6 +205,27 @@
       box-shadow:var(--shadow);
     }
     .card:hover{transform:translateY(-4px)}
+    .cardIcon{
+      width:22px;
+      height:22px;
+      stroke-width:2.25;
+    }
+    .cardIconWrap{
+      width:44px;
+      height:44px;
+      display:grid;
+      place-items:center;
+      border-radius:14px;
+      margin-bottom:14px;
+      color:#0369a1;
+      background:linear-gradient(180deg, rgba(2,132,199,.12), rgba(10,123,143,.08));
+      border:1px solid rgba(2,132,199,.14);
+    }
+    .card--featured .cardIconWrap{
+      color:#0a7b8f;
+      background:linear-gradient(180deg, rgba(10,123,143,.14), rgba(11,61,145,.08));
+      border-color:rgba(10,123,143,.18);
+    }
     .cardTag{
       display:inline-flex;
       align-items:center;
@@ -416,6 +438,9 @@
         break-inside:avoid;
         page-break-inside:avoid;
       }
+      .cardIconWrap{
+        display:none;
+      }
       .cardTag{
         min-height:20px;
         padding:0 7px;
@@ -449,7 +474,7 @@
       }
     }
 
-    @media (max-width:1100px){
+    @media (max-width:1180px){
       .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
     }
     @media (max-width:760px){
@@ -500,6 +525,7 @@
       <div class="grid" id="toolGrid">
 
         <article class="card" data-search="jornada horas folha calculo">
+          <span class="cardIconWrap"><i class="cardIcon" data-lucide="clock-3"></i></span>
           <span class="cardTag">Horas e folha</span>
           <h3>Jornada</h3>
           <p>Calcule jornada, horas extras e adicional noturno com leitura clara para conferência e impressão.</p>
@@ -510,6 +536,7 @@
 
 
         <article class="card card--featured" data-search="rescisao desligamento verbas">
+          <span class="cardIconWrap"><i class="cardIcon" data-lucide="file-x-2"></i></span>
           <span class="cardTag">Desligamento</span>
           <h3>Rescisão</h3>
           <p>Simule verbas rescisórias com detalhamento organizado para conferência, análise e emissão de resumo.</p>
@@ -520,6 +547,7 @@
 
 
         <article class="card" data-search="adicional noturno horas dsr rsr">
+          <span class="cardIconWrap"><i class="cardIcon" data-lucide="moon"></i></span>
           <span class="cardTag">Horas e folha</span>
           <h3>Adicional Noturno</h3>
           <p>Apure adicional noturno, hora reduzida e reflexos em DSR/RSR de forma rápida e objetiva.</p>
@@ -530,6 +558,7 @@
 
 
         <article class="card" data-search="custo clt encargos beneficios provisoes">
+          <span class="cardIconWrap"><i class="cardIcon" data-lucide="calculator"></i></span>
           <span class="cardTag">Custos</span>
           <h3>Custo CLT</h3>
           <p>Visualize o custo completo da contratação CLT, incluindo encargos, benefícios e provisões.</p>
@@ -540,6 +569,7 @@
 
 
         <article class="card card--featured" data-search="rubricas consulta cruzamento tabela incidencias">
+          <span class="cardIconWrap"><i class="cardIcon" data-lucide="search-check"></i></span>
           <span class="cardTag">Consulta oficial</span>
           <h3>Rubricas Atualizadas</h3>
           <p>Consulte incidências, cruze bases e valide rubricas com mais segurança em uma base atualizada.</p>
@@ -550,6 +580,7 @@
 
 
         <article class="card" data-search="pat beneficio economia">
+          <span class="cardIconWrap"><i class="cardIcon" data-lucide="hand-coins"></i></span>
           <span class="cardTag">Benefícios</span>
           <h3>Economia PAT</h3>
           <p>Compare custo e benefício do PAT para apoiar decisões com leitura rápida do impacto financeiro.</p>
@@ -560,6 +591,7 @@
 
 
         <article class="card" data-search="fgts digital extrato txt complemento caixa manual preenchimento">
+          <span class="cardIconWrap"><i class="cardIcon" data-lucide="landmark"></i></span>
           <span class="cardTag">FGTS</span>
           <h3>FGTS Digital</h3>
           <p>Converta extratos para FGTS Digital ou preencha o TXT manualmente quando já tiver os valores definidos.</p>
@@ -571,6 +603,7 @@
 
 
         <article class="card card--featured" data-search="dirf irpf xml s-5002 comprovante relatorio lote funcionarios planilha zip">
+          <span class="cardIconWrap"><i class="cardIcon" data-lucide="receipt-text"></i></span>
           <span class="cardTag">Comprovantes</span>
           <h3>DIRF / IRPF</h3>
           <p>Gere o relatório individual a partir do XML S-5002 ou use o módulo em lote para processar vários funcionários de uma vez.</p>
@@ -582,6 +615,7 @@
 
 
         <article class="card" data-search="irrf comparativo lote calculo">
+          <span class="cardIconWrap"><i class="cardIcon" data-lucide="scale"></i></span>
           <span class="cardTag">Comparativo</span>
           <h3>Simulador IRRF</h3>
           <p>Compare cenários de IRRF em cálculo individual ou em lote para apoiar análises e conferências.</p>
@@ -591,6 +625,7 @@
         </article>
 
         <article class="card" data-search="decimo terceiro 13 salario natalina primeira parcela segunda parcela">
+          <span class="cardIconWrap"><i class="cardIcon" data-lucide="badge-dollar-sign"></i></span>
           <span class="cardTag">Folha anual</span>
           <h3>13º Salário</h3>
           <p>Calcule avos, primeira parcela, segunda parcela e descontos do décimo terceiro com leitura imediata.</p>
@@ -600,6 +635,7 @@
         </article>
 
         <article class="card" data-search="inss contribuicao tabela desconto aliquota previdencia">
+          <span class="cardIconWrap"><i class="cardIcon" data-lucide="percent"></i></span>
           <span class="cardTag">Encargos</span>
           <h3>Calculadora INSS</h3>
           <p>Simule desconto previdenciário com base atual e compare faixas, teto e contribuição do segurado.</p>
@@ -609,6 +645,7 @@
         </article>
 
         <article class="card" data-search="ferias abono um terco irrf inss recibo">
+          <span class="cardIconWrap"><i class="cardIcon" data-lucide="plane"></i></span>
           <span class="cardTag">Férias</span>
           <h3>Calculadora Férias</h3>
           <p>Projete férias com um terço, abono pecuniário e descontos para apoiar conferência e planejamento.</p>
@@ -618,6 +655,7 @@
         </article>
 
         <article class="card" data-search="dissidio reajuste salario retroativo percentual acordo coletivo">
+          <span class="cardIconWrap"><i class="cardIcon" data-lucide="trending-up"></i></span>
           <span class="cardTag">Reajuste</span>
           <h3>Calculadora Dissídio</h3>
           <p>Projete reajuste salarial por percentual, retroativo e novo salário com memória de cálculo clara.</p>
@@ -627,6 +665,7 @@
         </article>
 
         <article class="card" data-search="pdf juntar dividir comprimir converter word jpg imagens documentos">
+          <span class="cardIconWrap"><i class="cardIcon" data-lucide="files"></i></span>
           <span class="cardTag">Documentos</span>
           <h3>Central PDF</h3>
           <p>Junte, divida, comprima e converta PDFs e imagens em um ambiente único para rotinas administrativas.</p>
@@ -741,6 +780,10 @@
         console.error(err);
       }
     });
+
+    if(window.lucide){
+      window.lucide.createIcons();
+    }
   </script>
 </body>
 </html>
