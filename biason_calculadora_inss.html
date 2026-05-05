@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BIASON | Calculadora de INSS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+<style>
+  :root{
+    --brand:#081a24;
+    --brand-2:#0b3d91;
+    --accent:#007ea7;
+    --accent-2:#0a7b8f;
+    --bg:#f4f7fb;
+    --panel:#ffffff;
+    --muted:#5a6878;
+    --text:#0b1b2a;
+    --line:rgba(15,23,42,.10);
+    --line-strong:rgba(15,23,42,.16);
+    --shadow:0 24px 48px -30px rgba(8,26,36,.48);
+    --radius:20px;
+    --radius-sm:14px;
+    --danger:#c53030;
+    --success:#0f766e;
+    --warning:#b45309;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(circle at top right, rgba(0,126,167,.10), transparent 24%),
+      linear-gradient(180deg, #eef4f9 0%, #f6f8fb 28%, var(--bg) 100%);
+  }
+
+  .shell-header{
+    position:sticky;
+    top:0;
+    z-index:40;
+    background:linear-gradient(90deg,var(--brand-2) 0%, #123f8f 62%, var(--accent-2) 100%);
+    color:#fff;
+    box-shadow:0 14px 28px -20px rgba(8,26,36,.65);
+  }
+  .shell-header__inner{
+    max-width:1360px;
+    min-height:68px;
+    margin:0 auto;
+    padding:0 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .shell-header__left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+    min-width:0;
+  }
+  .shell-header__brand{font-size:17px;font-weight:900;letter-spacing:.02em}
+  .shell-header__divider{color:rgba(255,255,255,.5);font-weight:700}
+  .shell-header__tool{font-size:13px;font-weight:800;letter-spacing:.01em}
+  .shell-header__crumb{
+    min-height:30px;
+    display:inline-flex;
+    align-items:center;
+    padding:0 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.20);
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+
+  main{
+    max-width:1360px;
+    margin:18px auto 0;
+    padding:0 24px 32px;
+    display:grid;
+    grid-template-columns:minmax(300px,340px) minmax(0,1fr);
+    gap:18px;
+  }
+  main > *{min-width:0}
+
+  .card{
+    background:rgba(255,255,255,.94);
+    border:1px solid var(--line);
+    box-shadow:var(--shadow);
+    border-radius:var(--radius);
+    padding:22px;
+  }
+
+  .guide{
+    position:sticky;
+    top:96px;
+    align-self:start;
+    background:linear-gradient(180deg, rgba(8,26,36,.02), rgba(0,126,167,.04));
+  }
+  .card h1,.card h2,.card h3{
+    margin:0 0 14px;
+    color:var(--brand);
+    letter-spacing:-.02em;
+  }
+  .card h1{font-size:clamp(28px,3vw,36px)}
+  .card h2{font-size:clamp(22px,2.2vw,28px)}
+  .card h3{font-size:18px}
+  .section-title{
+    font-size:12px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    font-weight:800;
+    color:#0a6f85;
+    margin:0 0 8px;
+  }
+  .lead,.guide p,.guide li,.muted{line-height:1.6;color:var(--muted)}
+  .guide ul{padding-left:18px;margin:0}
+  .guide li+li{margin-top:8px}
+  .guide section+section{margin-top:20px}
+
+  .hero-note{
+    margin:0 0 18px;
+    padding:14px 16px;
+    border-radius:18px;
+    background:linear-gradient(180deg, rgba(0,126,167,.06), rgba(255,255,255,.96));
+    border:1px solid rgba(0,126,167,.14);
+    color:#234;
+    line-height:1.55;
+    font-size:14px;
+  }
+
+  .grid-two, .grid-three{
+    display:grid;
+    gap:18px;
+  }
+  .grid-two{grid-template-columns:repeat(2, minmax(0,1fr));}
+  .grid-three{grid-template-columns:repeat(3, minmax(0,1fr));}
+
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  label{
+    font-size:13px;
+    font-weight:800;
+    color:var(--brand);
+    letter-spacing:.01em;
+  }
+  .hint{
+    font-size:12px;
+    color:var(--muted);
+    line-height:1.45;
+  }
+  input[type="text"], input[type="tel"], select{
+    width:100%;
+    min-height:52px;
+    border:1px solid var(--line-strong);
+    border-radius:16px;
+    padding:0 14px;
+    font:inherit;
+    color:var(--text);
+    background:#fff;
+    outline:none;
+    transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+  }
+  input:focus, select:focus{
+    border-color:rgba(11,61,145,.45);
+    box-shadow:0 0 0 4px rgba(11,61,145,.10);
+  }
+
+  .actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:18px;
+  }
+  button{
+    border:0;
+    border-radius:16px;
+    min-height:50px;
+    padding:0 18px;
+    font:inherit;
+    font-weight:800;
+    letter-spacing:.01em;
+    cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+  }
+  button:hover{transform:translateY(-1px)}
+  .btn-primary{
+    background:linear-gradient(90deg,var(--brand-2),var(--accent-2));
+    color:#fff;
+    box-shadow:0 16px 28px -18px rgba(11,61,145,.72);
+  }
+  .btn-secondary{
+    background:#eef4fb;
+    color:var(--brand);
+    border:1px solid rgba(11,61,145,.12);
+  }
+
+  .status{
+    margin-top:16px;
+    min-height:26px;
+    font-size:14px;
+    font-weight:700;
+  }
+  .status.error{color:var(--danger)}
+  .status.success{color:var(--success)}
+  .status.warn{color:var(--warning)}
+
+  .result-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:14px;
+    margin:18px 0;
+  }
+  .stat{
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:16px;
+    background:linear-gradient(180deg, rgba(8,26,36,.02), rgba(255,255,255,.98));
+  }
+  .stat__label{
+    display:block;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#0a6f85;
+    margin-bottom:8px;
+  }
+  .stat__value{
+    font-size:clamp(22px,2.1vw,30px);
+    font-weight:900;
+    color:var(--brand);
+    line-height:1.2;
+  }
+  .stat__sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+  .table-wrap{
+    overflow:auto;
+    border:1px solid var(--line);
+    border-radius:18px;
+    background:#fff;
+    margin-top:16px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:620px;
+  }
+  th,td{
+    padding:14px 16px;
+    border-bottom:1px solid var(--line);
+    text-align:left;
+    vertical-align:top;
+    font-size:14px;
+  }
+  th{
+    background:#f7fbff;
+    color:var(--brand);
+    font-size:13px;
+    letter-spacing:.02em;
+  }
+  tbody tr:last-child td, tbody tr:last-child th{border-bottom:0}
+
+  .table-note{
+    margin-top:10px;
+    font-size:12px;
+    color:var(--muted);
+    line-height:1.5;
+  }
+
+  .badge-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    min-height:30px;
+    padding:0 12px;
+    border-radius:999px;
+    background:rgba(11,61,145,.08);
+    border:1px solid rgba(11,61,145,.12);
+    color:var(--brand-2);
+    font-size:12px;
+    font-weight:800;
+  }
+
+  .footnote{
+    margin-top:18px;
+    font-size:12px;
+    line-height:1.6;
+    color:var(--muted);
+  }
+  .footnote a{color:var(--brand-2);text-decoration:none}
+
+  .receipt{
+    margin-top:16px;
+    border:1px dashed rgba(11,61,145,.24);
+    border-radius:18px;
+    padding:18px;
+    background:linear-gradient(180deg, rgba(247,251,255,.95), #fff);
+    line-height:1.7;
+    color:#1b2d40;
+  }
+  .receipt strong{color:var(--brand)}
+
+  .callout{
+    padding:14px 16px;
+    border-radius:16px;
+    background:rgba(15,118,110,.07);
+    border:1px solid rgba(15,118,110,.14);
+    color:#15453f;
+    font-size:14px;
+    line-height:1.55;
+    margin-top:14px;
+  }
+
+  @media (max-width: 1080px){
+    main{grid-template-columns:1fr}
+    .guide{position:static;top:auto}
+    .result-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+  @media (max-width: 760px){
+    body{background:#f4f7fb}
+    main{padding:0 14px 24px}
+    .card{padding:18px}
+    .grid-two,.grid-three{grid-template-columns:1fr}
+    .result-grid{grid-template-columns:1fr}
+    table{min-width:560px}
+    .shell-header__inner{padding:10px 14px}
+  }
+  @media print{
+    .shell-header,.guide,.actions,.status,.hero-note,.footnote,.callout,.badge-row{display:none !important}
+    main{display:block;max-width:none;padding:0;margin:0}
+    .card{box-shadow:none;border:0;padding:0}
+    .table-wrap{overflow:visible;border:0}
+    table{min-width:0}
+  }
+</style>
+
+</head>
+<body>
+  <header class="shell-header">
+    <div class="shell-header__inner">
+      <div class="shell-header__left">
+        <div class="shell-header__brand">BIASON</div>
+        <div class="shell-header__divider">|</div>
+        <div class="shell-header__tool">Calculadora de INSS</div>
+      </div>
+      <span class="shell-header__crumb">Página: Simulação</span>
+    </div>
+  </header>
+
+  <main>
+    <aside class="card guide">
+      <section>
+        <p class="section-title">Como usar</p>
+        <h2>Simule o desconto por faixa</h2>
+        <p>Informe o salário bruto e selecione a tabela desejada. O resultado mostra o desconto em cada faixa, o total a recolher e a alíquota efetiva.</p>
+      </section>
+      <section>
+        <p class="section-title">O que a ferramenta entrega</p>
+        <ul>
+          <li>Memória de cálculo por faixa de contribuição.</li>
+          <li>Total do desconto com teto aplicado automaticamente.</li>
+          <li>Leitura simples para conferência pelo RH e DP.</li>
+        </ul>
+      </section>
+      <section>
+        <p class="section-title">Faixas disponíveis</p>
+        <ul>
+          <li>2026</li>
+          <li>2025</li>
+          <li>2024</li>
+          <li>2023 (jan-abr e mai-dez)</li>
+          <li>2022</li>
+          <li>2021</li>
+        </ul>
+      </section>
+    </aside>
+
+    <section class="card">
+      <div class="badge-row">
+        <span class="badge">Cálculo progressivo</span>
+        <span class="badge">Resultado detalhado</span>
+        <span class="badge">Visual Biason</span>
+      </div>
+      <p class="section-title">Ferramenta</p>
+      <h1>Calculadora de INSS</h1>
+      <p class="hero-note">Use esta calculadora para conferir rapidamente o desconto do INSS sobre o salário bruto, com memória de cálculo por faixa e teto automático da tabela selecionada.</p>
+
+      <div class="grid-two">
+        <div class="field">
+          <label for="salario">Valor do salário bruto</label>
+          <input id="salario" type="tel" inputmode="decimal" placeholder="0,00" />
+          <div class="hint">Digite o salário sem descontos.</div>
+        </div>
+        <div class="field">
+          <label for="tabela">Tabela do INSS</label>
+          <select id="tabela">
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+            <option value="20235">2023 • de 01/05 a 31/12</option>
+            <option value="2023">2023 • de 01/01 a 30/04</option>
+            <option value="2022">2022</option>
+            <option value="2021">2021</option>
+          </select>
+          <div class="hint">A contribuição muda conforme a tabela escolhida.</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" id="calcular">Calcular</button>
+        <button class="btn-secondary" id="limpar">Limpar</button>
+      </div>
+      <div id="status" class="status"></div>
+
+      <div class="result-grid">
+        <article class="stat">
+          <span class="stat__label">Salário informado</span>
+          <div class="stat__value" id="statSalario">R$ 0,00</div>
+          <div class="stat__sub">Base de entrada</div>
+        </article>
+        <article class="stat">
+          <span class="stat__label">Desconto INSS</span>
+          <div class="stat__value" id="statInss">R$ 0,00</div>
+          <div class="stat__sub">Total a recolher</div>
+        </article>
+        <article class="stat">
+          <span class="stat__label">Alíquota efetiva</span>
+          <div class="stat__value" id="statEfetiva">0,00%</div>
+          <div class="stat__sub">Sobre o salário informado</div>
+        </article>
+        <article class="stat">
+          <span class="stat__label">Base limitada</span>
+          <div class="stat__value" id="statBase">R$ 0,00</div>
+          <div class="stat__sub">Com teto da tabela</div>
+        </article>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Faixa</th>
+              <th>Base aplicada</th>
+              <th>Alíquota</th>
+              <th>Desconto da faixa</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyFaixas">
+            <tr>
+              <td>1ª faixa</td>
+              <td>R$ 0,00</td>
+              <td>0,00%</td>
+              <td>R$ 0,00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Resumo</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyResumo">
+            <tr><th>Tabela selecionada</th><td>2026</td></tr>
+            <tr><th>Desconto total</th><td>R$ 0,00</td></tr>
+            <tr><th>Alíquota efetiva</th><td>0,00%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout" id="calloutTeto">Ao informar um valor acima do teto da tabela, a calculadora limita automaticamente a base de contribuição para o cálculo do desconto.</div>
+
+      <div class="footnote">
+        Referências oficiais: <a target="_blank" rel="noopener" href="https://www.gov.br/inss/pt-br/direitos-e-deveres/inscricao-e-contribuicao/tabela-de-contribuicao-mensal">tabela de contribuição mensal do INSS</a> e <a target="_blank" rel="noopener" href="https://www.gov.br/inss/pt-br/assuntos/com-reajuste-de-3-9-teto-do-inss-chega-a-r-8-475-55-em-2026">comunicado do reajuste de 2026</a>.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    
+const BRL = new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' });
+const PCT = new Intl.NumberFormat('pt-BR', { minimumFractionDigits:2, maximumFractionDigits:2 });
+
+function $(id){ return document.getElementById(id); }
+
+function parseCurrencyToCents(value){
+  const raw = String(value || '').trim();
+  if (!raw) return 0n;
+  const normalized = raw.replace(/\s/g,'');
+  const lastComma = normalized.lastIndexOf(',');
+  const lastDot = normalized.lastIndexOf('.');
+  const sepIndex = Math.max(lastComma, lastDot);
+  let intPart = normalized;
+  let decPart = '';
+  if (sepIndex >= 0){
+    intPart = normalized.slice(0, sepIndex);
+    decPart = normalized.slice(sepIndex + 1);
+  }
+  intPart = intPart.replace(/\D/g, '');
+  decPart = decPart.replace(/\D/g, '').slice(0,2);
+  if (!intPart) intPart = '0';
+  while (decPart.length < 2) decPart += '0';
+  return BigInt(intPart + decPart);
+}
+
+function formatCents(cents){
+  return BRL.format(Number(cents) / 100);
+}
+
+function formatPercentFromRatio(value){
+  return PCT.format(value) + '%';
+}
+
+function halfUpDiv(num, den){
+  return (num + (den / 2n)) / den;
+}
+
+function truncDiv(num, den){
+  return num / den;
+}
+
+function maskCurrencyInput(input){
+  input.addEventListener('blur', () => {
+    const cents = parseCurrencyToCents(input.value);
+    input.value = cents === 0n && !String(input.value).trim() ? '' : formatCents(cents).replace('R$ ', '');
+  });
+}
+
+function clearNode(node){
+  while (node.firstChild) node.removeChild(node.firstChild);
+}
+
+
+    const TABLES = {
+      '2026': {
+        label:'2026',
+        brackets:[
+          {label:'1ª faixa', limit:162100n, rateBps:750n, rateLabel:'7,50%'},
+          {label:'2ª faixa', limit:290284n, rateBps:900n, rateLabel:'9,00%'},
+          {label:'3ª faixa', limit:435427n, rateBps:1200n, rateLabel:'12,00%'},
+          {label:'4ª faixa', limit:847555n, rateBps:1400n, rateLabel:'14,00%'}
+        ]
+      },
+      '2025': {
+        label:'2025',
+        brackets:[
+          {label:'1ª faixa', limit:151800n, rateBps:750n, rateLabel:'7,50%'},
+          {label:'2ª faixa', limit:279388n, rateBps:900n, rateLabel:'9,00%'},
+          {label:'3ª faixa', limit:419083n, rateBps:1200n, rateLabel:'12,00%'},
+          {label:'4ª faixa', limit:815741n, rateBps:1400n, rateLabel:'14,00%'}
+        ]
+      },
+      '2024': {
+        label:'2024',
+        brackets:[
+          {label:'1ª faixa', limit:141200n, rateBps:750n, rateLabel:'7,50%'},
+          {label:'2ª faixa', limit:266668n, rateBps:900n, rateLabel:'9,00%'},
+          {label:'3ª faixa', limit:400003n, rateBps:1200n, rateLabel:'12,00%'},
+          {label:'4ª faixa', limit:778602n, rateBps:1400n, rateLabel:'14,00%'}
+        ]
+      },
+      '20235': {
+        label:'2023 • de 01/05 a 31/12',
+        brackets:[
+          {label:'1ª faixa', limit:132000n, rateBps:750n, rateLabel:'7,50%'},
+          {label:'2ª faixa', limit:257129n, rateBps:900n, rateLabel:'9,00%'},
+          {label:'3ª faixa', limit:385694n, rateBps:1200n, rateLabel:'12,00%'},
+          {label:'4ª faixa', limit:750749n, rateBps:1400n, rateLabel:'14,00%'}
+        ]
+      },
+      '2023': {
+        label:'2023 • de 01/01 a 30/04',
+        brackets:[
+          {label:'1ª faixa', limit:130200n, rateBps:750n, rateLabel:'7,50%'},
+          {label:'2ª faixa', limit:257129n, rateBps:900n, rateLabel:'9,00%'},
+          {label:'3ª faixa', limit:385694n, rateBps:1200n, rateLabel:'12,00%'},
+          {label:'4ª faixa', limit:750749n, rateBps:1400n, rateLabel:'14,00%'}
+        ]
+      },
+      '2022': {
+        label:'2022',
+        brackets:[
+          {label:'1ª faixa', limit:121200n, rateBps:750n, rateLabel:'7,50%'},
+          {label:'2ª faixa', limit:242735n, rateBps:900n, rateLabel:'9,00%'},
+          {label:'3ª faixa', limit:364103n, rateBps:1200n, rateLabel:'12,00%'},
+          {label:'4ª faixa', limit:708722n, rateBps:1400n, rateLabel:'14,00%'}
+        ]
+      },
+      '2021': {
+        label:'2021',
+        brackets:[
+          {label:'1ª faixa', limit:110000n, rateBps:750n, rateLabel:'7,50%'},
+          {label:'2ª faixa', limit:220348n, rateBps:900n, rateLabel:'9,00%'},
+          {label:'3ª faixa', limit:330522n, rateBps:1200n, rateLabel:'12,00%'},
+          {label:'4ª faixa', limit:643357n, rateBps:1400n, rateLabel:'14,00%'}
+        ]
+      }
+    };
+
+    function calculateInss(baseCents, tableKey){
+      const table = TABLES[tableKey];
+      const cap = table.brackets[table.brackets.length - 1].limit;
+      const taxable = baseCents > cap ? cap : baseCents;
+      let previous = 0n;
+      let totalNumerator = 0n;
+      const rows = [];
+
+      table.brackets.forEach(bracket => {
+        const sliceEnd = taxable < bracket.limit ? taxable : bracket.limit;
+        const portion = sliceEnd > previous ? (sliceEnd - previous) : 0n;
+        const numerator = portion * bracket.rateBps;
+        const contribution = halfUpDiv(numerator, 10000n);
+        totalNumerator += numerator;
+        rows.push({
+          label: bracket.label,
+          portion,
+          rateLabel: bracket.rateLabel,
+          contribution
+        });
+        previous = bracket.limit;
+      });
+
+      const total = halfUpDiv(totalNumerator, 10000n);
+      const effective = baseCents > 0n ? (Number(total) / Number(baseCents)) : 0;
+      return { table, taxable, total, effective, rows };
+    }
+
+    function render(result, salaryCents){
+      $('statSalario').textContent = formatCents(salaryCents);
+      $('statInss').textContent = formatCents(result.total);
+      $('statEfetiva').textContent = formatPercentFromRatio(result.effective * 100);
+      $('statBase').textContent = formatCents(result.taxable);
+
+      const tbodyFaixas = $('tbodyFaixas');
+      clearNode(tbodyFaixas);
+      result.rows.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <th>${row.label}</th>
+          <td>${formatCents(row.portion)}</td>
+          <td>${row.rateLabel}</td>
+          <td>${formatCents(row.contribution)}</td>
+        `;
+        tbodyFaixas.appendChild(tr);
+      });
+
+      const tbodyResumo = $('tbodyResumo');
+      clearNode(tbodyResumo);
+      tbodyResumo.innerHTML = `
+        <tr><th>Tabela selecionada</th><td>${result.table.label}</td></tr>
+        <tr><th>Salário informado</th><td>${formatCents(salaryCents)}</td></tr>
+        <tr><th>Base considerada no cálculo</th><td>${formatCents(result.taxable)}</td></tr>
+        <tr><th>Desconto total</th><td>${formatCents(result.total)}</td></tr>
+        <tr><th>Alíquota efetiva</th><td>${formatPercentFromRatio(result.effective * 100)}</td></tr>
+      `;
+
+      $('calloutTeto').style.display = salaryCents > result.taxable ? 'block' : 'none';
+    }
+
+    function resetForm(){
+      $('salario').value = '';
+      $('tabela').value = '2026';
+      $('status').className = 'status';
+      $('status').textContent = '';
+      render(calculateInss(0n, '2026'), 0n);
+    }
+
+    function onCalculate(){
+      const salaryCents = parseCurrencyToCents($('salario').value);
+      if (salaryCents <= 0n){
+        $('status').className = 'status error';
+        $('status').textContent = 'Informe um salário bruto maior que zero.';
+        return;
+      }
+      const result = calculateInss(salaryCents, $('tabela').value);
+      render(result, salaryCents);
+      $('status').className = 'status success';
+      $('status').textContent = 'Cálculo concluído com sucesso.';
+    }
+
+    maskCurrencyInput($('salario'));
+    $('calcular').addEventListener('click', onCalculate);
+    $('limpar').addEventListener('click', resetForm);
+    render(calculateInss(0n, '2026'), 0n);
+  </script>
+</body>
+</html>

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BIASON | Calculadora de Dissidio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --brand:#081a24;
+      --brand-2:#0b3d91;
+      --accent:#007ea7;
+      --accent-2:#0a7b8f;
+      --bg:#f4f7fb;
+      --panel:#ffffff;
+      --muted:#5a6878;
+      --text:#0b1b2a;
+      --line:rgba(15,23,42,.10);
+      --line-strong:rgba(15,23,42,.16);
+      --shadow:0 24px 48px -30px rgba(8,26,36,.48);
+      --radius:20px;
+      --danger:#c53030;
+      --success:#0f766e;
+      --warning:#b45309;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(0,126,167,.10), transparent 24%),
+        linear-gradient(180deg, #eef4f9 0%, #f6f8fb 28%, var(--bg) 100%);
+    }
+
+    .shell-header{
+      position:sticky;
+      top:0;
+      z-index:40;
+      background:linear-gradient(90deg,var(--brand-2) 0%, #123f8f 62%, var(--accent-2) 100%);
+      color:#fff;
+      box-shadow:0 14px 28px -20px rgba(8,26,36,.65);
+    }
+    .shell-header__inner{
+      max-width:1360px;
+      min-height:68px;
+      margin:0 auto;
+      padding:0 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .shell-header__left{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+      min-width:0;
+    }
+    .shell-header__brand{font-size:17px;font-weight:900;letter-spacing:.02em}
+    .shell-header__divider{color:rgba(255,255,255,.5);font-weight:700}
+    .shell-header__tool{font-size:13px;font-weight:800;letter-spacing:.01em}
+    .shell-header__right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .shell-header__crumb{
+      min-height:30px;
+      display:inline-flex;
+      align-items:center;
+      padding:0 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.20);
+      background:rgba(255,255,255,.12);
+      color:#fff;
+      font-size:12px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+    .shell-btn{
+      min-height:38px;
+      padding:0 14px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.10);
+      color:#fff;
+      font:700 13px 'Inter',system-ui,sans-serif;
+      cursor:pointer;
+      transition:transform .18s ease, background-color .18s ease, opacity .18s ease;
+    }
+    .shell-btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.18)}
+
+    main{
+      max-width:1360px;
+      margin:18px auto 0;
+      padding:0 24px 32px;
+      display:grid;
+      grid-template-columns:minmax(300px,340px) minmax(0,1fr);
+      gap:18px;
+    }
+    main > *{min-width:0}
+
+    .card{
+      background:rgba(255,255,255,.94);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      border-radius:var(--radius);
+      padding:22px;
+    }
+
+    .guide{
+      position:sticky;
+      top:96px;
+      align-self:start;
+      background:linear-gradient(180deg, rgba(8,26,36,.02), rgba(0,126,167,.04));
+    }
+    .card h1,.card h2,.card h3{
+      margin:0 0 14px;
+      color:var(--brand);
+      letter-spacing:-.02em;
+    }
+    .card h1{font-size:clamp(28px,3vw,36px)}
+    .card h2{font-size:clamp(22px,2.2vw,28px)}
+    .card h3{font-size:18px}
+    .section-title{
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight:800;
+      color:#0a6f85;
+      margin:0 0 8px;
+    }
+    .lead,.guide p,.guide li,.muted{line-height:1.6;color:var(--muted)}
+    .guide ul{padding-left:18px;margin:0}
+    .guide li+li{margin-top:8px}
+    .guide section+section{margin-top:20px}
+
+    .hero-note{
+      margin:0 0 18px;
+      padding:14px 16px;
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(0,126,167,.06), rgba(255,255,255,.96));
+      border:1px solid rgba(0,126,167,.14);
+      color:#234;
+      line-height:1.55;
+      font-size:14px;
+    }
+
+    .grid-two, .grid-three{
+      display:grid;
+      gap:18px;
+    }
+    .grid-two{grid-template-columns:repeat(2, minmax(0,1fr));}
+    .grid-three{grid-template-columns:repeat(3, minmax(0,1fr));}
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    label{
+      font-size:13px;
+      font-weight:800;
+      color:var(--brand);
+      letter-spacing:.01em;
+    }
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+    input[type="text"], input[type="tel"], input[type="number"], select{
+      width:100%;
+      min-height:52px;
+      border:1px solid var(--line-strong);
+      border-radius:16px;
+      padding:0 14px;
+      font:inherit;
+      color:var(--text);
+      background:#fff;
+      outline:none;
+      transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+    }
+    input:focus, select:focus{
+      border-color:rgba(11,61,145,.45);
+      box-shadow:0 0 0 4px rgba(11,61,145,.10);
+    }
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:18px;
+    }
+    button{
+      border:0;
+      border-radius:16px;
+      min-height:50px;
+      padding:0 18px;
+      font:inherit;
+      font-weight:800;
+      letter-spacing:.01em;
+      cursor:pointer;
+      transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+    }
+    button:hover{transform:translateY(-1px)}
+    .btn-primary{
+      background:linear-gradient(90deg,var(--brand-2),var(--accent-2));
+      color:#fff;
+      box-shadow:0 16px 28px -18px rgba(11,61,145,.72);
+    }
+    .btn-secondary{
+      background:#eef4fb;
+      color:var(--brand);
+      border:1px solid rgba(11,61,145,.12);
+    }
+    .btn-ghost{
+      background:#fff;
+      color:var(--brand);
+      border:1px solid var(--line);
+    }
+
+    .status{
+      margin-top:16px;
+      min-height:26px;
+      font-size:14px;
+      font-weight:700;
+    }
+    .status.error{color:var(--danger)}
+    .status.success{color:var(--success)}
+    .status.warn{color:var(--warning)}
+
+    .result-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:14px;
+      margin:18px 0;
+    }
+    .stat{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      background:linear-gradient(180deg, rgba(8,26,36,.02), rgba(255,255,255,.98));
+    }
+    .stat--accent{
+      background:linear-gradient(180deg, rgba(11,61,145,.08), rgba(255,255,255,.98));
+      border-color:rgba(11,61,145,.18);
+    }
+    .stat__label{
+      display:block;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#0a6f85;
+      margin-bottom:8px;
+    }
+    .stat__value{
+      font-size:clamp(22px,2.1vw,30px);
+      font-weight:900;
+      color:var(--brand);
+      line-height:1.2;
+    }
+    .stat__sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+    .table-wrap{
+      overflow:auto;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+      margin-top:16px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:620px;
+    }
+    th,td{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+    }
+    th{
+      background:#f7fbff;
+      color:var(--brand);
+      font-size:13px;
+      letter-spacing:.02em;
+    }
+    tbody tr:last-child td, tbody tr:last-child th{border-bottom:0}
+
+    .badge-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:14px;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      min-height:30px;
+      padding:0 12px;
+      border-radius:999px;
+      background:rgba(11,61,145,.08);
+      border:1px solid rgba(11,61,145,.12);
+      color:var(--brand-2);
+      font-size:12px;
+      font-weight:800;
+    }
+
+    .callout{
+      padding:14px 16px;
+      border-radius:16px;
+      background:rgba(15,118,110,.07);
+      border:1px solid rgba(15,118,110,.14);
+      color:#15453f;
+      font-size:14px;
+      line-height:1.55;
+      margin-top:14px;
+    }
+    .callout--warning{
+      background:rgba(180,83,9,.08);
+      border-color:rgba(180,83,9,.16);
+      color:#7a4210;
+    }
+
+    .receipt{
+      margin-top:16px;
+      border:1px dashed rgba(11,61,145,.24);
+      border-radius:18px;
+      padding:18px;
+      background:linear-gradient(180deg, rgba(247,251,255,.95), #fff);
+      line-height:1.7;
+      color:#1b2d40;
+    }
+    .receipt strong{color:var(--brand)}
+
+    .footnote{
+      margin-top:18px;
+      font-size:12px;
+      line-height:1.6;
+      color:var(--muted);
+    }
+
+    @media (max-width: 1080px){
+      main{grid-template-columns:1fr}
+      .guide{position:static;top:auto}
+      .result-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media (max-width: 760px){
+      body{background:#f4f7fb}
+      main{padding:0 14px 24px}
+      .card{padding:18px}
+      .grid-two,.grid-three{grid-template-columns:1fr}
+      .result-grid{grid-template-columns:1fr}
+      table{min-width:560px}
+      .shell-header__inner{padding:10px 14px}
+      .shell-header__right{width:100%;justify-content:flex-start}
+    }
+    @media print{
+      .shell-header,.guide,.actions,.status,.hero-note,.footnote,.callout,.badge-row{display:none !important}
+      main{display:block;max-width:none;padding:0;margin:0}
+      .card{box-shadow:none;border:0;padding:0}
+      .table-wrap{overflow:visible;border:0}
+      table{min-width:0}
+    }
+  </style>
+</head>
+<body>
+  <header class="shell-header">
+    <div class="shell-header__inner">
+      <div class="shell-header__left">
+        <div class="shell-header__brand">BIASON</div>
+        <div class="shell-header__divider">|</div>
+        <div class="shell-header__tool">Calculadora de Diss&iacute;dio</div>
+      </div>
+      <div class="shell-header__right">
+        <span class="shell-header__crumb">P&aacute;gina: Simula&ccedil;&atilde;o</span>
+        <button class="shell-btn" id="btnPrintHeader" type="button">Imprimir resumo</button>
+        <button class="shell-btn" id="btnHub" type="button">Voltar ao Hub</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <aside class="card guide">
+      <section>
+        <p class="section-title">Como usar</p>
+        <h2>Calcule reajuste e diss&iacute;dio em poucos campos</h2>
+        <p>Informe o sal&aacute;rio atual, o percentual do reajuste e, se quiser, o per&iacute;odo retroativo. A ferramenta devolve o novo sal&aacute;rio, a diferen&ccedil;a mensal e um resumo pronto para confer&ecirc;ncia.</p>
+      </section>
+      <section>
+        <p class="section-title">L&oacute;gica da base</p>
+        <ul>
+          <li>Novo sal&aacute;rio = sal&aacute;rio atual + percentual de reajuste.</li>
+          <li>Diferen&ccedil;a mensal = novo sal&aacute;rio - sal&aacute;rio atual.</li>
+          <li>Retroativo estimado = diferen&ccedil;a mensal x meses informados.</li>
+        </ul>
+      </section>
+      <section>
+        <p class="section-title">Leitura operacional</p>
+        <ul>
+          <li>Reajuste corrige a base salarial da categoria.</li>
+          <li>Aumento espont&acirc;neo n&atilde;o substitui diss&iacute;dio, salvo regra espec&iacute;fica da conven&ccedil;&atilde;o.</li>
+          <li>Retroativo aqui &eacute; estimativo mensal simples, sem reflexos autom&aacute;ticos em f&eacute;rias, 13&ordm; ou encargos.</li>
+        </ul>
+      </section>
+    </aside>
+
+    <section class="card">
+      <div class="badge-row">
+        <span class="badge">Reajuste percentual</span>
+        <span class="badge">Retroativo opcional</span>
+        <span class="badge">Resumo para imprimir</span>
+      </div>
+      <p class="section-title">Ferramenta</p>
+      <h1>Calculadora de Reajuste Salarial e Diss&iacute;dio</h1>
+      <p class="hero-note">A base desta ferramenta segue a l&oacute;gica cl&aacute;ssica do reajuste percentual: aplica o &iacute;ndice sobre o sal&aacute;rio informado para chegar ao novo valor. Para uso pr&aacute;tico no DP, a tela tamb&eacute;m estima o retroativo mensal do per&iacute;odo informado.</p>
+
+      <div class="grid-two">
+        <div class="field">
+          <label for="salarioAtual">Sal&aacute;rio atual</label>
+          <input id="salarioAtual" type="tel" inputmode="decimal" placeholder="0,00" />
+          <div class="hint">Informe o sal&aacute;rio-base antes do reajuste.</div>
+        </div>
+        <div class="field">
+          <label for="percentual">Percentual de reajuste</label>
+          <input id="percentual" type="number" inputmode="decimal" min="0" step="0.01" placeholder="5,00" />
+          <div class="hint">Exemplo da base: 5% sobre R$ 2.000 gera novo sal&aacute;rio de R$ 2.100.</div>
+        </div>
+      </div>
+
+      <div class="grid-three" style="margin-top:18px;">
+        <div class="field">
+          <label for="mesesRetroativos">Meses retroativos</label>
+          <select id="mesesRetroativos">
+            <option value="0" selected>00</option>
+            <option value="1">01</option><option value="2">02</option><option value="3">03</option>
+            <option value="4">04</option><option value="5">05</option><option value="6">06</option>
+            <option value="7">07</option><option value="8">08</option><option value="9">09</option>
+            <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+            <option value="13">13</option><option value="14">14</option><option value="15">15</option>
+            <option value="16">16</option><option value="17">17</option><option value="18">18</option>
+            <option value="19">19</option><option value="20">20</option><option value="21">21</option>
+            <option value="22">22</option><option value="23">23</option><option value="24">24</option>
+          </select>
+          <div class="hint">Campo opcional para estimar diferen&ccedil;a acumulada.</div>
+        </div>
+        <div class="field">
+          <label for="referencia">Refer&ecirc;ncia / data-base</label>
+          <input id="referencia" type="text" placeholder="Ex.: Conven&ccedil;&atilde;o 2026 / mar-2026" />
+          <div class="hint">Texto livre para sair no relat&oacute;rio.</div>
+        </div>
+        <div class="field">
+          <label for="observacao">Observa&ccedil;&atilde;o</label>
+          <input id="observacao" type="text" placeholder="Ex.: percentual fechado em CCT" />
+          <div class="hint">Complemento opcional para impress&atilde;o e confer&ecirc;ncia.</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" id="calcular" type="button">Calcular diss&iacute;dio</button>
+        <button class="btn-secondary" id="limpar" type="button">Limpar</button>
+        <button class="btn-ghost" id="imprimir" type="button">Imprimir</button>
+      </div>
+      <div id="status" class="status"></div>
+
+      <div class="result-grid">
+        <article class="stat">
+          <span class="stat__label">Sal&aacute;rio atual</span>
+          <div class="stat__value" id="statAtual">R$ 0,00</div>
+          <div class="stat__sub">Base antes do reajuste</div>
+        </article>
+        <article class="stat stat--accent">
+          <span class="stat__label">Novo sal&aacute;rio</span>
+          <div class="stat__value" id="statNovo">R$ 0,00</div>
+          <div class="stat__sub">Valor ap&oacute;s o diss&iacute;dio</div>
+        </article>
+        <article class="stat">
+          <span class="stat__label">Diferen&ccedil;a mensal</span>
+          <div class="stat__value" id="statDiferenca">R$ 0,00</div>
+          <div class="stat__sub">Acr&eacute;scimo sobre a folha</div>
+        </article>
+        <article class="stat">
+          <span class="stat__label">Retroativo estimado</span>
+          <div class="stat__value" id="statRetroativo">R$ 0,00</div>
+          <div class="stat__sub">Meses informados</div>
+        </article>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Mem&oacute;ria de c&aacute;lculo</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyMemoria"></tbody>
+        </table>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Resumo operacional</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyResumo"></tbody>
+        </table>
+      </div>
+
+      <div class="callout" id="calloutResumo">Use o retroativo como estimativa mensal simples. Se precisar considerar reflexos em f&eacute;rias, 13&ordm;, FGTS ou encargos, trate esses itens em c&aacute;lculo complementar.</div>
+      <div class="callout callout--warning" id="calloutSemRetro">Sem meses retroativos informados: o resultado mostra apenas o novo sal&aacute;rio e a diferen&ccedil;a mensal.</div>
+
+      <div class="receipt" id="relatorio">
+        <strong>Resumo de Diss&iacute;dio</strong><br>
+        Refer&ecirc;ncia: ________________________________<br>
+        Sal&aacute;rio atual: R$ 0,00<br>
+        Percentual de reajuste: 0,00%<br>
+        Novo sal&aacute;rio: R$ 0,00<br>
+        Diferen&ccedil;a mensal: R$ 0,00<br>
+        Meses retroativos: 00<br>
+        Retroativo estimado: R$ 0,00<br><br>
+        Observa&ccedil;&atilde;o: ________________________________________________<br>
+        Emitido em: ________________________________________________<br><br>
+        _____________________________________________<br>
+        Confer&ecirc;ncia / assinatura
+      </div>
+
+      <div class="footnote">
+        Refer&ecirc;ncia conceitual usada nesta tela: reajuste percentual aplicado diretamente sobre o sal&aacute;rio-base, como na base que voc&ecirc; enviou. Em caso de conven&ccedil;&atilde;o coletiva, confira sempre a regra do sindicato para proporcionalidade, compensa&ccedil;&otilde;es e reflexos.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const BRL = new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' });
+    const PCT = new Intl.NumberFormat('pt-BR', { minimumFractionDigits:2, maximumFractionDigits:2 });
+
+    function $(id){ return document.getElementById(id); }
+
+    function parseCurrencyToCents(value){
+      const raw = String(value || '').trim();
+      if (!raw) return 0n;
+      const normalized = raw.replace(/\s/g,'');
+      const lastComma = normalized.lastIndexOf(',');
+      const lastDot = normalized.lastIndexOf('.');
+      const sepIndex = Math.max(lastComma, lastDot);
+      let intPart = normalized;
+      let decPart = '';
+      if (sepIndex >= 0){
+        intPart = normalized.slice(0, sepIndex);
+        decPart = normalized.slice(sepIndex + 1);
+      }
+      intPart = intPart.replace(/\D/g, '');
+      decPart = decPart.replace(/\D/g, '').slice(0, 2);
+      if (!intPart) intPart = '0';
+      while (decPart.length < 2) decPart += '0';
+      return BigInt(intPart + decPart);
+    }
+
+    function parsePercentToBasisPoints(value){
+      const raw = String(value || '').trim().replace(',', '.');
+      if (!raw) return 0n;
+      const num = Number(raw);
+      if (!Number.isFinite(num) || num < 0) return -1n;
+      return BigInt(Math.round(num * 100));
+    }
+
+    function formatCents(cents){
+      return BRL.format(Number(cents) / 100);
+    }
+
+    function formatBasisPoints(bps){
+      return PCT.format(Number(bps) / 100) + '%';
+    }
+
+    function halfUpDiv(num, den){
+      return (num + (den / 2n)) / den;
+    }
+
+    function maskCurrencyInput(input){
+      input.addEventListener('blur', () => {
+        const cents = parseCurrencyToCents(input.value);
+        input.value = cents === 0n && !String(input.value).trim() ? '' : formatCents(cents).replace('R$\u00a0', '');
+      });
+    }
+
+    function clearNode(node){
+      while (node.firstChild) node.removeChild(node.firstChild);
+    }
+
+    function calculate(){
+      const salarioAtual = parseCurrencyToCents($('salarioAtual').value);
+      const percentualBps = parsePercentToBasisPoints($('percentual').value);
+      const mesesRetroativos = BigInt(parseInt($('mesesRetroativos').value || '0', 10));
+      const referencia = $('referencia').value.trim();
+      const observacao = $('observacao').value.trim();
+
+      if (salarioAtual <= 0n){
+        $('status').className = 'status error';
+        $('status').textContent = 'Informe um sal\u00e1rio atual maior que zero.';
+        return null;
+      }
+      if (percentualBps < 0n){
+        $('status').className = 'status error';
+        $('status').textContent = 'Informe um percentual de reajuste v\u00e1lido.';
+        return null;
+      }
+
+      const valorReajuste = halfUpDiv(salarioAtual * percentualBps, 10000n);
+      const novoSalario = salarioAtual + valorReajuste;
+      const diferencaMensal = valorReajuste;
+      const retroativo = diferencaMensal * mesesRetroativos;
+      const totalProjetado = novoSalario * 12n;
+
+      return {
+        salarioAtual,
+        percentualBps,
+        valorReajuste,
+        novoSalario,
+        diferencaMensal,
+        mesesRetroativos,
+        retroativo,
+        totalProjetado,
+        referencia,
+        observacao
+      };
+    }
+
+    function renderMemoria(result){
+      $('tbodyMemoria').innerHTML = `
+        <tr><th>Sal&aacute;rio atual</th><td>${formatCents(result.salarioAtual)}</td></tr>
+        <tr><th>Percentual aplicado</th><td>${formatBasisPoints(result.percentualBps)}</td></tr>
+        <tr><th>Valor do reajuste</th><td>${formatCents(result.valorReajuste)}</td></tr>
+        <tr><th>Novo sal&aacute;rio</th><td><strong>${formatCents(result.novoSalario)}</strong></td></tr>
+        <tr><th>Diferen&ccedil;a mensal</th><td>${formatCents(result.diferencaMensal)}</td></tr>
+        <tr><th>Meses retroativos</th><td>${String(result.mesesRetroativos).padStart(2, '0')}</td></tr>
+        <tr><th>Retroativo estimado</th><td>${formatCents(result.retroativo)}</td></tr>
+      `;
+    }
+
+    function renderResumo(result){
+      $('tbodyResumo').innerHTML = `
+        <tr><th>Refer&ecirc;ncia</th><td>${result.referencia || 'N\u00e3o informada'}</td></tr>
+        <tr><th>Observa&ccedil;&atilde;o</th><td>${result.observacao || 'Sem observa\u00e7\u00f5es'}</td></tr>
+        <tr><th>Impacto mensal na folha</th><td>${formatCents(result.diferencaMensal)}</td></tr>
+        <tr><th>Retroativo estimado do per&iacute;odo</th><td>${formatCents(result.retroativo)}</td></tr>
+        <tr><th>Proje&ccedil;&atilde;o anual do novo sal&aacute;rio</th><td>${formatCents(result.totalProjetado)}</td></tr>
+      `;
+    }
+
+    function renderReport(result){
+      const now = new Date();
+      $('relatorio').innerHTML = `
+        <strong>Resumo de Diss&iacute;dio</strong><br>
+        Refer&ecirc;ncia: ${result.referencia || 'N\u00e3o informada'}<br>
+        Sal&aacute;rio atual: ${formatCents(result.salarioAtual)}<br>
+        Percentual de reajuste: ${formatBasisPoints(result.percentualBps)}<br>
+        Valor do reajuste: ${formatCents(result.valorReajuste)}<br>
+        Novo sal&aacute;rio: ${formatCents(result.novoSalario)}<br>
+        Diferen&ccedil;a mensal: ${formatCents(result.diferencaMensal)}<br>
+        Meses retroativos: ${String(result.mesesRetroativos).padStart(2, '0')}<br>
+        Retroativo estimado: ${formatCents(result.retroativo)}<br>
+        Observa&ccedil;&atilde;o: ${result.observacao || 'Sem observa\u00e7\u00f5es'}<br>
+        Emitido em: ${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR')}<br><br>
+        _____________________________________________<br>
+        Confer&ecirc;ncia / assinatura
+      `;
+    }
+
+    function render(result){
+      $('statAtual').textContent = formatCents(result.salarioAtual);
+      $('statNovo').textContent = formatCents(result.novoSalario);
+      $('statDiferenca').textContent = formatCents(result.diferencaMensal);
+      $('statRetroativo').textContent = formatCents(result.retroativo);
+      renderMemoria(result);
+      renderResumo(result);
+      renderReport(result);
+      $('calloutSemRetro').style.display = result.mesesRetroativos === 0n ? 'block' : 'none';
+    }
+
+    function resetForm(){
+      $('salarioAtual').value = '';
+      $('percentual').value = '';
+      $('mesesRetroativos').value = '0';
+      $('referencia').value = '';
+      $('observacao').value = '';
+      $('status').className = 'status';
+      $('status').textContent = '';
+      render({
+        salarioAtual:0n,
+        percentualBps:0n,
+        valorReajuste:0n,
+        novoSalario:0n,
+        diferencaMensal:0n,
+        mesesRetroativos:0n,
+        retroativo:0n,
+        totalProjetado:0n,
+        referencia:'',
+        observacao:''
+      });
+    }
+
+    function onCalculate(){
+      const result = calculate();
+      if (!result) return;
+      render(result);
+      $('status').className = 'status success';
+      $('status').textContent = 'C\u00e1lculo conclu\u00eddo com sucesso.';
+    }
+
+    function onPrint(){
+      const result = calculate();
+      if (!result) return;
+      render(result);
+      window.print();
+    }
+
+    function returnToHub(){
+      try {
+        if (window.parent && window.parent !== window){
+          window.parent.postMessage({ type:'biason:return-to-hub' }, '*');
+        }
+        if (window.opener && !window.opener.closed){
+          window.close();
+          return;
+        }
+      } catch (error) {
+        console.warn('Nao foi possivel acionar o retorno ao hub.', error);
+      }
+      if (history.length > 1){
+        history.back();
+      }
+    }
+
+    maskCurrencyInput($('salarioAtual'));
+    $('calcular').addEventListener('click', onCalculate);
+    $('limpar').addEventListener('click', resetForm);
+    $('imprimir').addEventListener('click', onPrint);
+    $('btnPrintHeader').addEventListener('click', onPrint);
+    $('btnHub').addEventListener('click', returnToHub);
+    resetForm();
+  </script>
+</body>
+</html>

@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BIASON | Calculadora de 13º Salário</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --brand:#081a24;
+      --brand-2:#0b3d91;
+      --accent:#007ea7;
+      --accent-2:#0a7b8f;
+      --bg:#f4f7fb;
+      --panel:#ffffff;
+      --muted:#5a6878;
+      --text:#0b1b2a;
+      --line:rgba(15,23,42,.10);
+      --line-strong:rgba(15,23,42,.16);
+      --shadow:0 24px 48px -30px rgba(8,26,36,.48);
+      --radius:20px;
+      --radius-sm:14px;
+      --danger:#c53030;
+      --success:#0f766e;
+      --warning:#b45309;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(0,126,167,.10), transparent 24%),
+        linear-gradient(180deg, #eef4f9 0%, #f6f8fb 28%, var(--bg) 100%);
+    }
+
+    .shell-header{
+      position:sticky;
+      top:0;
+      z-index:40;
+      background:linear-gradient(90deg,var(--brand-2) 0%, #123f8f 62%, var(--accent-2) 100%);
+      color:#fff;
+      box-shadow:0 14px 28px -20px rgba(8,26,36,.65);
+    }
+    .shell-header__inner{
+      max-width:1360px;
+      min-height:68px;
+      margin:0 auto;
+      padding:0 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .shell-header__left{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+      min-width:0;
+    }
+    .shell-header__brand{font-size:17px;font-weight:900;letter-spacing:.02em}
+    .shell-header__divider{color:rgba(255,255,255,.5);font-weight:700}
+    .shell-header__tool{font-size:13px;font-weight:800;letter-spacing:.01em}
+    .shell-header__crumb{
+      min-height:30px;
+      display:inline-flex;
+      align-items:center;
+      padding:0 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.20);
+      background:rgba(255,255,255,.12);
+      color:#fff;
+      font-size:12px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    main{
+      max-width:1360px;
+      margin:18px auto 0;
+      padding:0 24px 32px;
+      display:grid;
+      grid-template-columns:minmax(300px,340px) minmax(0,1fr);
+      gap:18px;
+    }
+    main > *{min-width:0}
+
+    .card{
+      background:rgba(255,255,255,.94);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      border-radius:var(--radius);
+      padding:22px;
+    }
+
+    .guide{
+      position:sticky;
+      top:96px;
+      align-self:start;
+      background:linear-gradient(180deg, rgba(8,26,36,.02), rgba(0,126,167,.04));
+    }
+    .card h1,.card h2{
+      margin:0 0 14px;
+      color:var(--brand);
+      letter-spacing:-.02em;
+    }
+    .card h1{font-size:clamp(28px,3vw,36px)}
+    .card h2{font-size:clamp(22px,2.2vw,28px)}
+    .section-title{
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight:800;
+      color:#0a6f85;
+      margin:0 0 8px;
+    }
+    .lead,.guide p,.guide li,.muted{line-height:1.6;color:var(--muted)}
+    .guide ul{padding-left:18px;margin:0}
+    .guide li+li{margin-top:8px}
+    .guide section+section{margin-top:20px}
+
+    .hero-note{
+      margin:0 0 18px;
+      padding:14px 16px;
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(0,126,167,.06), rgba(255,255,255,.96));
+      border:1px solid rgba(0,126,167,.14);
+      color:#234;
+      line-height:1.55;
+      font-size:14px;
+    }
+
+    .grid-two{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:18px;
+    }
+
+    .panel{
+      padding:18px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fbfdff;
+    }
+    .panel+.panel{margin-top:16px}
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:14px;
+    }
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{
+      font-size:12px;
+      font-weight:700;
+      color:#415163;
+      letter-spacing:.01em;
+    }
+    .field small{font-size:11px;color:#6a7887;line-height:1.5}
+
+    input,select{
+      width:100%;
+      min-height:48px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      color:var(--text);
+      font:600 14px 'Inter',system-ui,sans-serif;
+      transition:border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+    input:focus,select:focus{
+      outline:none;
+      border-color:rgba(0,126,167,.45);
+      box-shadow:0 0 0 4px rgba(0,126,167,.12);
+    }
+    input[readonly]{background:#f4f7fa;color:#617180}
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin:18px 0;
+    }
+    .btn{
+      min-height:46px;
+      padding:0 16px;
+      border:0;
+      border-radius:14px;
+      font:800 14px 'Inter',system-ui,sans-serif;
+      cursor:pointer;
+      transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease, background-color .18s ease;
+      box-shadow:0 12px 24px -18px rgba(0,126,167,.45);
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-secondary{background:#eef3f7;color:var(--text)}
+    .btn-ghost{background:#fff;color:var(--brand);border:1px solid var(--line)}
+
+    .status{
+      min-height:22px;
+      margin:4px 0 0;
+      font-size:13px;
+      font-weight:700;
+    }
+    .status.error{color:var(--danger)}
+    .status.success{color:var(--success)}
+    .status.warn{color:var(--warning)}
+
+    .results-wrap{
+      display:grid;
+      grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);
+      gap:16px;
+      align-items:start;
+    }
+
+    .total-box{
+      border-radius:20px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, #fbfdff, #f3f8fb);
+      box-shadow:0 18px 30px -26px rgba(8,26,36,.4);
+      padding:18px;
+    }
+    .total-box h3{margin:0;color:var(--brand);font-size:16px}
+    .total-box .money{
+      margin:8px 0 10px;
+      font-size:clamp(30px,4vw,40px);
+      line-height:1;
+      font-weight:900;
+      letter-spacing:-.04em;
+      color:var(--brand);
+    }
+
+    .chips{display:flex;flex-wrap:wrap;gap:10px}
+    .chip{
+      border-radius:999px;
+      padding:8px 12px;
+      border:1px solid rgba(15,23,42,.10);
+      background:#fff;
+      font-size:12px;
+      color:#526173;
+    }
+    .chip strong{color:var(--accent)}
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      border:1px solid var(--line);
+      border-radius:18px;
+      overflow:hidden;
+      background:#fff;
+    }
+    th,td{padding:12px 14px;font-size:13px}
+    th{
+      text-align:left;
+      background:#f7fbfd;
+      color:#5b6b7a;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    tbody tr+tr td{border-top:1px solid rgba(15,23,42,.08)}
+    td.val{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+
+    .stats-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+    .stat{
+      padding:14px 16px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:#fff;
+    }
+    .stat__label{font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#617180}
+    .stat__value{margin-top:6px;font-size:24px;font-weight:900;letter-spacing:-.03em;color:var(--brand)}
+    .stat__sub{margin-top:4px;font-size:12px;color:#6a7887;line-height:1.5}
+
+    details.advanced{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+      overflow:hidden;
+    }
+    details.advanced summary{
+      cursor:pointer;
+      list-style:none;
+      padding:16px 18px;
+      font-weight:800;
+      color:var(--brand);
+    }
+    details.advanced summary::-webkit-details-marker{display:none}
+    .advanced-body{padding:0 18px 18px}
+
+    .footnote{
+      margin-top:12px;
+      font-size:12px;
+      color:#6a7887;
+      line-height:1.65;
+    }
+
+    #printReport{display:none;background:#fff;color:#111;padding:24px;font-family:Arial,Helvetica,sans-serif}
+    #printReport h1{font-size:22px;margin:0 0 10px}
+    #printReport h2{font-size:15px;margin:20px 0 8px;border-bottom:1px solid #ddd;padding-bottom:6px}
+    #printReport .meta{font-size:12px;color:#555;line-height:1.5;margin-bottom:12px}
+    #printReport table{border-radius:0;border:1px solid #ddd}
+    #printReport th,#printReport td{border:1px solid #ddd;padding:8px 10px;font-size:12px}
+    #printReport .report-total{margin-top:14px;padding:12px;border:1px solid #dbeafe;background:#eff6ff;border-radius:10px;font-size:13px;line-height:1.5}
+    #printReport .report-total strong{font-size:18px}
+
+    @media (max-width: 1120px){
+      main{grid-template-columns:1fr}
+      .guide{position:static}
+      .results-wrap,.grid-two{grid-template-columns:1fr}
+    }
+    @media (max-width: 720px){
+      .shell-header__inner{min-height:64px;padding:10px 12px}
+      .shell-header__brand{font-size:16px}
+      .shell-header__tool{font-size:12px}
+      main{padding:0 16px 24px}
+      .card,.panel,.total-box,.stat{padding:18px}
+      .actions .btn{width:100%}
+      .stats-grid{grid-template-columns:1fr}
+    }
+    @media print{
+      body{background:#fff !important}
+      .shell-header, main{display:none !important}
+      #printReport{display:block !important}
+      @page{size:A4;margin:12mm}
+    }
+  </style>
+</head>
+<body>
+  <header class="shell-header">
+    <div class="shell-header__inner">
+      <div class="shell-header__left">
+        <div class="shell-header__brand">BIASON</div>
+        <div class="shell-header__divider">|</div>
+        <div class="shell-header__tool">Calculadora de 13º Salário</div>
+        <div class="shell-header__crumb">Página: Simulação</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <aside class="card guide">
+      <h2>Guia de uso</h2>
+      <section>
+        <p class="section-title">O que preencher</p>
+        <ul>
+          <li>Informe o <strong>salário bruto mensal</strong>.</li>
+          <li>Preencha a <strong>média mensal de horas extras</strong> apenas se quiser compor o 13º com variável.</li>
+          <li>Informe o <strong>número de dependentes</strong> para compor o cálculo do IRRF.</li>
+          <li>Selecione os <strong>meses trabalhados</strong> no ano, de 1 a 12.</li>
+          <li>Escolha se quer calcular a <strong>primeira</strong>, <strong>segunda</strong> ou <strong>parcela única</strong>.</li>
+        </ul>
+      </section>
+
+      <section>
+        <p class="section-title">Como a ferramenta calcula</p>
+        <p>
+          A base proporcional do 13º é formada por <strong>salário + média de horas extras</strong>, multiplicada por <strong>meses trabalhados ÷ 12</strong>.
+          Na <strong>primeira parcela</strong>, a ferramenta mostra metade da base proporcional, sem descontos.
+          Na <strong>segunda parcela</strong>, os descontos de INSS e IRRF incidem sobre o 13º proporcional completo, mas o valor exibido em proventos representa apenas a metade complementar.
+          Na <strong>parcela única</strong>, o valor bruto integral proporcional é exibido e os descontos são aplicados diretamente.
+        </p>
+      </section>
+
+
+    </aside>
+
+    <section class="card">
+      <h1>Calculadora de 13º Salário</h1>
+      <p class="hero-note">
+        Ferramenta para simular o 13º salário com leitura clara, resultado detalhado e relatório pronto para impressão.
+      </p>
+
+      <div class="panel">
+        <p class="section-title">Dados para cálculo</p>
+        <div class="form-grid">
+          <div class="field">
+            <label for="salario">Salário bruto mensal</label>
+            <input id="salario" type="text" inputmode="decimal" placeholder="Ex.: 3.500,00" />
+            <small>Valor bruto, sem descontos.</small>
+          </div>
+          <div class="field">
+            <label for="hex">Média mensal de horas extras</label>
+            <input id="hex" type="text" inputmode="decimal" value="0,00" />
+            <small>Informe a média que deve compor o 13º.</small>
+          </div>
+          <div class="field">
+            <label for="depend">Número de dependentes</label>
+            <input id="depend" type="number" min="0" step="1" value="0" />
+            <small>Usado no cálculo do IRRF do 13º salário.</small>
+          </div>
+          <div class="field">
+            <label for="meses">Meses trabalhados</label>
+            <input id="meses" type="number" min="1" max="12" step="1" value="12" />
+            <small>Informe de 1 a 12.</small>
+          </div>
+          <div class="field">
+            <label for="parcela">Parcela para cálculo</label>
+            <select id="parcela">
+              <option value="1">Primeira</option>
+              <option value="2">Segunda</option>
+              <option value="3">Única</option>
+            </select>
+            <small>Primeira e segunda mostram a metade proporcional.</small>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="actions">
+        <button class="btn btn-primary" id="btnCalc" type="button">Calcular</button>
+        <button class="btn btn-secondary" id="btnClear" type="button">Limpar</button>
+        <button class="btn btn-ghost" id="btnPrint" type="button">Imprimir relatório</button>
+      </div>
+      <div class="status" id="status"></div>
+
+      <div class="results-wrap">
+        <div>
+          <div class="total-box">
+            <h3>Valor líquido da parcela</h3>
+            <div class="money" id="liquido">R$ 0,00</div>
+            <div class="chips">
+              <span class="chip">Referência: <strong id="chipRef">0/12</strong></span>
+              <span class="chip">13º proporcional total: <strong id="chipTotal13">R$ 0,00</strong></span>
+              <span class="chip">Adiantamento presumido: <strong id="chipAdiantamento">R$ 0,00</strong></span>
+              <span class="chip">Critério de cálculo: <strong id="chipModo">13º proporcional</strong></span>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:16px;">
+            <p class="section-title">Resultado detalhado</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Evento</th>
+                  <th>Ref.</th>
+                  <th>Proventos</th>
+                  <th>Descontos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Parcela 13º</td>
+                  <td id="tbRef">0/12</td>
+                  <td class="val" id="tbSalario">R$ 0,00</td>
+                  <td class="val">—</td>
+                </tr>
+                <tr>
+                  <td>Horas extras</td>
+                  <td>—</td>
+                  <td class="val" id="tbHex">R$ 0,00</td>
+                  <td class="val">—</td>
+                </tr>
+                <tr>
+                  <td>INSS</td>
+                  <td id="tbAliqInss">—</td>
+                  <td class="val">—</td>
+                  <td class="val" id="tbInss">R$ 0,00</td>
+                </tr>
+                <tr>
+                  <td>IRRF</td>
+                  <td id="tbAliqIrrf">—</td>
+                  <td class="val">—</td>
+                  <td class="val" id="tbIrrf">R$ 0,00</td>
+                </tr>
+                <tr>
+                  <td><strong>Totais</strong></td>
+                  <td>—</td>
+                  <td class="val" id="tbProventos"><strong>R$ 0,00</strong></td>
+                  <td class="val" id="tbDescontos"><strong>R$ 0,00</strong></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="footnote" id="obsParcela">
+              Informe os dados e clique em calcular para gerar o demonstrativo.
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="stats-grid">
+            <div class="stat">
+              <div class="stat__label">Base proporcional total</div>
+              <div class="stat__value" id="statBase">R$ 0,00</div>
+              <div class="stat__sub">Somatório proporcional de salário e média de horas extras.</div>
+            </div>
+            <div class="stat">
+              <div class="stat__label">Bruto da parcela exibida</div>
+              <div class="stat__value" id="statParcela">R$ 0,00</div>
+              <div class="stat__sub">Primeira e segunda mostram metade; única mostra o total proporcional.</div>
+            </div>
+            <div class="stat">
+              <div class="stat__label">INSS sobre 13º total</div>
+              <div class="stat__value" id="statInss">R$ 0,00</div>
+              <div class="stat__sub" id="subInss">Alíquota efetiva: 0,00%</div>
+            </div>
+            <div class="stat">
+              <div class="stat__label">IRRF sobre 13º</div>
+              <div class="stat__value" id="statIrrf">R$ 0,00</div>
+              <div class="stat__sub" id="subIrrf">Faixa: isento</div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:16px;">
+            <p class="section-title">Resumo do cálculo</p>
+            <div class="footnote" id="tecnica">
+              Nenhum cálculo realizado ainda.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <section id="printReport">
+    <h1>BIASON | Relatório de 13º Salário</h1>
+    <div class="meta" id="reportMeta"></div>
+
+    <h2>Resumo</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Evento</th>
+          <th>Ref.</th>
+          <th>Proventos</th>
+          <th>Descontos</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Parcela 13º</td>
+          <td id="rRef"></td>
+          <td id="rSalario"></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Horas extras</td>
+          <td>—</td>
+          <td id="rHex"></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>INSS</td>
+          <td id="rAliqInss"></td>
+          <td>—</td>
+          <td id="rInss"></td>
+        </tr>
+        <tr>
+          <td>IRRF</td>
+          <td id="rAliqIrrf"></td>
+          <td>—</td>
+          <td id="rIrrf"></td>
+        </tr>
+        <tr>
+          <td><strong>Totais</strong></td>
+          <td>—</td>
+          <td id="rProventos"><strong></strong></td>
+          <td id="rDescontos"><strong></strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="report-total">
+      <div><strong id="rLiquido">R$ 0,00</strong></div>
+      <div id="rObs"></div>
+      <div id="rTecnica" style="margin-top:8px;"></div>
+    </div>
+  </section>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const INSS_2026 = [
+      { upTo: 1621.00, rate: 0.075 },
+      { upTo: 2902.84, rate: 0.09 },
+      { upTo: 4354.27, rate: 0.12 },
+      { upTo: 8475.55, rate: 0.14 }
+    ];
+
+    const IR_2026 = [
+      { upTo: 2428.80, rate: 0, deduction: 0 },
+      { upTo: 2826.65, rate: 0.075, deduction: 182.16 },
+      { upTo: 3751.05, rate: 0.15, deduction: 394.16 },
+      { upTo: 4664.68, rate: 0.225, deduction: 675.49 },
+      { upTo: Infinity, rate: 0.275, deduction: 908.73 }
+    ];
+
+    const DEP_2026 = 189.59;
+
+    function round2(n){ return Math.round((Number(n) + Number.EPSILON) * 100) / 100; }
+    function clamp(n, min, max){ return Math.min(Math.max(n, min), max); }
+    function onlyNumberString(v){ return String(v ?? '').replace(/\s+/g,'').replace(/\./g,'').replace(',', '.').replace(/[^\d.-]/g,''); }
+    function parseMoney(value){
+      const n = parseFloat(onlyNumberString(value));
+      return Number.isFinite(n) ? n : 0;
+    }
+    function formatMoney(value){
+      return Number(value || 0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+    }
+    function formatPct(value){
+      return Number(value || 0).toLocaleString('pt-BR', { minimumFractionDigits:2, maximumFractionDigits:2 }) + '%';
+    }
+    function formatAliq(rate){
+      if (!rate) return '—';
+      return formatPct(rate * 100);
+    }
+
+    function maskCurrencyInput(input){
+      input.addEventListener('blur', () => {
+        const value = parseMoney(input.value);
+        input.value = value.toLocaleString('pt-BR', { minimumFractionDigits:2, maximumFractionDigits:2 });
+      });
+      input.addEventListener('focus', () => {
+        if (parseMoney(input.value) === 0 && !String(input.value).trim()) return;
+      });
+    }
+
+    function calcINSS(base){
+      let remaining = Math.max(0, base);
+      let previousLimit = 0;
+      let total = 0;
+      let bracketRate = 0;
+
+      for (const bracket of INSS_2026) {
+        const sliceLimit = bracket.upTo - previousLimit;
+        const taxableSlice = Math.max(0, Math.min(remaining, sliceLimit));
+        if (taxableSlice > 0) {
+          total += taxableSlice * bracket.rate;
+          bracketRate = bracket.rate;
+          remaining -= taxableSlice;
+          previousLimit = bracket.upTo;
+        } else {
+          previousLimit = bracket.upTo;
+        }
+        if (remaining <= 0) break;
+      }
+
+      const cappedBase = Math.min(base, INSS_2026[INSS_2026.length - 1].upTo);
+      return {
+        value: round2(total),
+        base: round2(cappedBase),
+        effectiveRate: cappedBase > 0 ? round2((total / cappedBase) * 100) : 0,
+        marginalRate: bracketRate
+      };
+    }
+
+    function getIRBracket(base){
+      return IR_2026.find(item => base <= item.upTo) || IR_2026[IR_2026.length - 1];
+    }
+
+    function calcIR(fullBase, inssValue, dependents){
+      const deductionUsed = round2(inssValue + (dependents * DEP_2026));
+      const deductionLabel = 'Deduções legais do 13º';
+      const baseCalculo = round2(Math.max(0, fullBase - deductionUsed));
+      const bracket = getIRBracket(baseCalculo);
+      const irFinal = round2(Math.max(0, (baseCalculo * bracket.rate) - bracket.deduction));
+
+      return {
+        value: irFinal,
+        base: baseCalculo,
+        rate: bracket.rate,
+        deductionLabel,
+        deductionUsed,
+        beforeReduction: irFinal,
+        reduction: 0,
+        faixaTexto: bracket.rate === 0 ? 'Isento' : `${formatPct(bracket.rate * 100)} · dedução ${formatMoney(bracket.deduction)}`
+      };
+    }
+
+    function validateInputs(data){
+      const errors = [];
+      if (data.salario <= 0) errors.push('Informe um salário bruto maior que zero.');
+      if (data.meses < 1 || data.meses > 12 || !Number.isInteger(data.meses)) errors.push('Meses trabalhados deve ser um número inteiro entre 1 e 12.');
+      if (data.depend < 0 || !Number.isInteger(data.depend)) errors.push('Número de dependentes deve ser um inteiro zero ou maior.');
+      if (![1,2,3].includes(data.parcela)) errors.push('Selecione a parcela para cálculo.');
+      return errors;
+    }
+
+    function calculate(){
+      const data = {
+        salario: round2(parseMoney($("salario").value)),
+        hex: round2(parseMoney($("hex").value)),
+        depend: parseInt($("depend").value || '0', 10),
+        meses: parseInt($("meses").value || '0', 10),
+        parcela: parseInt($("parcela").value, 10)
+      };
+
+      const errors = validateInputs(data);
+      if (errors.length) {
+        $("status").className = 'status error';
+        $("status").textContent = errors[0];
+        return null;
+      }
+
+      const ref = `${data.meses}/12`;
+      const proporcao = data.meses / 12;
+      const totalSalario13 = round2(data.salario * proporcao);
+      const totalHex13 = round2(data.hex * proporcao);
+      const totalBase13 = round2(totalSalario13 + totalHex13);
+      const adiantamento = round2(totalBase13 / 2);
+
+      let salarioExibido = totalSalario13;
+      let hexExibido = totalHex13;
+      let obs = '';
+
+      if (data.parcela === 1 || data.parcela === 2) {
+        salarioExibido = round2(totalSalario13 / 2);
+        hexExibido = round2(totalHex13 / 2);
+      }
+
+      const brutoExibido = round2(salarioExibido + hexExibido);
+      let inss = { value:0, effectiveRate:0, marginalRate:0, base:0 };
+      let ir = { value:0, rate:0, faixaTexto:'Isento', base:0, reduction:0, deductionLabel:'—', deductionUsed:0, beforeReduction:0 };
+      let descontos = 0;
+      let liquido = brutoExibido;
+
+      if (data.parcela === 1) {
+        obs = 'Primeira parcela: sem desconto de INSS e IRRF.';
+      } else if (data.parcela === 2) {
+        inss = calcINSS(totalBase13);
+        ir = calcIR(totalBase13, inss.value, data.depend);
+        descontos = round2(inss.value + ir.value);
+        liquido = round2(brutoExibido - descontos);
+        obs = 'Segunda parcela: descontos calculados sobre o 13º proporcional total, com exibição apenas da metade complementar em proventos.';
+      } else {
+        inss = calcINSS(totalBase13);
+        ir = calcIR(totalBase13, inss.value, data.depend);
+        descontos = round2(inss.value + ir.value);
+        liquido = round2(brutoExibido - descontos);
+        obs = 'Parcela única: valor proporcional integral com descontos aplicados diretamente sobre o total.';
+      }
+
+      if (liquido < 0) liquido = 0;
+
+      const tecnica = [
+        `Base proporcional total: ${formatMoney(totalBase13)} (${formatMoney(totalSalario13)} de salário + ${formatMoney(totalHex13)} de média de horas extras).`,
+        data.parcela === 1
+          ? 'Não há incidência de INSS ou IRRF na primeira parcela exibida.'
+          : `INSS calculado sobre ${formatMoney(inss.base)} com alíquota efetiva de ${formatPct(inss.effectiveRate)}.` ,
+        data.parcela === 1
+          ? 'Sem cálculo de IRRF nesta parcela.'
+          : `IRRF: base ${formatMoney(ir.base)}, ${ir.deductionLabel.toLowerCase()} de ${formatMoney(ir.deductionUsed)}, imposto apurado ${formatMoney(ir.value)}.`
+      ];
+
+      const result = {
+        ...data,
+        ref,
+        totalSalario13,
+        totalHex13,
+        totalBase13,
+        salarioExibido,
+        hexExibido,
+        brutoExibido,
+        inss,
+        ir,
+        descontos,
+        liquido,
+        adiantamento,
+        obs,
+        tecnica
+      };
+
+      render(result);
+      return result;
+    }
+
+    function render(r){
+      const modoNome = '13º proporcional';
+
+      $("status").className = 'status success';
+      $("status").textContent = 'Cálculo efetuado com sucesso.';
+
+      $("liquido").textContent = formatMoney(r.liquido);
+      $("chipRef").textContent = r.ref;
+      $("chipTotal13").textContent = formatMoney(r.totalBase13);
+      $("chipAdiantamento").textContent = r.parcela === 3 ? 'Não se aplica' : formatMoney(r.adiantamento);
+      $("chipModo").textContent = modoNome;
+
+      $("tbRef").textContent = r.ref;
+      $("tbSalario").textContent = formatMoney(r.salarioExibido);
+      $("tbHex").textContent = formatMoney(r.hexExibido);
+      $("tbAliqInss").textContent = r.parcela === 1 ? '—' : formatAliq(r.inss.marginalRate);
+      $("tbInss").textContent = formatMoney(r.inss.value);
+      $("tbAliqIrrf").textContent = r.parcela === 1 ? '—' : (r.ir.rate ? formatAliq(r.ir.rate) : 'Isento');
+      $("tbIrrf").textContent = formatMoney(r.ir.value);
+      $("tbProventos").innerHTML = `<strong>${formatMoney(r.brutoExibido)}</strong>`;
+      $("tbDescontos").innerHTML = `<strong>${formatMoney(r.descontos)}</strong>`;
+      $("obsParcela").textContent = r.obs;
+
+      $("statBase").textContent = formatMoney(r.totalBase13);
+      $("statParcela").textContent = formatMoney(r.brutoExibido);
+      $("statInss").textContent = formatMoney(r.inss.value);
+      $("subInss").textContent = r.parcela === 1
+        ? 'Sem desconto nesta parcela.'
+        : `Alíquota efetiva: ${formatPct(r.inss.effectiveRate)} · marginal ${formatAliq(r.inss.marginalRate)}`;
+      $("statIrrf").textContent = formatMoney(r.ir.value);
+      $("subIrrf").textContent = r.parcela === 1
+        ? 'Sem desconto nesta parcela.'
+        : `Faixa: ${r.ir.faixaTexto}`;
+
+      $("tecnica").innerHTML = r.tecnica.map(item => `<div>• ${item}</div>`).join('');
+
+      const agora = new Date();
+      $("reportMeta").innerHTML = `
+        Salário bruto: <strong>${formatMoney(r.salario)}</strong><br>
+        Média de horas extras: <strong>${formatMoney(r.hex)}</strong><br>
+        Dependentes: <strong>${r.depend}</strong><br>
+        Meses trabalhados: <strong>${r.meses}</strong><br>
+        Parcela: <strong>${['','Primeira','Segunda','Única'][r.parcela]}</strong><br>
+        Emitido em: <strong>${agora.toLocaleDateString('pt-BR')} ${agora.toLocaleTimeString('pt-BR')}</strong>
+      `;
+      $("rRef").textContent = r.ref;
+      $("rSalario").textContent = formatMoney(r.salarioExibido);
+      $("rHex").textContent = formatMoney(r.hexExibido);
+      $("rAliqInss").textContent = r.parcela === 1 ? '—' : formatAliq(r.inss.marginalRate);
+      $("rInss").textContent = formatMoney(r.inss.value);
+      $("rAliqIrrf").textContent = r.parcela === 1 ? '—' : (r.ir.rate ? formatAliq(r.ir.rate) : 'Isento');
+      $("rIrrf").textContent = formatMoney(r.ir.value);
+      $("rProventos").innerHTML = `<strong>${formatMoney(r.brutoExibido)}</strong>`;
+      $("rDescontos").innerHTML = `<strong>${formatMoney(r.descontos)}</strong>`;
+      $("rLiquido").textContent = formatMoney(r.liquido);
+      $("rObs").textContent = r.obs;
+      $("rTecnica").textContent = r.tecnica.join(' ');
+    }
+
+    function clearAll(){
+      $("salario").value = '';
+      $("hex").value = '0,00';
+      $("depend").value = '0';
+      $("meses").value = '12';
+      $("parcela").value = '1';
+      $("status").className = 'status';
+      $("status").textContent = '';
+
+      render({
+        ref:'0/12', salario:0, hex:0, depend:0, meses:0, parcela:1,
+        totalSalario13:0, totalHex13:0, totalBase13:0, salarioExibido:0, hexExibido:0,
+        brutoExibido:0, descontos:0, liquido:0, adiantamento:0,
+        inss:{value:0,effectiveRate:0,marginalRate:0,base:0},
+        ir:{value:0,rate:0,faixaTexto:'Isento',base:0,reduction:0,deductionLabel:'—',deductionUsed:0,beforeReduction:0},
+        obs:'Informe os dados e clique em calcular para gerar o demonstrativo.',
+        tecnica:['Nenhum cálculo realizado ainda.']
+      });
+    }
+
+    $("btnCalc").addEventListener('click', calculate);
+    $("btnClear").addEventListener('click', clearAll);
+    $("btnPrint").addEventListener('click', () => {
+      const r = calculate();
+      if (r) window.print();
+    });
+
+    [$("salario"), $("hex")].forEach(maskCurrencyInput);
+    clearAll();
+  </script>
+</body>
+</html>

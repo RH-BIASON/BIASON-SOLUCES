@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BIASON | Calculadora de Férias</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+<style>
+  :root{
+    --brand:#081a24;
+    --brand-2:#0b3d91;
+    --accent:#007ea7;
+    --accent-2:#0a7b8f;
+    --bg:#f4f7fb;
+    --panel:#ffffff;
+    --muted:#5a6878;
+    --text:#0b1b2a;
+    --line:rgba(15,23,42,.10);
+    --line-strong:rgba(15,23,42,.16);
+    --shadow:0 24px 48px -30px rgba(8,26,36,.48);
+    --radius:20px;
+    --radius-sm:14px;
+    --danger:#c53030;
+    --success:#0f766e;
+    --warning:#b45309;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(circle at top right, rgba(0,126,167,.10), transparent 24%),
+      linear-gradient(180deg, #eef4f9 0%, #f6f8fb 28%, var(--bg) 100%);
+  }
+
+  .shell-header{
+    position:sticky;
+    top:0;
+    z-index:40;
+    background:linear-gradient(90deg,var(--brand-2) 0%, #123f8f 62%, var(--accent-2) 100%);
+    color:#fff;
+    box-shadow:0 14px 28px -20px rgba(8,26,36,.65);
+  }
+  .shell-header__inner{
+    max-width:1360px;
+    min-height:68px;
+    margin:0 auto;
+    padding:0 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .shell-header__left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+    min-width:0;
+  }
+  .shell-header__brand{font-size:17px;font-weight:900;letter-spacing:.02em}
+  .shell-header__divider{color:rgba(255,255,255,.5);font-weight:700}
+  .shell-header__tool{font-size:13px;font-weight:800;letter-spacing:.01em}
+  .shell-header__crumb{
+    min-height:30px;
+    display:inline-flex;
+    align-items:center;
+    padding:0 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.20);
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+
+  main{
+    max-width:1360px;
+    margin:18px auto 0;
+    padding:0 24px 32px;
+    display:grid;
+    grid-template-columns:minmax(300px,340px) minmax(0,1fr);
+    gap:18px;
+  }
+  main > *{min-width:0}
+
+  .card{
+    background:rgba(255,255,255,.94);
+    border:1px solid var(--line);
+    box-shadow:var(--shadow);
+    border-radius:var(--radius);
+    padding:22px;
+  }
+
+  .guide{
+    position:sticky;
+    top:96px;
+    align-self:start;
+    background:linear-gradient(180deg, rgba(8,26,36,.02), rgba(0,126,167,.04));
+  }
+  .card h1,.card h2,.card h3{
+    margin:0 0 14px;
+    color:var(--brand);
+    letter-spacing:-.02em;
+  }
+  .card h1{font-size:clamp(28px,3vw,36px)}
+  .card h2{font-size:clamp(22px,2.2vw,28px)}
+  .card h3{font-size:18px}
+  .section-title{
+    font-size:12px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    font-weight:800;
+    color:#0a6f85;
+    margin:0 0 8px;
+  }
+  .lead,.guide p,.guide li,.muted{line-height:1.6;color:var(--muted)}
+  .guide ul{padding-left:18px;margin:0}
+  .guide li+li{margin-top:8px}
+  .guide section+section{margin-top:20px}
+
+  .hero-note{
+    margin:0 0 18px;
+    padding:14px 16px;
+    border-radius:18px;
+    background:linear-gradient(180deg, rgba(0,126,167,.06), rgba(255,255,255,.96));
+    border:1px solid rgba(0,126,167,.14);
+    color:#234;
+    line-height:1.55;
+    font-size:14px;
+  }
+
+  .grid-two, .grid-three{
+    display:grid;
+    gap:18px;
+  }
+  .grid-two{grid-template-columns:repeat(2, minmax(0,1fr));}
+  .grid-three{grid-template-columns:repeat(3, minmax(0,1fr));}
+
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  label{
+    font-size:13px;
+    font-weight:800;
+    color:var(--brand);
+    letter-spacing:.01em;
+  }
+  .hint{
+    font-size:12px;
+    color:var(--muted);
+    line-height:1.45;
+  }
+  input[type="text"], input[type="tel"], select{
+    width:100%;
+    min-height:52px;
+    border:1px solid var(--line-strong);
+    border-radius:16px;
+    padding:0 14px;
+    font:inherit;
+    color:var(--text);
+    background:#fff;
+    outline:none;
+    transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+  }
+  input:focus, select:focus{
+    border-color:rgba(11,61,145,.45);
+    box-shadow:0 0 0 4px rgba(11,61,145,.10);
+  }
+
+  .actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:18px;
+  }
+  button{
+    border:0;
+    border-radius:16px;
+    min-height:50px;
+    padding:0 18px;
+    font:inherit;
+    font-weight:800;
+    letter-spacing:.01em;
+    cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+  }
+  button:hover{transform:translateY(-1px)}
+  .btn-primary{
+    background:linear-gradient(90deg,var(--brand-2),var(--accent-2));
+    color:#fff;
+    box-shadow:0 16px 28px -18px rgba(11,61,145,.72);
+  }
+  .btn-secondary{
+    background:#eef4fb;
+    color:var(--brand);
+    border:1px solid rgba(11,61,145,.12);
+  }
+
+  .status{
+    margin-top:16px;
+    min-height:26px;
+    font-size:14px;
+    font-weight:700;
+  }
+  .status.error{color:var(--danger)}
+  .status.success{color:var(--success)}
+  .status.warn{color:var(--warning)}
+
+  .result-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:14px;
+    margin:18px 0;
+  }
+  .stat{
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:16px;
+    background:linear-gradient(180deg, rgba(8,26,36,.02), rgba(255,255,255,.98));
+  }
+  .stat__label{
+    display:block;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#0a6f85;
+    margin-bottom:8px;
+  }
+  .stat__value{
+    font-size:clamp(22px,2.1vw,30px);
+    font-weight:900;
+    color:var(--brand);
+    line-height:1.2;
+  }
+  .stat__sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+  .table-wrap{
+    overflow:auto;
+    border:1px solid var(--line);
+    border-radius:18px;
+    background:#fff;
+    margin-top:16px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:620px;
+  }
+  th,td{
+    padding:14px 16px;
+    border-bottom:1px solid var(--line);
+    text-align:left;
+    vertical-align:top;
+    font-size:14px;
+  }
+  th{
+    background:#f7fbff;
+    color:var(--brand);
+    font-size:13px;
+    letter-spacing:.02em;
+  }
+  tbody tr:last-child td, tbody tr:last-child th{border-bottom:0}
+
+  .table-note{
+    margin-top:10px;
+    font-size:12px;
+    color:var(--muted);
+    line-height:1.5;
+  }
+
+  .badge-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    min-height:30px;
+    padding:0 12px;
+    border-radius:999px;
+    background:rgba(11,61,145,.08);
+    border:1px solid rgba(11,61,145,.12);
+    color:var(--brand-2);
+    font-size:12px;
+    font-weight:800;
+  }
+
+  .footnote{
+    margin-top:18px;
+    font-size:12px;
+    line-height:1.6;
+    color:var(--muted);
+  }
+  .footnote a{color:var(--brand-2);text-decoration:none}
+
+  .receipt{
+    margin-top:16px;
+    border:1px dashed rgba(11,61,145,.24);
+    border-radius:18px;
+    padding:18px;
+    background:linear-gradient(180deg, rgba(247,251,255,.95), #fff);
+    line-height:1.7;
+    color:#1b2d40;
+  }
+  .receipt strong{color:var(--brand)}
+
+  .callout{
+    padding:14px 16px;
+    border-radius:16px;
+    background:rgba(15,118,110,.07);
+    border:1px solid rgba(15,118,110,.14);
+    color:#15453f;
+    font-size:14px;
+    line-height:1.55;
+    margin-top:14px;
+  }
+
+  @media (max-width: 1080px){
+    main{grid-template-columns:1fr}
+    .guide{position:static;top:auto}
+    .result-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+  @media (max-width: 760px){
+    body{background:#f4f7fb}
+    main{padding:0 14px 24px}
+    .card{padding:18px}
+    .grid-two,.grid-three{grid-template-columns:1fr}
+    .result-grid{grid-template-columns:1fr}
+    table{min-width:560px}
+    .shell-header__inner{padding:10px 14px}
+  }
+  @media print{
+    .shell-header,.guide,.actions,.status,.hero-note,.footnote,.callout,.badge-row{display:none !important}
+    main{display:block;max-width:none;padding:0;margin:0}
+    .card{box-shadow:none;border:0;padding:0}
+    .table-wrap{overflow:visible;border:0}
+    table{min-width:0}
+  }
+</style>
+
+</head>
+<body>
+  <header class="shell-header">
+    <div class="shell-header__inner">
+      <div class="shell-header__left">
+        <div class="shell-header__brand">BIASON</div>
+        <div class="shell-header__divider">|</div>
+        <div class="shell-header__tool">Calculadora de Férias</div>
+      </div>
+      <span class="shell-header__crumb">Página: Simulação</span>
+    </div>
+  </header>
+
+  <main>
+    <aside class="card guide">
+      <section>
+        <p class="section-title">Como usar</p>
+        <h2>Calcule férias com memória completa</h2>
+        <p>Informe salário, média de horas extras, dependentes e a configuração das férias. O resultado mostra verbas, descontos e um recibo pronto para impressão.</p>
+      </section>
+      <section>
+        <p class="section-title">Nesta calculadora</p>
+        <ul>
+          <li>Férias proporcionais aos dias informados.</li>
+          <li>1/3 constitucional.</li>
+          <li>Abono pecuniário com venda de 10 dias.</li>
+          <li>Adiantamento da 1ª parcela do 13º.</li>
+          <li>Descontos de INSS e IRRF.</li>
+        </ul>
+      </section>
+      <section>
+        <p class="section-title">Regra prática</p>
+        <p>Quando houver abono pecuniário, a ferramenta considera a venda de 10 dias, com gozo de 20 dias. Essa é a lógica operacional usada nesta simulação.</p>
+      </section>
+    </aside>
+
+    <section class="card">
+      <div class="badge-row">
+        <span class="badge">Cálculo detalhado</span>
+        <span class="badge">Recibo para imprimir</span>
+        <span class="badge">Visual Biason</span>
+      </div>
+      <p class="section-title">Ferramenta</p>
+      <h1>Calculadora de Férias</h1>
+      <p class="hero-note">Simule o valor líquido das férias, com detalhamento das verbas e descontos. A ferramenta considera horas extras médias, dependentes, venda de 1/3 e adiantamento da 1ª parcela do 13º.</p>
+
+      <div class="grid-two">
+        <div class="field">
+          <label for="salario">Salário bruto</label>
+          <input id="salario" type="tel" inputmode="decimal" placeholder="0,00" />
+          <div class="hint">Salário-base sem descontos.</div>
+        </div>
+        <div class="field">
+          <label for="he">Média de horas extras no ano</label>
+          <input id="he" type="tel" inputmode="decimal" placeholder="0,00" />
+          <div class="hint">Campo opcional. Será incorporado à base de cálculo.</div>
+        </div>
+      </div>
+
+      <div class="grid-three" style="margin-top:18px;">
+        <div class="field">
+          <label for="dependentes">Dependentes</label>
+          <select id="dependentes">
+            <option value="0">00</option><option value="1">01</option><option value="2">02</option><option value="3">03</option>
+            <option value="4">04</option><option value="5">05</option><option value="6">06</option><option value="7">07</option>
+            <option value="8">08</option><option value="9">09</option><option value="10">10</option>
+          </select>
+          <div class="hint">Usado para dedução do IRRF.</div>
+        </div>
+        <div class="field">
+          <label for="dias">Dias de férias</label>
+          <select id="dias">
+            <option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option>
+            <option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option>
+            <option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option>
+            <option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option>
+            <option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option>
+            <option value="30" selected>30</option>
+          </select>
+          <div class="hint">Quantidade de dias a gozar.</div>
+        </div>
+        <div class="field">
+          <label for="abono">Abono pecuniário</label>
+          <select id="abono">
+            <option value="nao" selected>Não</option>
+            <option value="sim">Sim</option>
+          </select>
+          <div class="hint">Ao marcar “Sim”, considera-se a venda de 10 dias.</div>
+        </div>
+      </div>
+
+      <div class="grid-two" style="margin-top:18px;">
+        <div class="field">
+          <label for="adiantar13">Adiantar 1ª parcela do 13º</label>
+          <select id="adiantar13">
+            <option value="nao" selected>Não</option>
+            <option value="sim">Sim</option>
+          </select>
+          <div class="hint">Adiciona a 1ª parcela do 13º sem descontos de INSS e IRRF nesta etapa.</div>
+        </div>
+        <div class="field">
+          <label>Referência da simulação</label>
+          <input id="referencia" type="text" placeholder="Ex.: férias de março/2026" />
+          <div class="hint">Opcional. Aparece no recibo impresso.</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" id="calcular">Calcular férias</button>
+        <button class="btn-secondary" id="limpar">Limpar</button>
+        <button class="btn-secondary" id="imprimir">Imprimir</button>
+      </div>
+      <div id="status" class="status"></div>
+
+      <div class="result-grid">
+        <article class="stat">
+          <span class="stat__label">Líquido de férias</span>
+          <div class="stat__value" id="statLiquido">R$ 0,00</div>
+          <div class="stat__sub">Valor estimado a receber</div>
+        </article>
+        <article class="stat">
+          <span class="stat__label">Total de verbas</span>
+          <div class="stat__value" id="statBruto">R$ 0,00</div>
+          <div class="stat__sub">Somatório das verbas</div>
+        </article>
+        <article class="stat">
+          <span class="stat__label">Desconto INSS</span>
+          <div class="stat__value" id="statInss">R$ 0,00</div>
+          <div class="stat__sub">Sobre férias gozadas + 1/3</div>
+        </article>
+        <article class="stat">
+          <span class="stat__label">Desconto IRRF</span>
+          <div class="stat__value" id="statIrrf">R$ 0,00</div>
+          <div class="stat__sub">Com dedução por dependentes</div>
+        </article>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Informações inseridas</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyEntrada"></tbody>
+        </table>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Memória de cálculo</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyVerbas"></tbody>
+        </table>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Descontos</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyDescontos"></tbody>
+        </table>
+      </div>
+
+      <div class="receipt" id="recibo">
+        <strong>Recibo de Férias</strong><br>
+        Recebi de ________________________________________________ a importância de <strong>R$ 0,00</strong> referente ao pagamento das minhas férias.<br><br>
+        Férias: R$ 0,00<br>
+        Desconto INSS: R$ 0,00<br>
+        Imposto de Renda: R$ 0,00<br>
+        Líquido de férias: R$ 0,00<br><br>
+        Referência: ________________________________________________<br>
+        Local e data: _____________________________________________<br><br>
+        _____________________________________________<br>
+        Assinatura
+      </div>
+
+      <div class="footnote">
+        Referências oficiais: <a target="_blank" rel="noopener" href="https://www.gov.br/inss/pt-br/direitos-e-deveres/inscricao-e-contribuicao/tabela-de-contribuicao-mensal">tabela de contribuição mensal do INSS</a>, <a target="_blank" rel="noopener" href="https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/tabelas/2026">tabela mensal do IRPF 2026</a>, <a target="_blank" rel="noopener" href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del1535.htm">art. 143 da CLT</a> e orientação da PGFN sobre a não incidência de IR sobre o abono pecuniário: <a target="_blank" rel="noopener" href="https://www.gov.br/pgfn/pt-br/cidadania-tributaria/por-assunto/imposto-de-renda-pessoa-fisica-irpf-2/copy_of_conceito-de-rendimentos-e-verbas-nao-tributaveis/ferias">férias</a>.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    
+const BRL = new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' });
+const PCT = new Intl.NumberFormat('pt-BR', { minimumFractionDigits:2, maximumFractionDigits:2 });
+
+function $(id){ return document.getElementById(id); }
+
+function parseCurrencyToCents(value){
+  const raw = String(value || '').trim();
+  if (!raw) return 0n;
+  const normalized = raw.replace(/\s/g,'');
+  const lastComma = normalized.lastIndexOf(',');
+  const lastDot = normalized.lastIndexOf('.');
+  const sepIndex = Math.max(lastComma, lastDot);
+  let intPart = normalized;
+  let decPart = '';
+  if (sepIndex >= 0){
+    intPart = normalized.slice(0, sepIndex);
+    decPart = normalized.slice(sepIndex + 1);
+  }
+  intPart = intPart.replace(/\D/g, '');
+  decPart = decPart.replace(/\D/g, '').slice(0,2);
+  if (!intPart) intPart = '0';
+  while (decPart.length < 2) decPart += '0';
+  return BigInt(intPart + decPart);
+}
+
+function formatCents(cents){
+  return BRL.format(Number(cents) / 100);
+}
+
+function formatPercentFromRatio(value){
+  return PCT.format(value) + '%';
+}
+
+function halfUpDiv(num, den){
+  return (num + (den / 2n)) / den;
+}
+
+function truncDiv(num, den){
+  return num / den;
+}
+
+function maskCurrencyInput(input){
+  input.addEventListener('blur', () => {
+    const cents = parseCurrencyToCents(input.value);
+    input.value = cents === 0n && !String(input.value).trim() ? '' : formatCents(cents).replace('R$ ', '');
+  });
+}
+
+function clearNode(node){
+  while (node.firstChild) node.removeChild(node.firstChild);
+}
+
+
+    const DEPENDENTE_2026 = 18959n;
+    const IRRF_2026 = [
+      { limit:242880n, rateBps:0n, deduction:0n, label:'Isento' },
+      { limit:282665n, rateBps:750n, deduction:18216n, label:'7,50%' },
+      { limit:375105n, rateBps:1500n, deduction:39416n, label:'15,00%' },
+      { limit:466468n, rateBps:2250n, deduction:67549n, label:'22,50%' },
+      { limit:999999999n, rateBps:2750n, deduction:90873n, label:'27,50%' }
+    ];
+    const INSS_2026 = [
+      { limit:162100n, rateBps:750n, label:'1ª faixa' },
+      { limit:290284n, rateBps:900n, label:'2ª faixa' },
+      { limit:435427n, rateBps:1200n, label:'3ª faixa' },
+      { limit:847555n, rateBps:1400n, label:'4ª faixa' }
+    ];
+
+    function roundFractionOfCents(baseCents, numerator, denominator){
+      return halfUpDiv(baseCents * BigInt(numerator), BigInt(denominator));
+    }
+
+    function truncFractionOfCents(baseCents, numerator, denominator){
+      return truncDiv(baseCents * BigInt(numerator), BigInt(denominator));
+    }
+
+    function calcInss2026(baseCents){
+      const cap = INSS_2026[INSS_2026.length - 1].limit;
+      const taxable = baseCents > cap ? cap : baseCents;
+      let previous = 0n;
+      let totalNumerator = 0n;
+      INSS_2026.forEach(bracket => {
+        const sliceEnd = taxable < bracket.limit ? taxable : bracket.limit;
+        const portion = sliceEnd > previous ? (sliceEnd - previous) : 0n;
+        totalNumerator += portion * bracket.rateBps;
+        previous = bracket.limit;
+      });
+      return halfUpDiv(totalNumerator, 10000n);
+    }
+
+    function calcIrrf2026(baseCents){
+      const bracket = IRRF_2026.find(item => baseCents <= item.limit) || IRRF_2026[IRRF_2026.length - 1];
+      if (bracket.rateBps === 0n) return 0n;
+      const taxNumerator = baseCents * bracket.rateBps;
+      const grossTax = halfUpDiv(taxNumerator, 10000n);
+      return grossTax > bracket.deduction ? (grossTax - bracket.deduction) : 0n;
+    }
+
+    function calculate(){
+      const salario = parseCurrencyToCents($('salario').value);
+      const he = parseCurrencyToCents($('he').value);
+      const dependentes = BigInt(parseInt($('dependentes').value || '0', 10));
+      const dias = BigInt(parseInt($('dias').value || '0', 10));
+      const abono = $('abono').value === 'sim';
+      const adiantar13 = $('adiantar13').value === 'sim';
+      const referencia = $('referencia').value.trim();
+
+      if (salario <= 0n){
+        $('status').className = 'status error';
+        $('status').textContent = 'Informe um salário bruto maior que zero.';
+        return null;
+      }
+      if (abono && dias !== 20n){
+        $('status').className = 'status error';
+        $('status').textContent = 'Para vender 1/3 das férias, selecione 20 dias de gozo.';
+        return null;
+      }
+
+      const baseRemuneracao = salario + he;
+      const valorFerias = roundFractionOfCents(baseRemuneracao * dias, 1, 30);
+      const tercoFerias = roundFractionOfCents(valorFerias, 1, 3);
+      const abonoPecuniario = abono ? roundFractionOfCents(baseRemuneracao * 10n, 1, 30) : 0n;
+      const tercoAbono = abono ? truncFractionOfCents(abonoPecuniario, 1, 3) : 0n;
+      const adiantamento13 = adiantar13 ? roundFractionOfCents(baseRemuneracao, 1, 2) : 0n;
+
+      const baseTributavel = valorFerias + tercoFerias;
+      const inss = calcInss2026(baseTributavel);
+      const baseIrrfBruta = baseTributavel > inss ? (baseTributavel - inss) : 0n;
+      const deducaoDependentes = dependentes * DEPENDENTE_2026;
+      const baseIrrf = baseIrrfBruta > deducaoDependentes ? (baseIrrfBruta - deducaoDependentes) : 0n;
+      const irrf = calcIrrf2026(baseIrrf);
+
+      const totalVerbas = valorFerias + tercoFerias + abonoPecuniario + tercoAbono + adiantamento13;
+      const totalDescontos = inss + irrf;
+      const liquido = totalVerbas > totalDescontos ? (totalVerbas - totalDescontos) : 0n;
+
+      return {
+        salario, he, dependentes, dias, abono, adiantar13, referencia,
+        valorFerias, tercoFerias, abonoPecuniario, tercoAbono, adiantamento13,
+        baseTributavel, inss, baseIrrfBruta, deducaoDependentes, baseIrrf, irrf,
+        totalVerbas, totalDescontos, liquido
+      };
+    }
+
+    function renderEntrada(result){
+      $('tbodyEntrada').innerHTML = `
+        <tr><th>Salário bruto</th><td>${formatCents(result.salario)}</td></tr>
+        <tr><th>Média de horas extras</th><td>${formatCents(result.he)}</td></tr>
+        <tr><th>Dependentes</th><td>${String(result.dependentes).padStart(2,'0')}</td></tr>
+        <tr><th>Dias de férias</th><td>${result.dias} dias</td></tr>
+        <tr><th>Abono pecuniário</th><td>${result.abono ? 'Sim' : 'Não'}</td></tr>
+        <tr><th>Adiantar 1ª parcela do 13º</th><td>${result.adiantar13 ? 'Sim' : 'Não'}</td></tr>
+        <tr><th>Referência</th><td>${result.referencia || 'Não informada'}</td></tr>
+      `;
+    }
+
+    function renderVerbas(result){
+      $('tbodyVerbas').innerHTML = `
+        <tr><th>Base de remuneração</th><td>${formatCents(result.salario + result.he)}</td></tr>
+        <tr><th>Valor das férias</th><td>${formatCents(result.valorFerias)}</td></tr>
+        <tr><th>1/3 de férias</th><td>${formatCents(result.tercoFerias)}</td></tr>
+        <tr><th>Abono pecuniário</th><td>${formatCents(result.abonoPecuniario)}</td></tr>
+        <tr><th>1/3 do abono pecuniário</th><td>${formatCents(result.tercoAbono)}</td></tr>
+        <tr><th>Adiantamento 13º</th><td>${formatCents(result.adiantamento13)}</td></tr>
+        <tr><th>Total de verbas</th><td><strong>${formatCents(result.totalVerbas)}</strong></td></tr>
+      `;
+    }
+
+    function renderDescontos(result){
+      $('tbodyDescontos').innerHTML = `
+        <tr><th>Base INSS</th><td>${formatCents(result.baseTributavel)}</td></tr>
+        <tr><th>Desconto INSS</th><td>${formatCents(result.inss)}</td></tr>
+        <tr><th>Base IRRF antes de dependentes</th><td>${formatCents(result.baseIrrfBruta)}</td></tr>
+        <tr><th>Dedução por dependentes</th><td>${formatCents(result.deducaoDependentes)}</td></tr>
+        <tr><th>Base IRRF</th><td>${formatCents(result.baseIrrf)}</td></tr>
+        <tr><th>Desconto IRRF</th><td>${formatCents(result.irrf)}</td></tr>
+        <tr><th>Total de descontos</th><td><strong>${formatCents(result.totalDescontos)}</strong></td></tr>
+      `;
+    }
+
+    function renderRecibo(result){
+      const referencia = result.referencia || '________________________________';
+      $('recibo').innerHTML = `
+        <strong>Recibo de Férias</strong><br>
+        Recebi de ________________________________________________ a importância de <strong>${formatCents(result.liquido)}</strong> referente ao pagamento das minhas férias.<br><br>
+        Férias: ${formatCents(result.valorFerias + result.tercoFerias + result.abonoPecuniario + result.tercoAbono + result.adiantamento13)}<br>
+        Desconto INSS: ${formatCents(result.inss)}<br>
+        Imposto de Renda: ${formatCents(result.irrf)}<br>
+        Líquido de férias: ${formatCents(result.liquido)}<br><br>
+        Referência: ${referencia}<br>
+        Local e data: _____________________________________________<br><br>
+        _____________________________________________<br>
+        Assinatura
+      `;
+    }
+
+    function render(result){
+      $('statLiquido').textContent = formatCents(result.liquido);
+      $('statBruto').textContent = formatCents(result.totalVerbas);
+      $('statInss').textContent = formatCents(result.inss);
+      $('statIrrf').textContent = formatCents(result.irrf);
+      renderEntrada(result);
+      renderVerbas(result);
+      renderDescontos(result);
+      renderRecibo(result);
+    }
+
+    function resetForm(){
+      $('salario').value = '';
+      $('he').value = '';
+      $('dependentes').value = '0';
+      $('dias').value = '30';
+      $('abono').value = 'nao';
+      $('adiantar13').value = 'nao';
+      $('referencia').value = '';
+      $('status').className = 'status';
+      $('status').textContent = '';
+      const empty = {
+        salario:0n, he:0n, dependentes:0n, dias:30n, abono:false, adiantar13:false, referencia:'',
+        valorFerias:0n, tercoFerias:0n, abonoPecuniario:0n, tercoAbono:0n, adiantamento13:0n,
+        baseTributavel:0n, inss:0n, baseIrrfBruta:0n, deducaoDependentes:0n, baseIrrf:0n, irrf:0n,
+        totalVerbas:0n, totalDescontos:0n, liquido:0n
+      };
+      render(empty);
+    }
+
+    function onCalculate(){
+      const result = calculate();
+      if (!result) return;
+      render(result);
+      $('status').className = 'status success';
+      $('status').textContent = 'Cálculo concluído com sucesso.';
+    }
+
+    function onPrint(){
+      window.print();
+    }
+
+    maskCurrencyInput($('salario'));
+    maskCurrencyInput($('he'));
+    $('calcular').addEventListener('click', onCalculate);
+    $('limpar').addEventListener('click', resetForm);
+    $('imprimir').addEventListener('click', onPrint);
+    resetForm();
+  </script>
+</body>
+</html>
