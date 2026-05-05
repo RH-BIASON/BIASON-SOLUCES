@@ -343,6 +343,21 @@
       gap:8px;
       margin:12px 0 0;
     }
+    .suggestionActions{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .suggestionActions .button{
+      width:auto;
+      min-width:132px;
+      min-height:38px;
+      padding:0 14px;
+      font-size:13px;
+    }
     .suggestionItem{
       display:grid;
       gap:4px;
@@ -357,6 +372,13 @@
     .suggestionItem strong{
       color:#081a24;
       font-size:12px;
+    }
+    .suggestionItem a{
+      color:inherit;
+      text-decoration:none;
+    }
+    .suggestionItem a:hover{
+      color:#0369a1;
     }
     .suggestionItem span{
       color:#64748b;
@@ -777,7 +799,7 @@
               <div class="suggestionEmail" id="suggestionEmail">Identificando usuário...</div>
             </div>
           </div>
-          <p>Registre ideias para novas ferramentas, ajustes de cálculo ou melhorias de uso. O e-mail logado fica vinculado à sugestão.</p>
+          <p>Registre ideias para novas ferramentas, ajustes de cálculo ou melhorias de uso. As sugestões ficam públicas no GitHub do projeto.</p>
           <form class="suggestionForm" id="suggestionForm">
             <select id="suggestionCategory" aria-label="Categoria da sugestão">
               <option value="Nova ferramenta">Nova ferramenta</option>
@@ -785,9 +807,12 @@
               <option value="Correção">Correção</option>
             </select>
             <textarea id="suggestionText" aria-label="Texto da sugestão" placeholder="Descreva a sugestão" required></textarea>
-            <button class="button" type="submit">Registrar</button>
+            <button class="button" type="submit">Publicar</button>
           </form>
           <div class="suggestionList" id="suggestionList"></div>
+          <div class="suggestionActions">
+            <a class="button button--ghost" id="suggestionAllLink" href="https://github.com/RH-BIASON/BIASON-SOLUCES/issues" target="_blank" rel="noopener">Ver todas</a>
+          </div>
         </article>
 
       </div>
@@ -826,7 +851,10 @@
     const suggestionText = document.getElementById('suggestionText');
     const suggestionEmail = document.getElementById('suggestionEmail');
     const suggestionList = document.getElementById('suggestionList');
-    const suggestionStorageKey = 'biason.suggestions';
+    const suggestionAllLink = document.getElementById('suggestionAllLink');
+    const suggestionRepo = 'RH-BIASON/BIASON-SOLUCES';
+    const suggestionIssueListUrl = `https://github.com/${suggestionRepo}/issues?q=is%3Aissue+is%3Aopen+%5BSugest%C3%A3o%5D`;
+    const suggestionApiUrl = `https://api.github.com/repos/${suggestionRepo}/issues?state=open&per_page=20`;
     const hubSession = window.BiasonAuth && window.BiasonAuth.getSession
       ? window.BiasonAuth.getSession('hub')
       : null;
@@ -895,45 +923,66 @@
       });
     });
 
-    function readSuggestions(){
-      try{
-        return JSON.parse(localStorage.getItem(suggestionStorageKey) || '[]');
-      }catch(error){
-        return [];
-      }
-    }
-
-    function saveSuggestions(items){
-      localStorage.setItem(suggestionStorageKey, JSON.stringify(items.slice(0, 6)));
-    }
-
-    function renderSuggestions(){
-      const items = readSuggestions();
-      suggestionEmail.textContent = currentUserEmail;
+    function setSuggestionMessage(message){
       suggestionList.innerHTML = '';
+      const empty = document.createElement('div');
+      empty.className = 'suggestionEmpty';
+      empty.textContent = message;
+      suggestionList.appendChild(empty);
+    }
 
-      if(!items.length){
-        const empty = document.createElement('div');
-        empty.className = 'suggestionEmpty';
-        empty.textContent = 'Nenhuma sugestão registrada neste navegador.';
-        suggestionList.appendChild(empty);
+    function issueDate(value){
+      return new Date(value).toLocaleDateString('pt-BR');
+    }
+
+    async function renderSuggestions(){
+      suggestionEmail.textContent = currentUserEmail;
+      suggestionAllLink.href = suggestionIssueListUrl;
+      setSuggestionMessage('Carregando sugestões públicas...');
+
+      let issues = [];
+      try{
+        const response = await fetch(suggestionApiUrl, {
+          headers: { Accept: 'application/vnd.github+json' },
+        });
+        if(!response.ok) throw new Error('GitHub indisponivel');
+        const data = await response.json();
+        issues = data
+          .filter((item) => !item.pull_request && item.title && item.title.startsWith('[Sugestão]'))
+          .slice(0, 3);
+      }catch(error){
+        setSuggestionMessage('Não foi possível carregar as sugestões agora.');
         return;
       }
 
-      items.slice(0, 2).forEach((item) => {
+      suggestionList.innerHTML = '';
+
+      if(!issues.length){
+        setSuggestionMessage('Nenhuma sugestão pública aberta ainda.');
+        return;
+      }
+
+      issues.forEach((item) => {
         const row = document.createElement('div');
         row.className = 'suggestionItem';
 
+        const link = document.createElement('a');
+        link.href = item.html_url;
+        link.target = '_blank';
+        link.rel = 'noopener';
+
         const title = document.createElement('strong');
-        title.textContent = item.category;
+        title.textContent = item.title.replace('[Sugestão]', '').trim();
 
         const meta = document.createElement('span');
-        meta.textContent = `${item.email} • ${item.date}`;
+        const author = item.user && item.user.login ? item.user.login : 'usuario';
+        meta.textContent = `${author} • ${issueDate(item.created_at)}`;
 
         const text = document.createElement('div');
-        text.textContent = item.text;
+        text.textContent = item.body ? item.body.split('\n').find((line) => line.trim() && !line.startsWith('##')) || 'Abrir sugestão' : 'Abrir sugestão';
 
-        row.append(title, meta, text);
+        link.append(title, meta, text);
+        row.appendChild(link);
         suggestionList.appendChild(row);
       });
     }
@@ -943,16 +992,25 @@
       const text = suggestionText.value.trim();
       if(!text) return;
 
-      const item = {
-        category: suggestionCategory.value,
+      const shortTitle = text.length > 70 ? `${text.slice(0, 70)}...` : text;
+      const title = `[Sugestão] ${suggestionCategory.value}: ${shortTitle}`;
+      const body = [
+        '## Sugestão',
         text,
-        email: currentUserEmail,
-        date: new Date().toLocaleDateString('pt-BR'),
-      };
-
-      saveSuggestions([item, ...readSuggestions()]);
-      suggestionText.value = '';
-      renderSuggestions();
+        '',
+        '## Categoria',
+        suggestionCategory.value,
+        '',
+        '## E-mail logado',
+        currentUserEmail,
+        '',
+        '## Origem',
+        'Hub Trabalhista BIASON',
+      ].join('\n');
+      const url = new URL(`https://github.com/${suggestionRepo}/issues/new`);
+      url.searchParams.set('title', title);
+      url.searchParams.set('body', body);
+      window.open(url.href, '_blank', 'noopener');
     });
 
     window.addEventListener('message', (event) => {
