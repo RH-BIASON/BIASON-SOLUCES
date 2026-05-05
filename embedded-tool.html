@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BIASON | Ferramenta</title>
+    <style>
+      html, body {
+        width: 100%;
+        min-height: 100%;
+        margin: 0;
+        background: #f4f7fb;
+      }
+
+      #status {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        color: #334155;
+        font: 600 15px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="status">Carregando ferramenta...</div>
+    <script src="embedded-tools.js"></script>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const tool = params.get("tool") || "";
+        const encoded = window.BIASON_EMBEDDED_TOOLS && window.BIASON_EMBEDDED_TOOLS[tool];
+        const status = document.getElementById("status");
+
+        if (!encoded) {
+          status.textContent = "Ferramenta nao encontrada.";
+          return;
+        }
+
+        try {
+          const binary = atob(encoded);
+          const bytes = new Uint8Array(binary.length);
+          for (let index = 0; index < binary.length; index += 1) {
+            bytes[index] = binary.charCodeAt(index);
+          }
+
+          const html = new TextDecoder("utf-8").decode(bytes);
+          document.open();
+          document.write(html);
+          document.close();
+        } catch (error) {
+          status.textContent = "Nao foi possivel carregar a ferramenta.";
+        }
+      })();
+    </script>
+  </body>
+</html>
