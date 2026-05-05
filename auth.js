@@ -23,18 +23,6 @@
       hash: "0679a3c2098a02d90589beebdf7b00d5a746a8b346e06e4769c82d96aee1b71d",
       scopes: ["hub", "dirf", "rubricas"],
     },
-    {
-      name: "DIRF / IRPF",
-      email: "dirf@biason.com.br",
-      hash: "ac1db8a95073663a19f63ff11beb0a2bd56c745e0e7c7db66f7a53c328ca3165",
-      scopes: ["dirf"],
-    },
-    {
-      name: "Rubricas",
-      email: "rubricas@biason.com.br",
-      hash: "014fb15479d2a8078339e46f77603d94137b83f6343bae6761737a9d97945a9a",
-      scopes: ["rubricas"],
-    },
   ];
 
   const pathParts = location.pathname.split("/");
