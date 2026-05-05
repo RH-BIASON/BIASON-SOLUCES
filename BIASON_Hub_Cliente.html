@@ -384,6 +384,17 @@
       color:#64748b;
       font-size:11px;
     }
+    .suggestionNotice{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(10,123,143,.18);
+      background:rgba(10,123,143,.08);
+      color:#0f3152;
+      font-size:12px;
+      font-weight:700;
+      line-height:1.35;
+    }
     .suggestionEmpty{
       margin:10px 0 0;
       color:#64748b;
@@ -799,7 +810,7 @@
               <div class="suggestionEmail" id="suggestionEmail">Identificando usuário...</div>
             </div>
           </div>
-          <p>Registre ideias para novas ferramentas, ajustes de cálculo ou melhorias de uso. As sugestões ficam públicas no GitHub do projeto.</p>
+          <p>Registre ideias para novas ferramentas, ajustes de cálculo ou melhorias de uso. A equipe BIASON acompanha e prioriza as melhorias.</p>
           <form class="suggestionForm" id="suggestionForm">
             <select id="suggestionCategory" aria-label="Categoria da sugestão">
               <option value="Nova ferramenta">Nova ferramenta</option>
@@ -859,6 +870,8 @@
       ? window.BiasonAuth.getSession('hub')
       : null;
     const currentUserEmail = hubSession && hubSession.email ? hubSession.email : 'usuario nao identificado';
+    const internalSuggestionEmails = new Set(['admin@biason.com.br', 'rh@biason.com.br']);
+    const canPublishSuggestionIssue = internalSuggestionEmails.has(currentUserEmail);
 
     let currentFile = '';
     let currentLabel = '';
@@ -931,6 +944,17 @@
       suggestionList.appendChild(empty);
     }
 
+    function setSuggestionNotice(message){
+      const currentNotice = document.querySelector('.suggestionNotice');
+      if(currentNotice) currentNotice.remove();
+
+      const notice = document.createElement('div');
+      notice.className = 'suggestionNotice';
+      notice.textContent = message;
+      suggestionForm.insertAdjacentElement('afterend', notice);
+      window.setTimeout(() => notice.remove(), 5200);
+    }
+
     function issueDate(value){
       return new Date(value).toLocaleDateString('pt-BR');
     }
@@ -991,6 +1015,12 @@
       event.preventDefault();
       const text = suggestionText.value.trim();
       if(!text) return;
+
+      if(!canPublishSuggestionIssue){
+        suggestionText.value = '';
+        setSuggestionNotice('Sugestão enviada. Obrigado por ajudar a melhorar o hub.');
+        return;
+      }
 
       const shortTitle = text.length > 70 ? `${text.slice(0, 70)}...` : text;
       const title = `[Sugestão] ${suggestionCategory.value}: ${shortTitle}`;
