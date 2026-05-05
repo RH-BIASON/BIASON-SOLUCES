@@ -274,9 +274,12 @@
     </main>
 
     <script>
-      const session = window.BiasonAuth.getSession();
-      if (session) {
-        window.location.replace("BIASON_Hub_Cliente.html");
+      const params = new URLSearchParams(window.location.search);
+      const requiredScope = params.get("scope") || "hub";
+      const session = window.BiasonAuth.getSession(requiredScope);
+
+      if (session && window.BiasonAuth.hasScope(session, requiredScope)) {
+        window.location.replace(params.get("next") || "BIASON_Hub_Cliente.html");
       }
 
       const form = document.getElementById("loginForm");
@@ -296,14 +299,13 @@
         event.preventDefault();
         error.textContent = "";
 
-        const result = await window.BiasonAuth.login(email.value, password.value, remember.checked);
+        const result = await window.BiasonAuth.login(email.value, password.value, remember.checked, requiredScope);
         if (!result.ok) {
-          error.textContent = "Email ou senha invalido.";
+          error.textContent = result.forbidden ? "Usuario sem permissao para esta ferramenta." : "Email ou senha invalido.";
           password.select();
           return;
         }
 
-        const params = new URLSearchParams(window.location.search);
         window.location.replace(params.get("next") || "BIASON_Hub_Cliente.html");
       });
     </script>
