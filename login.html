@@ -214,6 +214,82 @@
         color: #1a78aa;
       }
 
+      body.vipLogin {
+        background:
+          radial-gradient(circle at 18% 18%, rgba(255, 255, 255, .14), transparent 26%),
+          linear-gradient(135deg, #061326 0%, #0b2240 48%, #0f3152 100%);
+      }
+
+      body.vipLogin .loginShell {
+        background: rgba(255, 255, 255, .98);
+        box-shadow: 0 28px 70px -34px rgba(0, 0, 0, .9);
+      }
+
+      body.vipLogin .brandPanel {
+        position: relative;
+        overflow: hidden;
+        background:
+          linear-gradient(145deg, rgba(255, 255, 255, .08), transparent 35%),
+          linear-gradient(150deg, #061326 0%, #0b2240 52%, #123b63 100%);
+      }
+
+      body.vipLogin .brandPanel::after {
+        content: "ACESSO VIP";
+        position: absolute;
+        left: 34px;
+        bottom: 34px;
+        padding: 9px 14px;
+        border: 1px solid rgba(255, 255, 255, .28);
+        border-radius: 999px;
+        color: rgba(255, 255, 255, .9);
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: .14em;
+      }
+
+      body.vipLogin .brandMark {
+        border: 1px solid rgba(255, 255, 255, .18);
+        background: linear-gradient(145deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .02));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16), 0 26px 54px -36px rgba(0, 0, 0, .8);
+      }
+
+      body.vipLogin h1 {
+        color: #0b2240;
+      }
+
+      body.vipLogin .loginCard::before {
+        content: "Ferramenta restrita BIASON";
+        display: block;
+        width: max-content;
+        max-width: 100%;
+        margin: 0 auto 14px;
+        padding: 8px 13px;
+        border-radius: 999px;
+        background: #eaf2fb;
+        color: #0f3152;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+      }
+
+      body.vipLogin label {
+        color: #0f3152;
+      }
+
+      body.vipLogin .submit {
+        background: linear-gradient(135deg, #0b2240, #123b63);
+        box-shadow: 0 10px 18px -12px rgba(5, 19, 38, .95);
+      }
+
+      body.vipLogin .submit:hover {
+        background: linear-gradient(135deg, #061326, #0f3152);
+      }
+
+      body.vipLogin .footer strong {
+        color: #0f3152;
+      }
+
       @media (max-width: 820px) {
         body {
           background: linear-gradient(180deg, #287fae 0 34%, #f7fbff 34% 100%);
@@ -251,7 +327,7 @@
 
       <section class="formPanel">
         <form class="loginCard" id="loginForm">
-          <h1>Seja bem vindo!</h1>
+          <h1 id="loginTitle">Seja bem vindo!</h1>
 
           <div class="field">
             <label for="email">Usuário ou Email *</label>
@@ -292,6 +368,7 @@
       const params = new URLSearchParams(window.location.search);
       const requiredScope = params.get("scope") || "hub";
       const session = window.BiasonAuth.getSession(requiredScope);
+      const isVipAccess = ["dirf", "rubricas"].includes(requiredScope);
 
       if (session && window.BiasonAuth.hasScope(session, requiredScope)) {
         window.location.replace(params.get("next") || "BIASON_Hub_Cliente.html");
@@ -303,6 +380,13 @@
       const remember = document.getElementById("remember");
       const error = document.getElementById("loginError");
       const togglePassword = document.getElementById("togglePassword");
+      const loginTitle = document.getElementById("loginTitle");
+
+      if (isVipAccess) {
+        document.body.classList.add("vipLogin");
+        document.title = "BIASON | Acesso VIP";
+        loginTitle.textContent = "Seja bem vindo ao acesso VIP";
+      }
 
       togglePassword.addEventListener("click", () => {
         const visible = password.type === "text";
