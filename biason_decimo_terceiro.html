@@ -369,7 +369,7 @@
         <p>
           A base proporcional do 13º é formada por <strong>salário + média de horas extras</strong>, multiplicada por <strong>meses trabalhados ÷ 12</strong>.
           Na <strong>primeira parcela</strong>, a ferramenta mostra metade da base proporcional, sem descontos.
-          Na <strong>segunda parcela</strong>, os descontos de INSS e IRRF incidem sobre o 13º proporcional completo, mas o valor exibido em proventos representa apenas a metade complementar.
+          Na <strong>segunda parcela</strong>, o 13º proporcional completo é exibido em proventos, com desconto separado da primeira parcela já paga, além de INSS e IRRF.
           Na <strong>parcela única</strong>, o valor bruto integral proporcional é exibido e os descontos são aplicados diretamente.
         </p>
       </section>
@@ -464,6 +464,12 @@
                   <td class="val">—</td>
                 </tr>
                 <tr>
+                  <td>Adiantamento 1ª parcela</td>
+                  <td id="tbRefAdiantamento">—</td>
+                  <td class="val">—</td>
+                  <td class="val" id="tbAdiantamento">R$ 0,00</td>
+                </tr>
+                <tr>
                   <td>INSS</td>
                   <td id="tbAliqInss">—</td>
                   <td class="val">—</td>
@@ -497,9 +503,9 @@
               <div class="stat__sub">Somatório proporcional de salário e média de horas extras.</div>
             </div>
             <div class="stat">
-              <div class="stat__label">Bruto da parcela exibida</div>
+              <div class="stat__label">Bruto demonstrado</div>
               <div class="stat__value" id="statParcela">R$ 0,00</div>
-              <div class="stat__sub">Primeira e segunda mostram metade; única mostra o total proporcional.</div>
+              <div class="stat__sub">Na segunda parcela, o total proporcional aparece com desconto da 1ª parcela.</div>
             </div>
             <div class="stat">
               <div class="stat__label">INSS sobre 13º total</div>
@@ -550,6 +556,12 @@
           <td>—</td>
           <td id="rHex"></td>
           <td>—</td>
+        </tr>
+        <tr>
+          <td>Adiantamento 1ª parcela</td>
+          <td id="rRefAdiantamento"></td>
+          <td>—</td>
+          <td id="rAdiantamento"></td>
         </tr>
         <tr>
           <td>INSS</td>
@@ -713,9 +725,10 @@
 
       let salarioExibido = totalSalario13;
       let hexExibido = totalHex13;
+      let adiantamentoDesconto = 0;
       let obs = '';
 
-      if (data.parcela === 1 || data.parcela === 2) {
+      if (data.parcela === 1) {
         salarioExibido = round2(totalSalario13 / 2);
         hexExibido = round2(totalHex13 / 2);
       }
@@ -724,21 +737,26 @@
       let inss = { value:0, effectiveRate:0, marginalRate:0, base:0 };
       let ir = { value:0, rate:0, faixaTexto:'Isento', base:0, reduction:0, deductionLabel:'—', deductionUsed:0, beforeReduction:0 };
       let descontos = 0;
+      let totalDescontos = 0;
       let liquido = brutoExibido;
 
       if (data.parcela === 1) {
+        totalDescontos = descontos;
         obs = 'Primeira parcela: sem desconto de INSS e IRRF.';
       } else if (data.parcela === 2) {
+        adiantamentoDesconto = adiantamento;
         inss = calcINSS(totalBase13);
         ir = calcIR(totalBase13, inss.value, data.depend);
         descontos = round2(inss.value + ir.value);
-        liquido = round2(brutoExibido - descontos);
-        obs = 'Segunda parcela: descontos calculados sobre o 13º proporcional total, com exibição apenas da metade complementar em proventos.';
+        totalDescontos = round2(adiantamentoDesconto + descontos);
+        liquido = round2(brutoExibido - totalDescontos);
+        obs = 'Segunda parcela: o 13º proporcional total é demonstrado em proventos, com desconto separado da 1ª parcela já paga, INSS e IRRF.';
       } else {
         inss = calcINSS(totalBase13);
         ir = calcIR(totalBase13, inss.value, data.depend);
         descontos = round2(inss.value + ir.value);
-        liquido = round2(brutoExibido - descontos);
+        totalDescontos = descontos;
+        liquido = round2(brutoExibido - totalDescontos);
         obs = 'Parcela única: valor proporcional integral com descontos aplicados diretamente sobre o total.';
       }
 
@@ -746,13 +764,16 @@
 
       const tecnica = [
         `Base proporcional total: ${formatMoney(totalBase13)} (${formatMoney(totalSalario13)} de salário + ${formatMoney(totalHex13)} de média de horas extras).`,
+        data.parcela === 2
+          ? `Adiantamento da 1ª parcela descontado separadamente: ${formatMoney(adiantamentoDesconto)}.`
+          : '',
         data.parcela === 1
           ? 'Não há incidência de INSS ou IRRF na primeira parcela exibida.'
           : `INSS calculado sobre ${formatMoney(inss.base)} com alíquota efetiva de ${formatPct(inss.effectiveRate)}.` ,
         data.parcela === 1
           ? 'Sem cálculo de IRRF nesta parcela.'
           : `IRRF: base ${formatMoney(ir.base)}, ${ir.deductionLabel.toLowerCase()} de ${formatMoney(ir.deductionUsed)}, imposto apurado ${formatMoney(ir.value)}.`
-      ];
+      ].filter(Boolean);
 
       const result = {
         ...data,
@@ -766,8 +787,10 @@
         inss,
         ir,
         descontos,
+        totalDescontos,
         liquido,
         adiantamento,
+        adiantamentoDesconto,
         obs,
         tecnica
       };
@@ -791,12 +814,14 @@
       $("tbRef").textContent = r.ref;
       $("tbSalario").textContent = formatMoney(r.salarioExibido);
       $("tbHex").textContent = formatMoney(r.hexExibido);
+      $("tbRefAdiantamento").textContent = r.parcela === 2 ? '1/2' : '—';
+      $("tbAdiantamento").textContent = r.parcela === 2 ? formatMoney(r.adiantamentoDesconto) : '—';
       $("tbAliqInss").textContent = r.parcela === 1 ? '—' : formatAliq(r.inss.marginalRate);
       $("tbInss").textContent = formatMoney(r.inss.value);
       $("tbAliqIrrf").textContent = r.parcela === 1 ? '—' : (r.ir.rate ? formatAliq(r.ir.rate) : 'Isento');
       $("tbIrrf").textContent = formatMoney(r.ir.value);
       $("tbProventos").innerHTML = `<strong>${formatMoney(r.brutoExibido)}</strong>`;
-      $("tbDescontos").innerHTML = `<strong>${formatMoney(r.descontos)}</strong>`;
+      $("tbDescontos").innerHTML = `<strong>${formatMoney(r.totalDescontos)}</strong>`;
       $("obsParcela").textContent = r.obs;
 
       $("statBase").textContent = formatMoney(r.totalBase13);
@@ -824,12 +849,14 @@
       $("rRef").textContent = r.ref;
       $("rSalario").textContent = formatMoney(r.salarioExibido);
       $("rHex").textContent = formatMoney(r.hexExibido);
+      $("rRefAdiantamento").textContent = r.parcela === 2 ? '1/2' : '—';
+      $("rAdiantamento").textContent = r.parcela === 2 ? formatMoney(r.adiantamentoDesconto) : '—';
       $("rAliqInss").textContent = r.parcela === 1 ? '—' : formatAliq(r.inss.marginalRate);
       $("rInss").textContent = formatMoney(r.inss.value);
       $("rAliqIrrf").textContent = r.parcela === 1 ? '—' : (r.ir.rate ? formatAliq(r.ir.rate) : 'Isento');
       $("rIrrf").textContent = formatMoney(r.ir.value);
       $("rProventos").innerHTML = `<strong>${formatMoney(r.brutoExibido)}</strong>`;
-      $("rDescontos").innerHTML = `<strong>${formatMoney(r.descontos)}</strong>`;
+      $("rDescontos").innerHTML = `<strong>${formatMoney(r.totalDescontos)}</strong>`;
       $("rLiquido").textContent = formatMoney(r.liquido);
       $("rObs").textContent = r.obs;
       $("rTecnica").textContent = r.tecnica.join(' ');
@@ -847,7 +874,7 @@
       render({
         ref:'0/12', salario:0, hex:0, depend:0, meses:0, parcela:1,
         totalSalario13:0, totalHex13:0, totalBase13:0, salarioExibido:0, hexExibido:0,
-        brutoExibido:0, descontos:0, liquido:0, adiantamento:0,
+        brutoExibido:0, descontos:0, totalDescontos:0, liquido:0, adiantamento:0, adiantamentoDesconto:0,
         inss:{value:0,effectiveRate:0,marginalRate:0,base:0},
         ir:{value:0,rate:0,faixaTexto:'Isento',base:0,reduction:0,deductionLabel:'—',deductionUsed:0,beforeReduction:0},
         obs:'Informe os dados e clique em calcular para gerar o demonstrativo.',
