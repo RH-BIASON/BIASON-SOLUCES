@@ -41,6 +41,9 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
 .note.ok{border-color:rgba(22,163,74,.35);background:rgba(22,163,74,.08)}
 .note.warn{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.08)}
 .note.err{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08);color:#7f1d1d}
+.fieldHint{margin-top:2px;color:#64748b;font-size:12px;line-height:1.4}
+.inlineToolLink{display:inline-flex;align-items:center;margin-top:2px;color:#0f5aa6;font-size:12px;font-weight:800;text-decoration:none}
+.inlineToolLink:hover{text-decoration:underline}
 .tbl{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--border);border-radius:14px}
 .tbl th,.tbl td{padding:10px 10px;border-bottom:1px solid var(--border);font-size:13px;text-align:left}
 .tbl th{background:#f8fafc;color:#0f172a;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
@@ -454,7 +457,7 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
         </div>
         <div class="bd">
           <p class="help">
-            Informe o salário, horas mensais e a carga horária do período noturno.
+            Informe o salário, horas mensais e a jornada noturna do funcionário.
             Se você informar as horas em <b>tempo “diurno/relógio”</b>, eu converto para <b>hora noturna reduzida (52m30s)</b> no caso urbano.
             Para <b>rural</b>, não aplico hora reduzida e uso adicional padrão de 25%.
           </p>
@@ -487,11 +490,13 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
             </div>
 
             <div class="field">
-              <label>Carga horária noturna</label>
+              <label>Jornada noturna do funcionário</label>
               <div class="row">
                 <input id="hora_dia_trab" inputmode="numeric" placeholder="Ex.: 8">
                 <input id="minutos" inputmode="numeric" placeholder="min">
               </div>
+              <div class="fieldHint">Use o total de horas noturnas da jornada. Se houver entrada, intervalo, saída ou jornada mista, apure primeiro na ferramenta Jornada.</div>
+              <a class="inlineToolLink" href="jornada_debiason.html" target="_blank" rel="noopener">Abrir ferramenta Jornada</a>
             </div>
 
             <div class="field">
@@ -708,7 +713,7 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
 
     if(!isFinite(salario) || salario<=0) return showStatus('err','Informe um salário bruto válido.');
     if(!isFinite(horasMensais) || horasMensais<=0) return showStatus('err','Informe as horas mensais/contratuais.');
-    if(!isFinite(h) || h<0 || !isFinite(m) || m<0 || m>59) return showStatus('err','Informe a carga horária noturna corretamente.');
+    if(!isFinite(h) || h<0 || !isFinite(m) || m<0 || m>59) return showStatus('err','Informe a jornada noturna do funcionário corretamente.');
     if(!isFinite(diasUteis) || diasUteis<=0) return showStatus('err','Informe os dias úteis do mês, incluindo sábados.');
     if(!isFinite(feriados) || feriados<0) return showStatus('err','Informe domingos/feriados do mês.');
     if(!isFinite(perc) || perc<=0) perc = rural ? 25 : 20;
