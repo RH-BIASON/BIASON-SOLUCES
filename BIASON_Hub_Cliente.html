@@ -118,6 +118,27 @@
       cursor:pointer;
     }
     .topbarBtn:hover{background:rgba(255,255,255,.22);transform:translateY(-1px)}
+    .userPill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      min-height:38px;
+      padding:0 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.20);
+      background:rgba(255,255,255,.12);
+      color:#fff;
+      font-size:12px;
+      font-weight:800;
+    }
+    .userPill__status{
+      padding:4px 8px;
+      border-radius:999px;
+      background:rgba(255,255,255,.18);
+      font-size:10px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
 
     main{max-width:1360px;margin:0 auto;padding:22px 18px 40px}
     .hero{
@@ -243,6 +264,27 @@
       text-transform:uppercase;
       margin-bottom:12px;
     }
+    .statusBadge{
+      position:absolute;
+      top:16px;
+      right:16px;
+      z-index:2;
+      display:inline-flex;
+      align-items:center;
+      min-height:24px;
+      padding:0 9px;
+      border-radius:999px;
+      border:1px solid rgba(10,123,143,.18);
+      background:#eff8fb;
+      color:#086a7a;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .statusBadge--vip{background:#eef3fb;color:#0f3152;border-color:rgba(15,49,82,.20)}
+    .statusBadge--new{background:#ecfdf3;color:#087443;border-color:rgba(8,116,67,.20)}
+    .statusBadge--review{background:#fff8e8;color:#9a5b00;border-color:rgba(154,91,0,.20)}
     .cardActions{display:grid;gap:8px;margin-top:auto}
     .card h3{
       margin:0 0 8px;
@@ -650,6 +692,8 @@
         <div class="crumb">Página: Início</div>
       </div>
       <div class="topbar__right">
+        <div class="userPill" id="userPill">Carregando...</div>
+        <a class="topbarBtn" id="accessAdminLink" href="acessos.html" style="display:none">Acessos</a>
         <button class="topbarBtn" type="button" onclick="BiasonAuth.logout()">Sair</button>
       </div>
     </div>
@@ -676,6 +720,7 @@
       <div class="grid" id="toolGrid">
 
         <article class="card" data-search="jornada horas folha calculo calculadora ponto">
+          <span class="statusBadge statusBadge--new">Atualizado</span>
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="clock-3"></i></span>
           <span class="cardTag">Horas e folha</span>
           <h3>Calculadora de Jornada</h3>
@@ -698,6 +743,7 @@
 
 
         <article class="card" data-search="adicional noturno horas dsr rsr">
+          <span class="statusBadge statusBadge--new">Atualizado</span>
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="moon"></i></span>
           <span class="cardTag">Horas e folha</span>
           <h3>Adicional Noturno</h3>
@@ -720,6 +766,7 @@
 
 
         <article class="card card--featured" data-search="rubricas consulta cruzamento tabela incidencias">
+          <span class="statusBadge statusBadge--vip">VIP</span>
           <span class="vipRibbon">Acesso VIP</span>
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="search-check"></i></span>
           <span class="cardTag">Consulta oficial</span>
@@ -743,6 +790,7 @@
 
 
         <article class="card" data-search="fgts digital extrato txt complemento caixa manual preenchimento">
+          <span class="statusBadge statusBadge--review">Em revisão</span>
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="landmark"></i></span>
           <span class="cardTag">FGTS</span>
           <h3>Gerador FGTS Digital</h3>
@@ -755,6 +803,7 @@
 
 
         <article class="card card--featured" data-search="dirf irpf xml s-5002 comprovante relatorio lote funcionarios planilha zip">
+          <span class="statusBadge statusBadge--vip">VIP</span>
           <span class="vipRibbon">Acesso VIP</span>
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="receipt-text"></i></span>
           <span class="cardTag">Comprovantes</span>
@@ -889,6 +938,8 @@
     const suggestionEmail = document.getElementById('suggestionEmail');
     const suggestionList = document.getElementById('suggestionList');
     const suggestionAllLink = document.getElementById('suggestionAllLink');
+    const userPill = document.getElementById('userPill');
+    const accessAdminLink = document.getElementById('accessAdminLink');
     const suggestionRepo = 'RH-BIASON/BIASON-SOLUCES';
     const suggestionIssueListUrl = `https://github.com/${suggestionRepo}/issues?q=is%3Aissue+is%3Aopen+%5BSugest%C3%A3o%5D`;
     const suggestionApiUrl = `https://api.github.com/repos/${suggestionRepo}/issues?state=open&per_page=20`;
@@ -898,6 +949,10 @@
     const currentUserEmail = hubSession && hubSession.email ? hubSession.email : 'usuario nao identificado';
     const internalSuggestionEmails = new Set(['admin@biason.com.br', 'rh@biason.com.br']);
     const canPublishSuggestionIssue = internalSuggestionEmails.has(currentUserEmail);
+    const hasVipAccess = hubSession && (window.BiasonAuth.hasScope(hubSession, 'dirf') || window.BiasonAuth.hasScope(hubSession, 'rubricas'));
+
+    userPill.innerHTML = `${currentUserEmail} <span class="userPill__status">${hasVipAccess ? 'Acesso VIP' : 'Acesso padrão'}</span>`;
+    if (canPublishSuggestionIssue) accessAdminLink.style.display = 'inline-flex';
 
     let currentFile = '';
     let currentLabel = '';

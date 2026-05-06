@@ -5,6 +5,7 @@
   const SESSION_HOURS = 8;
   const PROTECTED_PAGES = {
     [HUB_PAGE]: "hub",
+    "acessos.html": "hub",
     "dirf_debiason_indv.html": "dirf",
     "dirf_debiason_v2.html": "dirf",
     "rubricas_debiason_atualizado.html": "rubricas",
@@ -87,6 +88,16 @@
   window.BiasonAuth = {
     getSession: readSession,
     hasScope,
+    listUsers() {
+      return USERS.map((user) => ({
+        name: user.name,
+        email: user.email,
+        scopes: user.scopes.slice(),
+      }));
+    },
+    hashCredential(email, password) {
+      return sha256(`${String(email || "").trim().toLowerCase()}:${String(password || "")}`);
+    },
 
     async login(email, password, remember, requiredScope) {
       const normalizedEmail = String(email || "").trim().toLowerCase();

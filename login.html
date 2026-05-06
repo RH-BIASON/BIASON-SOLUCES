@@ -203,6 +203,61 @@
         text-align: center;
       }
 
+      .permissionCard {
+        display: none;
+        margin: 0 0 22px;
+        padding: 18px;
+        border: 1px solid #c7d7ea;
+        border-radius: 12px;
+        background: linear-gradient(145deg, #f8fbff, #edf4fb);
+        text-align: center;
+      }
+
+      .permissionCard.isVisible {
+        display: block;
+      }
+
+      .permissionCard strong {
+        display: block;
+        margin-bottom: 8px;
+        color: #0b2240;
+        font-size: 17px;
+      }
+
+      .permissionCard p {
+        margin: 0 0 14px;
+        color: #4b5f76;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .permissionActions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .permissionLink {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 38px;
+        padding: 0 14px;
+        border-radius: 9px;
+        border: 1px solid #c7d7ea;
+        color: #0f3152;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .permissionLink--primary {
+        border-color: #0f3152;
+        background: #0f3152;
+        color: #fff;
+      }
+
       .footer {
         margin-top: 34px;
         text-align: center;
@@ -296,6 +351,10 @@
           padding: 0;
         }
 
+        body.vipLogin {
+          background: linear-gradient(180deg, #061326 0 34%, #f4f7fb 34% 100%);
+        }
+
         .loginShell {
           min-height: 100vh;
           grid-template-columns: 1fr;
@@ -354,6 +413,14 @@
           </div>
 
           <div class="error" id="loginError" aria-live="polite"></div>
+          <div class="permissionCard" id="permissionCard" aria-live="polite">
+            <strong>Acesso VIP não liberado</strong>
+            <p>Este módulo é restrito. Solicite à BIASON a liberação do seu e-mail para DIRF / IRPF ou Rubricas.</p>
+            <div class="permissionActions">
+              <a class="permissionLink permissionLink--primary" href="BIASON_Hub_Cliente.html">Voltar ao Hub</a>
+              <a class="permissionLink" href="mailto:admin@biason.com.br?subject=Solicitar%20acesso%20VIP%20BIASON">Solicitar acesso</a>
+            </div>
+          </div>
           <button class="submit" type="submit">ENTRAR</button>
 
           <div class="footer">
@@ -381,6 +448,7 @@
       const error = document.getElementById("loginError");
       const togglePassword = document.getElementById("togglePassword");
       const loginTitle = document.getElementById("loginTitle");
+      const permissionCard = document.getElementById("permissionCard");
 
       if (isVipAccess) {
         document.body.classList.add("vipLogin");
@@ -400,7 +468,13 @@
 
         const result = await window.BiasonAuth.login(email.value, password.value, remember.checked, requiredScope);
         if (!result.ok) {
-          error.textContent = result.forbidden ? "Usuario sem permissao para esta ferramenta." : "Email ou senha invalido.";
+          if (result.forbidden) {
+            error.textContent = "";
+            permissionCard.classList.add("isVisible");
+          } else {
+            permissionCard.classList.remove("isVisible");
+            error.textContent = "Email ou senha invalido.";
+          }
           password.select();
           return;
         }
