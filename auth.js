@@ -30,6 +30,12 @@
       hash: "bca50f9e2979cfe88613a8f028d1ab0472544e94bb7c4de4bb62229d32527dff",
       scopes: ["hub"],
     },
+    {
+      name: "Maria Biason",
+      email: "mariam@biason.net",
+      hash: "10339d9b213d322d9b3c776f368b513ca69aaf7236f4c5a8cebde74d1b40a5ca",
+      scopes: ["hub", "dirf", "rubricas"],
+    },
   ];
 
   const pathParts = location.pathname.split("/");
