@@ -36,6 +36,12 @@
       hash: "10339d9b213d322d9b3c776f368b513ca69aaf7236f4c5a8cebde74d1b40a5ca",
       scopes: ["hub", "dirf", "rubricas"],
     },
+    {
+      name: "Malu Biason",
+      email: "malu@biason.net",
+      hash: "6fa4a79f4effce489edd7353f4a95b790dd966a7e48c1d76c12cb4915d7caa1e",
+      scopes: ["hub", "dirf", "rubricas"],
+    },
   ];
 
   const pathParts = location.pathname.split("/");
