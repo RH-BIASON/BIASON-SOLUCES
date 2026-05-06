@@ -57,10 +57,6 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
 .tbl th,.tbl td{padding:10px 10px;border-bottom:1px solid var(--border);font-size:13px;text-align:left}
 .tbl th{background:#f8fafc;color:#0f172a;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
 .tbl tr:last-child td{border-bottom:none}
-.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
-.kpi{border:1px solid var(--border);border-radius:14px;padding:12px;background:#fff}
-.kpi .k{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.05em}
-.kpi .v{margin-top:6px;font-size:18px;font-weight:900}
 .reportCard{
   margin-top:16px;
   border:1px dashed rgba(11,61,145,.24);
@@ -570,36 +566,6 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
           <h2>Resultado</h2>
         </div>
         <div class="bd">
-          <div id="resultEmpty" class="emptyState screenOnly">
-            <strong>Antes de calcular</strong>
-            <p>Preencha salario, horas e dias do mes para ver o adicional noturno, o valor de DSR e a hora considerada no calculo.</p>
-          </div>
-          <table class="tbl screenOnly">
-            <thead>
-              <tr>
-                <th>Item</th><th>Valor</th>
-              </tr>
-            </thead>
-            <tbody id="resBody">
-              <tr><td colspan="2" style="color:#64748b">Preencha os dados e clique em Calcular.</td></tr>
-            </tbody>
-          </table>
-
-          <div class="kpis screenOnly">
-            <div class="kpi">
-              <div class="k">Total adicional (sem DSR)</div>
-              <div class="v" id="kpi_total">—</div>
-            </div>
-            <div class="kpi">
-              <div class="k">Horas noturnas (consideradas)</div>
-              <div class="v" id="kpi_horas">—</div>
-            </div>
-          </div>
-
-          <div class="note warn screenOnly" style="margin-top:12px">
-            *Observação: este cálculo segue a lógica padrão da ferramenta-base: urbano com hora reduzida (52m30s) quando horas informadas estão “diurnas/relógio” e rural sem hora reduzida.
-          </div>
-
           <section class="reportCard" id="reportCard">
             <span class="reportEyebrow">Demonstrativo final</span>
             <h3 class="reportTitle">Demonstrativo do adicional noturno</h3>
@@ -811,10 +777,6 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
     $('tipo_hora').value="diurna";
     $('rural').value="nao";
     $('jornada_resumo').textContent='Preencha a jornada para apurar o período noturno.';
-    $('resBody').innerHTML='<tr><td colspan="2" style="color:#64748b">Preencha os dados e clique em Calcular.</td></tr>';
-    $('resultEmpty').style.display='block';
-    $('kpi_total').textContent='—';
-    $('kpi_horas').textContent='—';
     resetReport();
     clearStatus();
   });
@@ -864,25 +826,6 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
     const valorDSR = (diasUteis>0 ? (totalAdicional / diasUteis) * domingosFeriados : 0);
     const totalComDSR = totalAdicional + valorDSR;
 
-    $('resultEmpty').style.display='none';
-    $('kpi_total').textContent = fmtBRL(totalAdicional);
-    $('kpi_horas').textContent = fmtNum(horasNoturnas,2);
-
-    const rows = [
-      ['Salário bruto', fmtBRL(salario)],
-      ['Horas mensais', fmtNum(horasMensais,0)],
-      ['Horas informadas', `${String(h||0).padStart(2,'0')}:${String(m||0).padStart(2,'0')} (${tipoHora === 'diurna' ? 'diurna/relógio' : 'noturna'})`],
-      ['Percentual adicional', fmtNum(perc,0)+'%'],
-      ['Valor hora', fmtBRL(valorHora)],
-      ['Horas noturnas consideradas', fmtNum(horasNoturnas,2)],
-      ['Valor do adicional noturno (por hora)', fmtBRL(valorAdicionalHora)],
-      ['Total do adicional (sem DSR)', fmtBRL(totalAdicional)],
-      ['Valor RSR/DSR', fmtBRL(valorDSR)],
-      ['Valor da hora com adicional', fmtBRL(valorHoraComAdic)],
-      ['Total geral (com DSR)', fmtBRL(totalComDSR)],
-    ];
-
-    $('resBody').innerHTML = rows.map(r=>`<tr><td>${r[0]}</td><td><b>${r[1]}</b></td></tr>`).join('');
     renderReport({
       salario,
       horasMensais,
