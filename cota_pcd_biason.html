@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BIASON | Calculadora de Cota PCD</title>
+  <script src="auth.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{--brand:#0b3d91;--brand2:#0a7b8f;--ink:#0b1b2a;--muted:#5b6b7a;--line:#dce6ef;--bg:#f4f7fb;--ok:#087443;--warn:#b45309;--shadow:0 18px 40px -28px rgba(8,26,36,.45)}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:radial-gradient(circle at top right,rgba(10,123,143,.12),transparent 28%),linear-gradient(180deg,#eef4f9,#f8fbfd 36%,var(--bg))}
+    .topbar{background:linear-gradient(90deg,#0b3d91,#12408f 58%,#0a7b8f);color:#fff;box-shadow:0 14px 28px -22px rgba(8,26,36,.8)}
+    .topbar__inner{max-width:1120px;min-height:68px;margin:0 auto;padding:0 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .brandLine{display:flex;align-items:center;gap:14px;font-weight:900}.brandLine span{color:rgba(255,255,255,.55)}
+    .hubBtn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 14px;border-radius:12px;background:rgba(255,255,255,.14);color:#fff;text-decoration:none;font-size:13px;font-weight:900}
+    main{max-width:1120px;margin:0 auto;padding:24px 18px 44px}
+    .hero,.card{border:1px solid rgba(15,23,42,.08);border-radius:22px;background:linear-gradient(145deg,#fff,#f3f8fc);box-shadow:var(--shadow)}
+    .hero{padding:24px;margin-bottom:18px}.eyebrow{display:inline-flex;padding:7px 12px;border-radius:999px;background:#eaf2fb;color:var(--brand);font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    h1{margin:12px 0 8px;font-size:36px;line-height:1.04;color:#081a24}.hero p{margin:0;max-width:76ch;color:var(--muted);font-size:14px;line-height:1.55}
+    .layout{display:grid;grid-template-columns:360px minmax(0,1fr);gap:18px;align-items:start}.card{background:#fff;overflow:hidden}.card__head{padding:18px 20px;border-bottom:1px solid var(--line)}.card__head h2{margin:0;font-size:20px}.card__body{padding:18px 20px}
+    .guide p{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.55}.guide strong{color:#334155}
+    label{display:block;margin:14px 0 7px;color:#334155;font-size:12px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
+    input{width:100%;min-height:48px;border:1px solid var(--line);border-radius:14px;padding:0 13px;background:#fff;color:var(--ink);font:inherit}.hint{margin-top:7px;color:var(--muted);font-size:12px;line-height:1.42}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}.btn{min-height:44px;border:0;border-radius:13px;background:linear-gradient(180deg,#0284c7,#0369a1);color:#fff;font:inherit;font-weight:900;cursor:pointer}.btn--ghost{background:#fff;color:#081a24;border:1px solid var(--line)}
+    .resultHero{padding:22px;border-radius:18px;background:linear-gradient(145deg,#eef8fb,#fff);border:1px dashed rgba(10,123,143,.28);margin-bottom:14px}.resultHero__label{display:inline-flex;padding:7px 11px;border-radius:999px;background:#eaf2fb;color:#0b3d91;font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}.resultHero h2{margin:12px 0 6px;font-size:30px;line-height:1.05}.resultHero p{margin:0;color:var(--muted);line-height:1.5}
+    .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.kpi{border:1px solid var(--line);border-radius:16px;background:#fff;padding:14px;min-height:118px}.kpi span{display:block;margin-bottom:8px;color:#08738d;font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.kpi strong{font-size:26px;line-height:1}.kpi p{margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.4}
+    .status{margin-top:14px;padding:14px 16px;border-radius:16px;font-weight:900}.status.ok{background:#ecfdf3;color:var(--ok);border:1px solid rgba(8,116,67,.18)}.status.warn{background:#fff8e8;color:var(--warn);border:1px solid rgba(180,83,9,.20)}
+    @media(max-width:920px){.layout{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  </style>
+</head>
+<body>
+  <header class="topbar"><div class="topbar__inner"><div class="brandLine">BIASON <span>|</span> Calculadora de Cota PCD</div><a class="hubBtn" href="BIASON_Hub_Cliente.html">Voltar ao Hub</a></div></header>
+  <main>
+    <section class="hero"><span class="eyebrow">Inclusão</span><h1>Calculadora de Cota PCD</h1><p>Informe o total de empregados e quantos PCDs/reabilitados a empresa possui hoje. A ferramenta mostra quantos devem existir e quantos faltam para cumprir a cota.</p></section>
+    <section class="layout">
+      <aside class="card guide"><div class="card__head"><h2>Como usar</h2></div><div class="card__body"><p><strong>O que faz:</strong> calcula a cota legal de PCD conforme a quantidade total de empregados.</p><p><strong>Como preencher:</strong> informe o total de empregados da empresa e o número atual de PCDs/reabilitados.</p><p><strong>Como interpretar:</strong> o resultado mostra a quantidade mínima exigida e se faltam contratações.</p></div></aside>
+      <section class="card"><div class="card__head"><h2>Dados para cálculo</h2></div><div class="card__body"><label for="total">Total de empregados</label><input id="total" type="number" min="0" step="1" placeholder="Ex.: 180"><div class="hint">A cota PCD se aplica para empresas com 100 ou mais empregados.</div><label for="current">PCDs atuais</label><input id="current" type="number" min="0" step="1" placeholder="Ex.: 1"><div class="actions"><button class="btn" id="calculate" type="button">Calcular</button><button class="btn btn--ghost" id="clear" type="button">Limpar</button></div></div></section>
+      <section class="card" style="grid-column:1 / -1"><div class="card__head"><h2>Resultado</h2></div><div class="card__body"><div class="resultHero"><span class="resultHero__label">PCD</span><h2 id="resultTitle">Informe os dados para calcular a cota</h2><p id="resultText">O resultado aparecerá aqui com a quantidade obrigatória e o saldo de contratações.</p></div><div class="kpis"><div class="kpi"><span>Percentual</span><strong id="kpiPercent">-</strong><p>Faixa legal aplicada.</p></div><div class="kpi"><span>Obrigatório</span><strong id="kpiRequired">-</strong><p>Quantidade mínima exigida.</p></div><div class="kpi"><span>Atual</span><strong id="kpiCurrent">-</strong><p>Quantidade informada.</p></div><div class="kpi"><span>Saldo</span><strong id="kpiMissing">-</strong><p>Faltantes ou excedente.</p></div></div><div class="status warn" id="statusBox">Aguardando cálculo.</div></div></section>
+    </section>
+  </main>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    function intValue(id){ const value = Number($(id).value || 0); return Number.isFinite(value) && value > 0 ? Math.floor(value) : 0; }
+    function percent(total){ if(total < 100) return 0; if(total <= 200) return .02; if(total <= 500) return .03; if(total <= 1000) return .04; return .05; }
+    function pct(value){ return value ? `${Math.round(value * 100)}%` : '0%'; }
+    function clearResult(){ $('resultTitle').textContent='Informe os dados para calcular a cota'; $('resultText').textContent='O resultado aparecerá aqui com a quantidade obrigatória e o saldo de contratações.'; ['kpiPercent','kpiRequired','kpiCurrent','kpiMissing'].forEach(id=>$(id).textContent='-'); $('statusBox').className='status warn'; $('statusBox').textContent='Aguardando cálculo.'; }
+    function calculate(){ const total=intValue('total'); const current=intValue('current'); const p=percent(total); const required=p ? Math.ceil(total*p) : 0; const missing=Math.max(required-current,0); const extra=Math.max(current-required,0); $('kpiPercent').textContent=pct(p); $('kpiRequired').textContent=String(required); $('kpiCurrent').textContent=String(current); $('kpiMissing').textContent=missing ? String(missing) : extra ? `+${extra}` : '0'; if(!required){ $('resultTitle').textContent='Sem cota obrigatória pela base informada'; $('resultText').textContent='A cota PCD é exigida para empresas com 100 ou mais empregados.'; $('statusBox').className='status ok'; $('statusBox').textContent='Sem obrigação mínima pela base informada.'; return; } $('resultTitle').textContent=`A empresa deve ter ${required} PCD${required===1?'':'s'}`; $('resultText').textContent=`Com base em ${total} empregados, aplica-se a faixa de ${pct(p)} para PCD/reabilitado.`; if(missing){ $('statusBox').className='status warn'; $('statusBox').textContent=`Faltam contratar ${missing} PCD${missing===1?'':'s'} para cumprir a cota.`; } else { $('statusBox').className='status ok'; $('statusBox').textContent=extra ? `Cota cumprida. Há ${extra} PCD${extra===1?'':'s'} acima do mínimo.` : 'Cota cumprida exatamente no mínimo obrigatório.'; } }
+    $('calculate').addEventListener('click', calculate);
+    $('clear').addEventListener('click', () => { $('total').value=''; $('current').value=''; clearResult(); });
+  </script>
+</body>
+</html>
