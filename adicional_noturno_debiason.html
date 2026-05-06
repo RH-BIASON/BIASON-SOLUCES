@@ -44,6 +44,15 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
 .fieldHint{margin-top:2px;color:#64748b;font-size:12px;line-height:1.4}
 .inlineToolLink{display:inline-flex;align-items:center;margin-top:2px;color:#0f5aa6;font-size:12px;font-weight:800;text-decoration:none}
 .inlineToolLink:hover{text-decoration:underline}
+.journeyQuick{grid-column:1 / -1;border:1px solid var(--border);border-radius:16px;padding:14px;background:linear-gradient(180deg,#fff,#f8fbfd)}
+.journeyQuickHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.journeyQuickHead strong{display:block;color:#0f172a;font-size:14px}
+.journeyQuickHead span{display:block;margin-top:3px;color:#64748b;font-size:12px;line-height:1.4}
+.journeyQuickGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.journeyQuickGrid label{display:block;margin-bottom:6px}
+.journeyQuickActions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+.journeySummary{color:#0f5aa6;font-size:12px;font-weight:800}
+.manualNightField{grid-column:1 / -1}
 .tbl{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--border);border-radius:14px}
 .tbl th,.tbl td{padding:10px 10px;border-bottom:1px solid var(--border);font-size:13px;text-align:left}
 .tbl th{background:#f8fafc;color:#0f172a;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
@@ -82,7 +91,8 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
 .reportItem small{display:block;margin-top:6px;color:#526173;font-size:12px;line-height:1.45}
 .reportNote{margin:12px 0 0;padding:14px 16px;border-radius:16px;background:rgba(11,61,145,.06);border:1px solid rgba(11,61,145,.10);color:#234;font-size:13px;line-height:1.6}
 .screenOnly{}
-@media (max-width: 920px){.grid{grid-template-columns:1fr}.form{grid-template-columns:1fr}}
+@media (max-width: 920px){.grid{grid-template-columns:1fr}.form{grid-template-columns:1fr}.journeyQuickGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width: 520px){.journeyQuickGrid{grid-template-columns:1fr}}
 @media (max-width: 920px){.reportGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width: 640px){.reportGrid{grid-template-columns:1fr}}
 </style>
@@ -489,14 +499,44 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
               </select>
             </div>
 
-            <div class="field">
+            <div class="journeyQuick">
+              <div class="journeyQuickHead">
+                <div>
+                  <strong>Apurar pela jornada do funcionário</strong>
+                  <span>Informe entrada, intervalo e saída para a ferramenta calcular automaticamente o período noturno da jornada.</span>
+                </div>
+              </div>
+              <div class="journeyQuickGrid">
+                <div>
+                  <label>Entrada</label>
+                  <input id="jornada_entrada" type="time">
+                </div>
+                <div>
+                  <label>Início intervalo</label>
+                  <input id="jornada_intervalo_ini" type="time">
+                </div>
+                <div>
+                  <label>Fim intervalo</label>
+                  <input id="jornada_intervalo_fim" type="time">
+                </div>
+                <div>
+                  <label>Saída</label>
+                  <input id="jornada_saida" type="time">
+                </div>
+              </div>
+              <div class="journeyQuickActions">
+                <button class="btn-outline" id="bt_apurar_jornada" type="button">Usar jornada</button>
+                <span class="journeySummary" id="jornada_resumo">Preencha a jornada para apurar o período noturno.</span>
+              </div>
+            </div>
+
+            <div class="field manualNightField">
               <label>Jornada noturna do funcionário</label>
               <div class="row">
                 <input id="hora_dia_trab" inputmode="numeric" placeholder="Ex.: 8">
                 <input id="minutos" inputmode="numeric" placeholder="min">
               </div>
-              <div class="fieldHint">Use o total de horas noturnas da jornada. Se houver entrada, intervalo, saída ou jornada mista, apure primeiro na ferramenta Jornada.</div>
-              <a class="inlineToolLink" href="jornada_debiason.html" target="_blank" rel="noopener">Abrir ferramenta Jornada</a>
+              <div class="fieldHint">Você pode preencher manualmente ou usar a jornada acima. Em jornada urbana, mantenha “Diurna (relógio)” para converter pela hora reduzida.</div>
             </div>
 
             <div class="field">
@@ -631,6 +671,69 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
     const n = Number(String(v||"").replace(/\D+/g,''));
     return isFinite(n)? n : NaN;
   }
+  function parseTime(value){
+    const match = String(value || '').match(/^(\d{2}):(\d{2})$/);
+    if(!match) return null;
+    const hours = Number(match[1]);
+    const minutes = Number(match[2]);
+    if(hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return null;
+    return (hours * 60) + minutes;
+  }
+  function formatHHMM(totalMinutes){
+    const safe = Math.max(0, Math.round(totalMinutes || 0));
+    const hours = Math.floor(safe / 60);
+    const minutes = safe % 60;
+    return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}`;
+  }
+  function normalizeEnd(start, end){
+    if(start == null || end == null) return end;
+    return end <= start ? end + 1440 : end;
+  }
+  function overlap(startA, endA, startB, endB){
+    const start = Math.max(startA, startB);
+    const end = Math.min(endA, endB);
+    return Math.max(0, end - start);
+  }
+  function nightMinutesInSegment(start, end){
+    if(start == null || end == null || end <= start) return 0;
+    let total = 0;
+    for(let day = -1; day <= Math.ceil(end / 1440); day += 1){
+      const base = day * 1440;
+      total += overlap(start, end, base + 1320, base + 1740);
+    }
+    return total;
+  }
+  function calculateJourneyNightMinutes(){
+    const entrada = parseTime($('jornada_entrada').value);
+    const saidaRaw = parseTime($('jornada_saida').value);
+    const intervaloIniRaw = parseTime($('jornada_intervalo_ini').value);
+    const intervaloFimRaw = parseTime($('jornada_intervalo_fim').value);
+
+    if(entrada == null || saidaRaw == null) return { ok:false, message:'Informe entrada e saída da jornada.' };
+
+    const saida = normalizeEnd(entrada, saidaRaw);
+    let workedSegments = [[entrada, saida]];
+
+    const hasIntervalStart = intervaloIniRaw != null;
+    const hasIntervalEnd = intervaloFimRaw != null;
+    if(hasIntervalStart || hasIntervalEnd){
+      if(!hasIntervalStart || !hasIntervalEnd) return { ok:false, message:'Informe início e fim do intervalo, ou deixe ambos vazios.' };
+      let intervaloIni = normalizeEnd(entrada, intervaloIniRaw);
+      let intervaloFim = normalizeEnd(intervaloIni, intervaloFimRaw);
+      if(intervaloIni < entrada) intervaloIni += 1440;
+      if(intervaloFim > saida) return { ok:false, message:'O intervalo precisa estar dentro da jornada.' };
+      if(intervaloFim <= intervaloIni) return { ok:false, message:'Confira os horários do intervalo.' };
+      workedSegments = [[entrada, intervaloIni], [intervaloFim, saida]];
+    }
+
+    const totalMinutes = workedSegments.reduce((sum, segment) => sum + Math.max(0, segment[1] - segment[0]), 0);
+    const nightMinutes = workedSegments.reduce((sum, segment) => sum + nightMinutesInSegment(segment[0], segment[1]), 0);
+
+    if(totalMinutes <= 0) return { ok:false, message:'Confira entrada e saída da jornada.' };
+    if(nightMinutes <= 0) return { ok:false, message:'A jornada informada não possui período noturno entre 22:00 e 05:00.' };
+
+    return { ok:true, totalMinutes, nightMinutes };
+  }
   function showStatus(kind, msg){
     const el=$('status');
     el.className='note '+kind;
@@ -685,10 +788,29 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
 
   $('rural').addEventListener('change', syncPerc);
 
+  $('bt_apurar_jornada').addEventListener('click', ()=>{
+    clearStatus();
+    const result = calculateJourneyNightMinutes();
+    if(!result.ok){
+      $('jornada_resumo').textContent = result.message;
+      showStatus('err', result.message);
+      return;
+    }
+
+    const hours = Math.floor(result.nightMinutes / 60);
+    const minutes = Math.round(result.nightMinutes % 60);
+    $('hora_dia_trab').value = String(hours);
+    $('minutos').value = String(minutes);
+    $('tipo_hora').value = 'diurna';
+    $('jornada_resumo').textContent = `Período noturno apurado: ${formatHHMM(result.nightMinutes)} de ${formatHHMM(result.totalMinutes)} trabalhadas.`;
+    showStatus('ok','Jornada noturna preenchida automaticamente.');
+  });
+
   $('bt_limpar').addEventListener('click', ()=>{
-    ['slr_bruto','hora_contra','hora_dia_trab','minutos','dia_util','feriado','perc_adic'].forEach(id=>$(id).value="");
+    ['slr_bruto','hora_contra','hora_dia_trab','minutos','dia_util','feriado','perc_adic','jornada_entrada','jornada_intervalo_ini','jornada_intervalo_fim','jornada_saida'].forEach(id=>$(id).value="");
     $('tipo_hora').value="diurna";
     $('rural').value="nao";
+    $('jornada_resumo').textContent='Preencha a jornada para apurar o período noturno.';
     $('resBody').innerHTML='<tr><td colspan="2" style="color:#64748b">Preencha os dados e clique em Calcular.</td></tr>';
     $('resultEmpty').style.display='block';
     $('kpi_total').textContent='—';
