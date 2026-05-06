@@ -93,7 +93,8 @@
     h2{margin:0 0 14px;font-size:20px;color:var(--brand)}
     .userRow{
       display:grid;
-      grid-template-columns:1.2fr .9fr;
+      grid-template-columns:1.2fr .9fr auto;
+      align-items:center;
       gap:10px;
       padding:12px 0;
       border-top:1px solid var(--line);
@@ -116,6 +117,17 @@
       text-transform:uppercase;
     }
     .scope--vip{background:#eef3fb;color:#0f3152}
+    .removeBtn{
+      min-height:34px;
+      width:auto;
+      padding:0 12px;
+      border:1px solid #f4d1d1;
+      background:#fff7f7;
+      color:#9f1f1f;
+      border-radius:10px;
+      font-size:12px;
+      font-weight:900;
+    }
     label{display:block;margin:12px 0 7px;font-size:12px;font-weight:900;color:#334155}
     input{
       width:100%;
@@ -194,7 +206,7 @@
     <section class="hero" id="contentHero">
       <span class="eyebrow">Administra&ccedil;&atilde;o</span>
       <h1>Controle de acessos</h1>
-      <p>Veja os acessos cadastrados e gere o bloco pronto para liberar novos usu&aacute;rios no Hub, DIRF / IRPF e Rubricas.</p>
+      <p>Veja os acessos cadastrados, gere novos cadastros e crie a instru&ccedil;&atilde;o para remover usu&aacute;rios quando necess&aacute;rio.</p>
     </section>
     <section class="grid" id="contentGrid">
       <div class="card">
@@ -215,7 +227,7 @@
           <label class="check"><input id="scopeRubricas" type="checkbox"> Rubricas</label>
         </div>
         <button id="generate" type="button">Gerar cadastro</button>
-        <p class="help">O bloco gerado deve ser adicionado no arquivo <strong>auth.js</strong>. Para evitar erro, mande esse bloco para o Codex quando quiser publicar.</p>
+        <p class="help">O bloco gerado deve ser adicionado no arquivo <strong>auth.js</strong>. Para remover, use o bot&atilde;o Excluir na lista de acessos e mande a instru&ccedil;&atilde;o gerada para o Codex.</p>
         <pre id="output">Preencha os dados e clique em gerar cadastro.</pre>
       </div>
     </section>
@@ -235,11 +247,24 @@
     }
 
     const userList = document.getElementById('userList');
+    const output = document.getElementById('output');
     const users = window.BiasonAuth.listUsers();
     userList.innerHTML = users.map((user) => {
       const scopes = user.scopes.map((scope) => `<span class="scope ${scope === 'hub' ? '' : 'scope--vip'}">${scope}</span>`).join('');
-      return `<div class="userRow"><div><div class="userEmail">${user.email}</div><div class="userName">${user.name}</div></div><div class="scopes">${scopes}</div></div>`;
+      return `<div class="userRow"><div><div class="userEmail">${user.email}</div><div class="userName">${user.name}</div></div><div class="scopes">${scopes}</div><button class="removeBtn" type="button" data-remove-email="${user.email}">Excluir</button></div>`;
     }).join('');
+
+    userList.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-remove-email]');
+      if (!button) return;
+      const email = button.getAttribute('data-remove-email');
+      output.textContent = `Remover acesso:
+
+Email: ${email}
+
+Instrução para o Codex:
+Remova do auth.js o usuário com email "${email}" dentro da lista USERS e publique a alteração.`;
+    });
 
     document.getElementById('generate').addEventListener('click', async () => {
       const name = document.getElementById('name').value.trim() || 'Usuario BIASON';
@@ -250,12 +275,12 @@
       if (document.getElementById('scopeRubricas').checked) scopes.push('rubricas');
 
       if (!email || !password) {
-        document.getElementById('output').textContent = 'Informe email e senha para gerar o cadastro.';
+        output.textContent = 'Informe email e senha para gerar o cadastro.';
         return;
       }
 
       const hash = await window.BiasonAuth.hashCredential(email, password);
-      document.getElementById('output').textContent = `{
+      output.textContent = `{
   name: "${name}",
   email: "${email}",
   hash: "${hash}",
