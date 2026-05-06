@@ -454,7 +454,7 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
         </div>
         <div class="bd">
           <p class="help">
-            Informe o salário, horas mensais e a quantidade de horas trabalhadas no período noturno.
+            Informe o salário, horas mensais e a carga horária do período noturno.
             Se você informar as horas em <b>tempo “diurno/relógio”</b>, eu converto para <b>hora noturna reduzida (52m30s)</b> no caso urbano.
             Para <b>rural</b>, não aplico hora reduzida e uso adicional padrão de 25%.
           </p>
@@ -487,7 +487,7 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
             </div>
 
             <div class="field">
-              <label>Horas trabalhadas (h)</label>
+              <label>Carga horária noturna</label>
               <div class="row">
                 <input id="hora_dia_trab" inputmode="numeric" placeholder="Ex.: 8">
                 <input id="minutos" inputmode="numeric" placeholder="min">
@@ -500,8 +500,8 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
             </div>
 
             <div class="field">
-              <label>Dias úteis no mês</label>
-              <input id="dia_util" inputmode="numeric" placeholder="Ex.: 22">
+              <label>Dias úteis no mês (inclua sábados)</label>
+              <input id="dia_util" inputmode="numeric" placeholder="Ex.: 26">
             </div>
 
             <div class="field">
@@ -708,8 +708,8 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
 
     if(!isFinite(salario) || salario<=0) return showStatus('err','Informe um salário bruto válido.');
     if(!isFinite(horasMensais) || horasMensais<=0) return showStatus('err','Informe as horas mensais/contratuais.');
-    if(!isFinite(h) || h<0 || !isFinite(m) || m<0 || m>59) return showStatus('err','Informe horas e minutos trabalhados corretamente.');
-    if(!isFinite(diasUteis) || diasUteis<=0) return showStatus('err','Informe os dias úteis do mês.');
+    if(!isFinite(h) || h<0 || !isFinite(m) || m<0 || m>59) return showStatus('err','Informe a carga horária noturna corretamente.');
+    if(!isFinite(diasUteis) || diasUteis<=0) return showStatus('err','Informe os dias úteis do mês, incluindo sábados.');
     if(!isFinite(feriados) || feriados<0) return showStatus('err','Informe domingos/feriados do mês.');
     if(!isFinite(perc) || perc<=0) perc = rural ? 25 : 20;
     const domingosFeriados = feriados;
