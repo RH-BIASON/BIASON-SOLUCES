@@ -195,6 +195,7 @@
       align-items:stretch;
     }
     .card{
+      position:relative;
       display:flex;
       flex-direction:column;
       min-height:232px;
@@ -203,6 +204,7 @@
       border:1px solid var(--line);
       border-radius:20px;
       box-shadow:var(--shadow);
+      overflow:hidden;
     }
     .card:hover{transform:translateY(-4px)}
     .cardIcon{
@@ -285,6 +287,25 @@
       background:
         linear-gradient(180deg, rgba(10,123,143,.04), rgba(255,255,255,.98) 22%),
         #fff;
+    }
+    .vipRibbon{
+      position:absolute;
+      top:14px;
+      right:-38px;
+      z-index:2;
+      width:150px;
+      min-height:28px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transform:rotate(36deg);
+      background:linear-gradient(90deg,#0f3152,#0a7b8f);
+      color:#fff;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      box-shadow:0 12px 24px -18px rgba(8,26,36,.75);
     }
     .suggestionCard{
       grid-column:span 2;
@@ -552,6 +573,9 @@
         break-inside:avoid;
         page-break-inside:avoid;
       }
+      .vipRibbon{
+        display:none;
+      }
       .cardIconWrap{
         display:none;
       }
@@ -696,6 +720,7 @@
 
 
         <article class="card card--featured" data-search="rubricas consulta cruzamento tabela incidencias">
+          <span class="vipRibbon">Acesso VIP</span>
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="search-check"></i></span>
           <span class="cardTag">Consulta oficial</span>
           <h3>Rubricas Atualizadas</h3>
@@ -730,6 +755,7 @@
 
 
         <article class="card card--featured" data-search="dirf irpf xml s-5002 comprovante relatorio lote funcionarios planilha zip">
+          <span class="vipRibbon">Acesso VIP</span>
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="receipt-text"></i></span>
           <span class="cardTag">Comprovantes</span>
           <h3>DIRF / IRPF</h3>
