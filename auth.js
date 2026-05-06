@@ -27,8 +27,8 @@
     {
       name: "Lucas Biason",
       email: "lucasg@biason.net",
-      hash: "bca50f9e2979cfe88613a8f028d1ab0472544e94bb7c4de4bb62229d32527dff",
-      scopes: ["hub"],
+      hash: "0a5ae4ae94acbb309f3de271dca65245a97e5af0471dfbe6425cc30a9f113fca",
+      scopes: ["hub", "dirf", "rubricas"],
     },
     {
       name: "Maria Biason",
