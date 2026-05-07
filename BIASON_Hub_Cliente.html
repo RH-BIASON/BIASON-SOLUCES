@@ -237,12 +237,6 @@
       color:#fff;
       border-color:#0a7b8f;
     }
-    .quickPanels{
-      display:grid;
-      grid-template-columns:1.2fr .8fr;
-      gap:16px;
-      margin:0 0 18px;
-    }
     .quickPanel{
       border:1px solid rgba(15,23,42,.08);
       border-radius:20px;
@@ -269,26 +263,6 @@
       font-size:12px;
       line-height:1.45;
     }
-    .favoriteList{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-    .favoriteChip{
-      display:inline-flex;
-      align-items:center;
-      gap:7px;
-      min-height:34px;
-      padding:0 11px;
-      border-radius:999px;
-      border:1px solid rgba(10,123,143,.18);
-      background:#fff;
-      color:#0b1b2a;
-      font-size:12px;
-      font-weight:800;
-      cursor:pointer;
-    }
-    .favoriteChip:hover{transform:translateY(-1px);border-color:#0a7b8f}
     .newsList{
       display:grid;
       gap:8px;
@@ -667,7 +641,6 @@
 
     @media (max-width:1180px){
       .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-      .quickPanels{grid-template-columns:1fr}
     }
     @media (max-width:760px){
       .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -722,6 +695,7 @@
       <div class="hubControls">
         <div class="categoryTabs" id="categoryTabs" aria-label="Categorias de ferramentas">
           <button class="categoryTab is-active" type="button" data-category="todas">Todas</button>
+          <button class="categoryTab" type="button" data-category="favoritos">Favoritos</button>
           <button class="categoryTab" type="button" data-category="folha">Folha</button>
           <button class="categoryTab" type="button" data-category="encargos">Encargos</button>
           <button class="categoryTab" type="button" data-category="rescisao">Rescisão</button>
@@ -730,16 +704,7 @@
         </div>
       </div>
 
-      <div class="quickPanels">
-        <section class="quickPanel" aria-labelledby="favoritesTitle">
-          <div class="quickPanel__head">
-            <div>
-              <h3 id="favoritesTitle">Favoritos deste acesso</h3>
-              <p>Salvos para o e-mail logado neste navegador.</p>
-            </div>
-          </div>
-          <div class="favoriteList" id="favoriteList"></div>
-        </section>
+      <div class="hubControls">
         <section class="quickPanel" aria-labelledby="newsTitle">
           <div class="quickPanel__head">
             <div>
@@ -961,7 +926,6 @@
     const viewerNewTab = document.getElementById('viewerNewTab');
     const searchInput = document.getElementById('toolSearch');
     const categoryTabs = document.getElementById('categoryTabs');
-    const favoriteList = document.getElementById('favoriteList');
     const cards = Array.from(document.querySelectorAll('#toolGrid .card'));
     const userPill = document.getElementById('userPill');
     const accessAdminLink = document.getElementById('accessAdminLink');
@@ -1077,30 +1041,6 @@
           button.setAttribute('aria-pressed', active ? 'true' : 'false');
         }
       });
-
-      favoriteList.innerHTML = '';
-      const favoriteCards = favorites
-        .map((key) => cards.find((card) => card.dataset.key === key))
-        .filter(Boolean);
-
-      if(!favoriteCards.length){
-        const empty = document.createElement('p');
-        empty.textContent = 'Use a estrela nos cards para montar seus atalhos.';
-        favoriteList.appendChild(empty);
-        return;
-      }
-
-      favoriteCards.forEach((card) => {
-        const primary = card.querySelector('[data-open-file]');
-        const chip = document.createElement('button');
-        chip.className = 'favoriteChip';
-        chip.type = 'button';
-        chip.innerHTML = `<i data-lucide="star"></i><span>${cardLabel(card)}</span>`;
-        chip.addEventListener('click', () => {
-          openTool(primary.getAttribute('data-open-file'), primary.getAttribute('data-label') || cardLabel(card));
-        });
-        favoriteList.appendChild(chip);
-      });
     }
 
     function openTool(file, label){
@@ -1154,7 +1094,9 @@
       let visibleCount = 0;
       cards.forEach((card) => {
         const haystack = normalizeText(`${card.dataset.search || ''} ${card.textContent || ''}`);
-        const categoryMatch = activeCategory === 'todas' || card.dataset.category === activeCategory;
+        const categoryMatch = activeCategory === 'todas'
+          || card.dataset.category === activeCategory
+          || (activeCategory === 'favoritos' && favorites.includes(card.dataset.key));
         const baseMatch = !query.base.length || query.base.every((term) => haystack.includes(term));
         const expandedMatch = !query.expanded.length || query.expanded.some((term) => haystack.includes(term));
         const queryMatch = baseMatch || expandedMatch;
@@ -1167,7 +1109,9 @@
         empty = document.createElement('div');
         empty.id = 'emptyState';
         empty.className = 'emptyState';
-        empty.textContent = 'Nenhuma ferramenta encontrada. Tente buscar por outro termo ou mudar a categoria.';
+        empty.textContent = activeCategory === 'favoritos'
+          ? 'Nenhum favorito salvo ainda. Use a estrela nos cards para montar seus atalhos.'
+          : 'Nenhuma ferramenta encontrada. Tente buscar por outro termo ou mudar a categoria.';
         document.getElementById('toolGrid').appendChild(empty);
       }
       empty.style.display = visibleCount ? 'none' : 'block';
