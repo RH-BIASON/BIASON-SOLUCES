@@ -87,6 +87,8 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
 .reportItem strong{display:block;font-size:clamp(20px,2.2vw,24px);line-height:1.15;letter-spacing:0;color:#081a24;white-space:normal;overflow-wrap:anywhere}
 .reportItem small{display:block;margin-top:6px;color:#526173;font-size:12px;line-height:1.45}
 .reportNote{margin:12px 0 0;padding:14px 16px;border-radius:16px;background:rgba(11,61,145,.06);border:1px solid rgba(11,61,145,.10);color:#234;font-size:13px;line-height:1.6}
+.receipt{margin-top:16px;border:1px dashed rgba(11,61,145,.24);border-radius:18px;padding:18px;background:linear-gradient(180deg,rgba(247,251,255,.95),#fff);line-height:1.7;color:#1b2d40;font-size:13px}
+.receipt strong{color:var(--brand)}
 .screenOnly{}
 @media (max-width: 920px){.grid{grid-template-columns:1fr}.form{grid-template-columns:1fr}.journeyQuickGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width: 520px){.journeyQuickGrid{grid-template-columns:1fr}}
@@ -622,6 +624,16 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
             </table>
 
             <p class="reportNote" id="reportNote">Preencha os dados do cálculo para gerar o demonstrativo final do adicional noturno.</p>
+            <div class="receipt" id="reciboNoturno">
+              <strong>Recibo de Adicional Noturno</strong><br>
+              Recebi a importancia de <strong>R$ 0,00</strong> referente ao adicional noturno demonstrado.<br><br>
+              Adicional sem DSR: R$ 0,00<br>
+              Reflexo de DSR: R$ 0,00<br>
+              Total estimado: R$ 0,00<br><br>
+              Local e data: _____________________________________________<br><br>
+              _____________________________________________<br>
+              Assinatura
+            </div>
           </section>
         </div>
       </section>
@@ -731,6 +743,7 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
       ['Total estimado','R$ 0,00']
     ].map(r=>`<tr><td>${r[0]}</td><td><b>${r[1]}</b></td></tr>`).join('');
     $('reportNote').textContent = 'Preencha os dados do cálculo para gerar o demonstrativo final do adicional noturno.';
+    $('reciboNoturno').innerHTML = '<strong>Recibo de Adicional Noturno</strong><br>Recebi a importancia de <strong>R$ 0,00</strong> referente ao adicional noturno demonstrado.<br><br>Adicional sem DSR: R$ 0,00<br>Reflexo de DSR: R$ 0,00<br>Total estimado: R$ 0,00<br><br>Local e data: _____________________________________________<br><br>_____________________________________________<br>Assinatura';
   }
   function renderReport(model){
     $('reportSalario').textContent = fmtBRL(model.salario);
@@ -750,6 +763,16 @@ button{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 1
       ['Total estimado com DSR', fmtBRL(model.totalComDSR)]
     ].map(r=>`<tr><td>${r[0]}</td><td><b>${r[1]}</b></td></tr>`).join('');
     $('reportNote').textContent = model.observacao;
+    $('reciboNoturno').innerHTML = `
+      <strong>Recibo de Adicional Noturno</strong><br>
+      Recebi a importancia de <strong>${fmtBRL(model.totalComDSR)}</strong> referente ao adicional noturno demonstrado.<br><br>
+      Adicional sem DSR: ${fmtBRL(model.totalAdicional)}<br>
+      Reflexo de DSR: ${fmtBRL(model.valorDSR)}<br>
+      Total estimado: ${fmtBRL(model.totalComDSR)}<br><br>
+      Local e data: _____________________________________________<br><br>
+      _____________________________________________<br>
+      Assinatura
+    `;
   }
 
   function syncPerc(){

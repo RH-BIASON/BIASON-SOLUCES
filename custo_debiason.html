@@ -546,6 +546,17 @@
       font-weight:800;
       letter-spacing:.08em;
     }
+    .receipt{
+      margin-top:16px;
+      padding:18px;
+      border:1px dashed rgba(11,61,145,.24);
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(247,251,255,.95), #fff);
+      color:#1b2d40;
+      font-size:13px;
+      line-height:1.7;
+    }
+    .receipt strong{color:var(--biason-brand)}
     @media (max-width: 1024px){
       main{grid-template-columns:1fr}
       .guide{position:static;top:auto}
@@ -967,6 +978,17 @@
           Esta calculadora fornece uma <strong>estimativa</strong> de custo mensal. Não contempla particularidades como
           convenções coletivas, adicionais variáveis não informados, desoneração, rescisões, afastamentos, etc.
         </div>
+        <div class="receipt" id="reciboCusto">
+          <strong>Resumo de custo mensal</strong><br>
+          Demonstrativo estimado do custo mensal do colaborador.<br><br>
+          Base remuneratoria: R$ 0,00<br>
+          Encargos totais: R$ 0,00<br>
+          Beneficios mensais: R$ 0,00<br>
+          Custo total estimado: R$ 0,00<br><br>
+          Local e data: _____________________________________________<br><br>
+          _____________________________________________<br>
+          Conferencia
+        </div>
       </div>
     </div>
   </main>
@@ -1117,6 +1139,17 @@
       } else {
         $('note').innerHTML = 'Esta calculadora fornece uma <strong>estimativa</strong> de custo mensal. Não contempla particularidades como convenções coletivas, adicionais variáveis não informados, desoneração, rescisões, afastamentos, etc.';
       }
+      $('reciboCusto').innerHTML = `
+        <strong>Resumo de custo mensal</strong><br>
+        Demonstrativo estimado do custo mensal do colaborador.<br><br>
+        Base remuneratoria: ${brl(s.baseRemuneratoria)}<br>
+        Encargos totais: ${brl(s.encargos + s.encargosSobreProvisao)}<br>
+        Beneficios mensais: ${brl(s.beneficios)}<br>
+        Custo total estimado: ${brl(s.total)}<br><br>
+        Local e data: _____________________________________________<br><br>
+        _____________________________________________<br>
+        Conferencia
+      `;
       return s;
     }
 

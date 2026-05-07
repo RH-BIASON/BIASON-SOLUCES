@@ -446,6 +446,17 @@
       padding:10px 0;
       font-size:13px;
     }
+    .receipt{
+      margin-top:16px;
+      padding:18px;
+      border:1px dashed rgba(11,61,145,.24);
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(247,251,255,.95), #fff);
+      color:#1b2d40;
+      font-size:13px;
+      line-height:1.7;
+    }
+    .receipt strong{color:var(--biason-brand)}
     .alert{
       border-radius:16px;
       font-weight:700;
@@ -922,6 +933,17 @@
         </div>
         <div style="margin-top:0.5rem; font-size:0.8rem; color:var(--color-text-secondary);" id="pillTempo">Preencha os dados acima e clique em Calcular para completar o cenário do relatório.</div>
       </div>
+      <div class="receipt" id="reciboRescisao">
+        <strong>Recibo de Rescisao</strong><br>
+        Recebi a importancia de <strong>R$ 0,00</strong> referente as verbas rescisorias demonstradas.<br><br>
+        Verbas calculadas: R$ 0,00<br>
+        Descontos estimados: R$ 0,00<br>
+        Multa do FGTS: R$ 0,00<br>
+        Liquido estimado: R$ 0,00<br><br>
+        Local e data: _____________________________________________<br><br>
+        _____________________________________________<br>
+        Assinatura
+      </div>
     </div>
   </main>
   <script>
@@ -1141,6 +1163,17 @@
       document.getElementById('resumo_descontos').textContent = brl.format(descontos);
       document.getElementById('resumo_multa_fgts').textContent = brl.format(H9);
       document.getElementById('resumo_total').textContent = brl.format(H12);
+      document.getElementById('reciboRescisao').innerHTML = `
+        <strong>Recibo de Rescisao</strong><br>
+        Recebi a importancia de <strong>${brl.format(H12)}</strong> referente as verbas rescisorias demonstradas.<br><br>
+        Verbas calculadas: ${brl.format(E14)}<br>
+        Descontos estimados: ${brl.format(descontos)}<br>
+        Multa do FGTS: ${brl.format(H9)}<br>
+        Liquido estimado: ${brl.format(H12)}<br><br>
+        Local e data: _____________________________________________<br><br>
+        _____________________________________________<br>
+        Assinatura
+      `;
       // Atualiza pill de tempo
       const pill = document.getElementById('pillTempo');
       if (pill){
@@ -1218,6 +1251,7 @@
       document.getElementById('resumo_descontos').textContent = 'R$ 0,00';
       document.getElementById('resumo_multa_fgts').textContent = 'R$ 0,00';
       document.getElementById('resumo_total').textContent = 'R$ 0,00';
+      document.getElementById('reciboRescisao').innerHTML = '<strong>Recibo de Rescisao</strong><br>Recebi a importancia de <strong>R$ 0,00</strong> referente as verbas rescisorias demonstradas.<br><br>Verbas calculadas: R$ 0,00<br>Descontos estimados: R$ 0,00<br>Multa do FGTS: R$ 0,00<br>Liquido estimado: R$ 0,00<br><br>Local e data: _____________________________________________<br><br>_____________________________________________<br>Assinatura';
       document.getElementById('det_verbas').innerHTML = '';
       document.getElementById('det_descontos').innerHTML = '';
       document.getElementById('det_consignado').innerHTML = consignadoPlaceholderHTML();

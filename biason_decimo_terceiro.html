@@ -308,6 +308,18 @@
       line-height:1.65;
     }
 
+    .receipt{
+      margin-top:16px;
+      padding:18px;
+      border:1px dashed rgba(11,61,145,.24);
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(247,251,255,.95), #fff);
+      color:#1b2d40;
+      font-size:13px;
+      line-height:1.7;
+    }
+    .receipt strong{color:var(--brand)}
+
     #printReport{display:none;background:#fff;color:#111;padding:24px;font-family:Arial,Helvetica,sans-serif}
     #printReport h1{font-size:22px;margin:0 0 10px}
     #printReport h2{font-size:15px;margin:20px 0 8px;border-bottom:1px solid #ddd;padding-bottom:6px}
@@ -493,6 +505,18 @@
             <div class="footnote" id="obsParcela">
               Informe os dados e clique em calcular para gerar o demonstrativo.
             </div>
+          </div>
+
+          <div class="receipt" id="recibo13">
+            <strong>Recibo de 13o Salario</strong><br>
+            Recebi a importancia de <strong>R$ 0,00</strong> referente ao pagamento do 13o salario.<br><br>
+            Parcela: ________________________________________________<br>
+            Proventos: R$ 0,00<br>
+            Descontos: R$ 0,00<br>
+            Liquido: R$ 0,00<br><br>
+            Local e data: _____________________________________________<br><br>
+            _____________________________________________<br>
+            Assinatura
           </div>
         </div>
 
@@ -861,6 +885,18 @@
       $("rLiquido").textContent = formatMoney(r.liquido);
       $("rObs").textContent = r.obs;
       $("rTecnica").textContent = r.tecnica.join(' ');
+
+      $("recibo13").innerHTML = `
+        <strong>Recibo de 13o Salario</strong><br>
+        Recebi a importancia de <strong>${formatMoney(r.liquido)}</strong> referente ao pagamento do 13o salario.<br><br>
+        Parcela: ${['','Primeira parcela','Segunda parcela','Parcela unica'][r.parcela]} (${r.ref})<br>
+        Proventos: ${formatMoney(r.brutoExibido)}<br>
+        Descontos: ${formatMoney(r.totalDescontos)}<br>
+        Liquido: ${formatMoney(r.liquido)}<br><br>
+        Local e data: _____________________________________________<br><br>
+        _____________________________________________<br>
+        Assinatura
+      `;
     }
 
     function clearAll(){
