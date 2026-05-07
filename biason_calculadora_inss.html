@@ -428,6 +428,7 @@
       <div class="actions">
         <button class="btn-primary" id="calcular">Calcular</button>
         <button class="btn-secondary" id="limpar">Limpar</button>
+        <button class="btn-secondary" id="imprimir" type="button">Imprimir demonstrativo</button>
       </div>
       <div id="status" class="status"></div>
 
@@ -492,6 +493,17 @@
       </div>
 
       <div class="callout" id="calloutTeto">Ao informar um valor acima do teto da tabela, a calculadora limita automaticamente a base de contribuição para o cálculo do desconto.</div>
+
+      <div class="receipt" id="reciboInss">
+        <strong>Demonstrativo de INSS</strong><br>
+        Tabela selecionada: 2026<br>
+        Salario informado: R$ 0,00<br>
+        Base considerada: R$ 0,00<br>
+        Desconto INSS: R$ 0,00<br>
+        Aliquota efetiva: 0,00%<br><br>
+        Observacao: demonstrativo de conferencia do desconto previdenciario calculado pela tabela progressiva.<br>
+        Emitido em: ________________________________________________
+      </div>
 
       <div class="footnote">
         Referências oficiais: <a target="_blank" rel="noopener" href="https://www.gov.br/inss/pt-br/direitos-e-deveres/inscricao-e-contribuicao/tabela-de-contribuicao-mensal">tabela de contribuição mensal do INSS</a> e <a target="_blank" rel="noopener" href="https://www.gov.br/inss/pt-br/assuntos/com-reajuste-de-3-9-teto-do-inss-chega-a-r-8-475-55-em-2026">comunicado do reajuste de 2026</a>.
@@ -678,6 +690,16 @@ function clearNode(node){
       `;
 
       $('calloutTeto').style.display = salaryCents > result.taxable ? 'block' : 'none';
+      $('reciboInss').innerHTML = `
+        <strong>Demonstrativo de INSS</strong><br>
+        Tabela selecionada: ${result.table.label}<br>
+        Salario informado: ${formatCents(salaryCents)}<br>
+        Base considerada: ${formatCents(result.taxable)}<br>
+        Desconto INSS: ${formatCents(result.total)}<br>
+        Aliquota efetiva: ${formatPercentFromRatio(result.effective * 100)}<br><br>
+        Observacao: demonstrativo de conferencia do desconto previdenciario calculado pela tabela progressiva.<br>
+        Emitido em: ________________________________________________
+      `;
     }
 
     function resetForm(){
@@ -704,6 +726,10 @@ function clearNode(node){
     maskCurrencyInput($('salario'));
     $('calcular').addEventListener('click', onCalculate);
     $('limpar').addEventListener('click', resetForm);
+    $('imprimir').addEventListener('click', () => {
+      onCalculate();
+      if ($('status').className.includes('success')) window.print();
+    });
     render(calculateInss(0n, '2026'), 0n);
   </script>
 </body>
