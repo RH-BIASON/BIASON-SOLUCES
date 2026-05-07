@@ -329,120 +329,6 @@
       text-transform:uppercase;
       box-shadow:0 12px 24px -18px rgba(8,26,36,.75);
     }
-    .suggestionCard{
-      grid-column:span 2;
-      min-height:232px;
-      background:
-        radial-gradient(circle at top right, rgba(10,123,143,.12), transparent 34%),
-        linear-gradient(145deg, #ffffff, #f6fbfd);
-    }
-    .suggestionHeader{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:12px;
-    }
-    .suggestionTitle h3{
-      min-height:0;
-      margin-bottom:4px;
-    }
-    .suggestionEmail{
-      color:#526173;
-      font-size:12px;
-      font-weight:700;
-      word-break:break-all;
-    }
-    .suggestionForm{
-      display:grid;
-      grid-template-columns:160px 1fr auto;
-      gap:10px;
-      align-items:start;
-      margin-top:auto;
-    }
-    .suggestionForm select,
-    .suggestionForm textarea{
-      width:100%;
-      min-height:44px;
-      border:1px solid rgba(15,23,42,.12);
-      border-radius:14px;
-      background:#fff;
-      color:var(--ink);
-      font:inherit;
-      font-size:13px;
-      box-shadow:0 10px 24px -22px rgba(8,26,36,.35);
-    }
-    .suggestionForm select{
-      padding:0 12px;
-    }
-    .suggestionForm textarea{
-      height:44px;
-      max-height:96px;
-      resize:vertical;
-      padding:12px;
-    }
-    .suggestionList{
-      display:grid;
-      gap:8px;
-      margin:12px 0 0;
-    }
-    .suggestionActions{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:12px;
-    }
-    .suggestionActions .button{
-      width:auto;
-      min-width:132px;
-      min-height:38px;
-      padding:0 14px;
-      font-size:13px;
-    }
-    .suggestionItem{
-      display:grid;
-      gap:4px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(15,23,42,.09);
-      background:rgba(255,255,255,.72);
-      color:#334155;
-      font-size:12px;
-      line-height:1.35;
-    }
-    .suggestionItem strong{
-      color:#081a24;
-      font-size:12px;
-    }
-    .suggestionItem a{
-      color:inherit;
-      text-decoration:none;
-    }
-    .suggestionItem a:hover{
-      color:#0369a1;
-    }
-    .suggestionItem span{
-      color:#64748b;
-      font-size:11px;
-    }
-    .suggestionNotice{
-      margin-top:12px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(10,123,143,.18);
-      background:rgba(10,123,143,.08);
-      color:#0f3152;
-      font-size:12px;
-      font-weight:700;
-      line-height:1.35;
-    }
-    .suggestionEmpty{
-      margin:10px 0 0;
-      color:#64748b;
-      font-size:12px;
-    }
     .hidden{display:none !important}
 
     .viewer{
@@ -601,12 +487,6 @@
       .cardIconWrap{
         display:none;
       }
-      .suggestionCard{
-        grid-column:span 3;
-      }
-      .suggestionForm{
-        grid-template-columns:1fr;
-      }
       .cardTag{
         min-height:20px;
         padding:0 7px;
@@ -642,21 +522,14 @@
 
     @media (max-width:1180px){
       .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-      .suggestionCard{grid-column:span 3}
-      .suggestionForm{grid-template-columns:150px 1fr}
-      .suggestionForm .button{grid-column:1 / -1}
     }
     @media (max-width:760px){
       .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
       .hero h1{font-size:34px}
-      .suggestionCard{grid-column:span 2}
-      .suggestionForm{grid-template-columns:1fr}
-      .suggestionForm .button{grid-column:auto}
     }
     @media (max-width:620px){
       main{padding:18px 14px 34px}
       .grid{grid-template-columns:1fr}
-      .suggestionCard{grid-column:auto}
       .viewer{padding:10px}
       .viewer__panel{height:calc(100vh - 20px)}
     }
@@ -871,31 +744,6 @@
           </div>
         </article>
 
-        <article class="card suggestionCard" data-search="sugestao melhoria pedido feedback ferramenta">
-          <div class="suggestionHeader">
-            <div class="suggestionTitle">
-              <span class="cardIconWrap"><i class="cardIcon" data-lucide="message-square-plus"></i></span>
-              <span class="cardTag">Sugestões</span>
-              <h3>Enviar melhoria</h3>
-              <div class="suggestionEmail" id="suggestionEmail">Identificando usuário...</div>
-            </div>
-          </div>
-          <p>Registre ideias para novas ferramentas, ajustes de cálculo ou melhorias de uso. A equipe BIASON acompanha e prioriza as melhorias.</p>
-          <form class="suggestionForm" id="suggestionForm">
-            <select id="suggestionCategory" aria-label="Categoria da sugestão">
-              <option value="Nova ferramenta">Nova ferramenta</option>
-              <option value="Melhoria">Melhoria</option>
-              <option value="Correção">Correção</option>
-            </select>
-            <textarea id="suggestionText" aria-label="Texto da sugestão" placeholder="Descreva a sugestão" required></textarea>
-            <button class="button" type="submit">Publicar</button>
-          </form>
-          <div class="suggestionList" id="suggestionList"></div>
-          <div class="suggestionActions">
-            <a class="button button--ghost" id="suggestionAllLink" href="https://github.com/RH-BIASON/BIASON-SOLUCES/issues" target="_blank" rel="noopener">Ver todas</a>
-          </div>
-        </article>
-
       </div>
     </section>
 
@@ -927,27 +775,17 @@
     const viewerNewTab = document.getElementById('viewerNewTab');
     const searchInput = document.getElementById('toolSearch');
     const cards = Array.from(document.querySelectorAll('#toolGrid .card'));
-    const suggestionForm = document.getElementById('suggestionForm');
-    const suggestionCategory = document.getElementById('suggestionCategory');
-    const suggestionText = document.getElementById('suggestionText');
-    const suggestionEmail = document.getElementById('suggestionEmail');
-    const suggestionList = document.getElementById('suggestionList');
-    const suggestionAllLink = document.getElementById('suggestionAllLink');
     const userPill = document.getElementById('userPill');
     const accessAdminLink = document.getElementById('accessAdminLink');
-    const suggestionRepo = 'RH-BIASON/BIASON-SOLUCES';
-    const suggestionIssueListUrl = `https://github.com/${suggestionRepo}/issues?q=is%3Aissue+is%3Aopen+%5BSugest%C3%A3o%5D`;
-    const suggestionApiUrl = `https://api.github.com/repos/${suggestionRepo}/issues?state=open&per_page=20`;
     const hubSession = window.BiasonAuth && window.BiasonAuth.getSession
       ? window.BiasonAuth.getSession('hub')
       : null;
     const currentUserEmail = hubSession && hubSession.email ? hubSession.email : 'usuario nao identificado';
-    const internalSuggestionEmails = new Set(['admin@biason.com.br', 'rh@biason.com.br']);
-    const canPublishSuggestionIssue = internalSuggestionEmails.has(currentUserEmail);
+    const internalAdminEmails = new Set(['admin@biason.com.br', 'rh@biason.com.br']);
     const hasVipAccess = hubSession && (window.BiasonAuth.hasScope(hubSession, 'dirf') || window.BiasonAuth.hasScope(hubSession, 'rubricas'));
 
     userPill.innerHTML = `${currentUserEmail} <span class="userPill__status">${hasVipAccess ? 'Acesso VIP' : 'Acesso padrão'}</span>`;
-    if (canPublishSuggestionIssue) accessAdminLink.style.display = 'inline-flex';
+    if (internalAdminEmails.has(currentUserEmail)) accessAdminLink.style.display = 'inline-flex';
 
     let currentFile = '';
     let currentLabel = '';
@@ -1012,113 +850,6 @@
       });
     });
 
-    function setSuggestionMessage(message){
-      suggestionList.innerHTML = '';
-      const empty = document.createElement('div');
-      empty.className = 'suggestionEmpty';
-      empty.textContent = message;
-      suggestionList.appendChild(empty);
-    }
-
-    function setSuggestionNotice(message){
-      const currentNotice = document.querySelector('.suggestionNotice');
-      if(currentNotice) currentNotice.remove();
-
-      const notice = document.createElement('div');
-      notice.className = 'suggestionNotice';
-      notice.textContent = message;
-      suggestionForm.insertAdjacentElement('afterend', notice);
-      window.setTimeout(() => notice.remove(), 5200);
-    }
-
-    function issueDate(value){
-      return new Date(value).toLocaleDateString('pt-BR');
-    }
-
-    async function renderSuggestions(){
-      suggestionEmail.textContent = currentUserEmail;
-      suggestionAllLink.href = suggestionIssueListUrl;
-      setSuggestionMessage('Carregando sugestões públicas...');
-
-      let issues = [];
-      try{
-        const response = await fetch(suggestionApiUrl, {
-          headers: { Accept: 'application/vnd.github+json' },
-        });
-        if(!response.ok) throw new Error('GitHub indisponivel');
-        const data = await response.json();
-        issues = data
-          .filter((item) => !item.pull_request && item.title && item.title.startsWith('[Sugestão]'))
-          .slice(0, 3);
-      }catch(error){
-        setSuggestionMessage('Não foi possível carregar as sugestões agora.');
-        return;
-      }
-
-      suggestionList.innerHTML = '';
-
-      if(!issues.length){
-        setSuggestionMessage('Nenhuma sugestão pública aberta ainda.');
-        return;
-      }
-
-      issues.forEach((item) => {
-        const row = document.createElement('div');
-        row.className = 'suggestionItem';
-
-        const link = document.createElement('a');
-        link.href = item.html_url;
-        link.target = '_blank';
-        link.rel = 'noopener';
-
-        const title = document.createElement('strong');
-        title.textContent = item.title.replace('[Sugestão]', '').trim();
-
-        const meta = document.createElement('span');
-        const author = item.user && item.user.login ? item.user.login : 'usuario';
-        meta.textContent = `${author} • ${issueDate(item.created_at)}`;
-
-        const text = document.createElement('div');
-        text.textContent = item.body ? item.body.split('\n').find((line) => line.trim() && !line.startsWith('##')) || 'Abrir sugestão' : 'Abrir sugestão';
-
-        link.append(title, meta, text);
-        row.appendChild(link);
-        suggestionList.appendChild(row);
-      });
-    }
-
-    suggestionForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const text = suggestionText.value.trim();
-      if(!text) return;
-
-      if(!canPublishSuggestionIssue){
-        suggestionText.value = '';
-        setSuggestionNotice('Sugestão enviada. Obrigado por ajudar a melhorar o hub.');
-        return;
-      }
-
-      const shortTitle = text.length > 70 ? `${text.slice(0, 70)}...` : text;
-      const title = `[Sugestão] ${suggestionCategory.value}: ${shortTitle}`;
-      const body = [
-        '## Sugestão',
-        text,
-        '',
-        '## Categoria',
-        suggestionCategory.value,
-        '',
-        '## E-mail logado',
-        currentUserEmail,
-        '',
-        '## Origem',
-        'Hub Trabalhista BIASON',
-      ].join('\n');
-      const url = new URL(`https://github.com/${suggestionRepo}/issues/new`);
-      url.searchParams.set('title', title);
-      url.searchParams.set('body', body);
-      window.open(url.href, '_blank', 'noopener');
-    });
-
     window.addEventListener('message', (event) => {
       try{
         const msg = event && event.data;
@@ -1135,7 +866,6 @@
       window.lucide.createIcons();
     }
 
-    renderSuggestions();
   </script>
 </body>
 </html>
