@@ -424,7 +424,6 @@
         <button class="btn btn-primary" id="btnCalc" type="button">Calcular</button>
         <button class="btn btn-secondary" id="btnClear" type="button">Limpar</button>
         <button class="btn btn-ghost" id="btnPrint" type="button">Imprimir relatório</button>
-        <button class="btn btn-ghost" id="btnCopyReceipt" type="button">Copiar resumo</button>
       </div>
       <div class="status" id="status"></div>
 
@@ -889,23 +888,6 @@
     $("btnPrint").addEventListener('click', () => {
       const r = calculate();
       if (r) window.print();
-    });
-    $("btnCopyReceipt").addEventListener('click', async () => {
-      const r = calculate();
-      if (!r) return;
-      const text = $("printReport").innerText.trim();
-      try {
-        await navigator.clipboard.writeText(text);
-      } catch (err) {
-        const area = document.createElement('textarea');
-        area.value = text;
-        document.body.appendChild(area);
-        area.select();
-        document.execCommand('copy');
-        area.remove();
-      }
-      $("status").className = 'status success';
-      $("status").textContent = 'Resumo copiado. Agora e so colar no Word.';
     });
 
     [$("salario"), $("hex")].forEach(maskCurrencyInput);

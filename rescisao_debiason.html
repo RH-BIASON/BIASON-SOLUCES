@@ -876,7 +876,6 @@
         <button class="btn-primary" id="btnCalc">Calcular</button>
         <button class="btn-secondary" id="btnReset">Limpar</button>
         <button class="btn-danger" id="btnPrint">Imprimir demonstrativo</button>
-        <button class="btn-secondary" id="btnCopyReceipt" type="button">Copiar resumo</button>
       </div>
       <div class="reportBanner">
         <div class="reportBanner__eyebrow">Demonstrativo final</div>
@@ -1232,43 +1231,6 @@
     document.getElementById('btnCalc').addEventListener('click', () => { calcular(); });
     document.getElementById('btnReset').addEventListener('click', () => { limpar(); });
     document.getElementById('btnPrint').addEventListener('click', () => { calcular(); window.print(); });
-    document.getElementById('btnCopyReceipt').addEventListener('click', async () => {
-      calcular();
-      const text = [
-        'BIASON | Resumo de Rescisao',
-        document.getElementById('reportSummaryText').innerText,
-        document.getElementById('reportMeta').innerText,
-        '',
-        'Verbas calculadas: ' + document.getElementById('resumo_verbas').innerText,
-        'Descontos estimados: ' + document.getElementById('resumo_descontos').innerText,
-        'Multa do FGTS: ' + document.getElementById('resumo_multa_fgts').innerText,
-        'Valor liquido estimado: ' + document.getElementById('resumo_total').innerText,
-        '',
-        'Composicao das verbas',
-        document.getElementById('det_verbas').innerText,
-        '',
-        'Descontos legais',
-        document.getElementById('det_descontos').innerText,
-        '',
-        'FGTS e valor final',
-        document.getElementById('det_fgts').innerText,
-        '',
-        'Local e data: _____________________________________________',
-        'Conferencia / assinatura: __________________________________'
-      ].join('\n');
-      try {
-        await navigator.clipboard.writeText(text);
-      } catch (err) {
-        const area = document.createElement('textarea');
-        area.value = text;
-        document.body.appendChild(area);
-        area.select();
-        document.execCommand('copy');
-        area.remove();
-      }
-      const pill = document.getElementById('pillTempo');
-      if (pill) pill.textContent = 'Resumo copiado. Agora e so colar no Word.';
-    });
     document.getElementById('tipoRescisao').addEventListener('change', (event) => {
       aplicarB8Visual();
       toggleModo(event.target.value);

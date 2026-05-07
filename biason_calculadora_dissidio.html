@@ -472,7 +472,6 @@
         <button class="btn-primary" id="calcular" type="button">Calcular diss&iacute;dio</button>
         <button class="btn-secondary" id="limpar" type="button">Limpar</button>
         <button class="btn-ghost" id="imprimir" type="button">Imprimir</button>
-        <button class="btn-ghost" id="copiarResumo" type="button">Copiar resumo</button>
       </div>
       <div id="status" class="status"></div>
 
@@ -731,25 +730,6 @@
       window.print();
     }
 
-    async function copyReport(){
-      const result = calculate();
-      if (!result) return;
-      render(result);
-      const text = $('relatorio').innerText.trim();
-      try {
-        await navigator.clipboard.writeText(text);
-      } catch (err) {
-        const area = document.createElement('textarea');
-        area.value = text;
-        document.body.appendChild(area);
-        area.select();
-        document.execCommand('copy');
-        area.remove();
-      }
-      $('status').className = 'status success';
-      $('status').textContent = 'Resumo copiado. Agora e so colar no Word.';
-    }
-
     function returnToHub(){
       try {
         if (window.parent && window.parent !== window){
@@ -771,7 +751,6 @@
     $('calcular').addEventListener('click', onCalculate);
     $('limpar').addEventListener('click', resetForm);
     $('imprimir').addEventListener('click', onPrint);
-    $('copiarResumo').addEventListener('click', copyReport);
     $('btnPrintHeader').addEventListener('click', onPrint);
     $('btnHub').addEventListener('click', returnToHub);
     resetForm();

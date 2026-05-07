@@ -464,7 +464,6 @@
         <button class="btn-primary" id="calcular">Calcular férias</button>
         <button class="btn-secondary" id="limpar">Limpar</button>
         <button class="btn-secondary" id="imprimir">Imprimir</button>
-        <button class="btn-secondary" id="copiarRecibo" type="button">Copiar recibo</button>
       </div>
       <div id="status" class="status"></div>
 
@@ -786,29 +785,11 @@ function clearNode(node){
       window.print();
     }
 
-    async function copyReceipt(){
-      const text = $('recibo').innerText.trim();
-      if (!text) return;
-      try {
-        await navigator.clipboard.writeText(text);
-      } catch (err) {
-        const area = document.createElement('textarea');
-        area.value = text;
-        document.body.appendChild(area);
-        area.select();
-        document.execCommand('copy');
-        area.remove();
-      }
-      $('status').className = 'status success';
-      $('status').textContent = 'Recibo copiado. Agora e so colar no Word.';
-    }
-
     maskCurrencyInput($('salario'));
     maskCurrencyInput($('he'));
     $('calcular').addEventListener('click', onCalculate);
     $('limpar').addEventListener('click', resetForm);
     $('imprimir').addEventListener('click', onPrint);
-    $('copiarRecibo').addEventListener('click', copyReceipt);
     resetForm();
   </script>
 </body>

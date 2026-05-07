@@ -894,7 +894,6 @@
         <button id="btnCalc" class="cta-button cta-primary">Calcular</button>
         <button id="btnReset" class="cta-button cta-secondary">Limpar</button>
         <button id="btnPDF" class="cta-button cta-primary">Imprimir demonstrativo</button>
-        <button id="btnCopyReceipt" class="cta-button cta-secondary" type="button">Copiar resumo</button>
       </div>
       <!-- Resultados -->
       <div class="results">
@@ -1231,43 +1230,6 @@
         buildPdfReport();
         // aciona a janela de impressão do navegador
         window.print();
-      });
-      $('btnCopyReceipt').addEventListener('click', async (e) => {
-        e.preventDefault();
-        buildPdfReport();
-        const text = [
-          'BIASON | Resumo de custo mensal do colaborador',
-          $('pdfMeta').innerText,
-          '',
-          'Base remuneratoria: ' + $('pdfSummaryBase').innerText,
-          'Encargos totais: ' + $('pdfSummaryEncargos').innerText,
-          'Beneficios mensais: ' + $('pdfSummaryBeneficios').innerText,
-          'Custo total estimado: ' + $('pdfSummaryTotal').innerText,
-          '',
-          'Dados considerados',
-          $('pdfInputs').innerText,
-          '',
-          'Percentuais aplicados',
-          $('pdfRates').innerText,
-          '',
-          'Composicao do custo mensal',
-          $('pdfCalc').innerText,
-          '',
-          $('pdfTotalBox').innerText,
-          '',
-          'Observacao: demonstrativo estimado com base nos dados informados.'
-        ].join('\n');
-        try {
-          await navigator.clipboard.writeText(text);
-        } catch (err) {
-          const area = document.createElement('textarea');
-          area.value = text;
-          document.body.appendChild(area);
-          area.select();
-          document.execCommand('copy');
-          area.remove();
-        }
-        $('note').innerHTML = '<strong>Resumo copiado.</strong> Agora e so colar no Word.';
       });
     });
   </script>
