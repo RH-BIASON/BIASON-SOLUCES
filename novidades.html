@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <title>BIASON | Novidades</title>
+  <script src="auth.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root{--brand:#0b3d91;--accent:#0a7b8f;--ink:#0b1b2a;--muted:#5b6b7a;--line:#e6ecf3;--bg:#f4f7fb;--shadow:0 18px 38px -28px rgba(8,26,36,.42)}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:linear-gradient(180deg,#eef4f9,#f7f9fc 32%,var(--bg))}
+    .topbar{background:linear-gradient(90deg,#0b3d91,#12408f 60%,#0a7b8f);color:#fff;box-shadow:0 14px 28px -20px rgba(8,26,36,.65)}
+    .topbar__inner{max-width:1100px;min-height:68px;margin:0 auto;padding:0 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+    .brand{font-weight:900;letter-spacing:.02em}.divider{color:rgba(255,255,255,.5);font-weight:700}.tool{font-size:13px;font-weight:800}
+    main{max-width:1100px;margin:0 auto;padding:28px 18px 46px}
+    .hero{border:1px solid rgba(15,23,42,.08);border-radius:24px;background:#fff;box-shadow:var(--shadow);padding:24px;margin-bottom:18px}
+    .hero span{display:inline-flex;min-height:28px;align-items:center;padding:0 10px;border-radius:999px;background:rgba(10,123,143,.08);color:#0f3152;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.1em}
+    h1{margin:12px 0 8px;font-size:clamp(34px,5vw,48px);letter-spacing:-.03em;line-height:1.02}
+    p{margin:0;color:var(--muted);line-height:1.6}
+    .timeline{display:grid;gap:14px}
+    .item{display:grid;grid-template-columns:120px 1fr;gap:14px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:var(--shadow);padding:18px}
+    .date{font-size:12px;font-weight:900;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+    h2{margin:0 0 6px;font-size:18px;color:#081a24}
+    ul{margin:8px 0 0;padding-left:18px;color:#46596d;line-height:1.7;font-size:14px}
+    footer{padding:22px 0 0;text-align:center;color:var(--muted);font-size:12px}
+    @media(max-width:700px){.item{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="brand">BIASON</div>
+      <div class="divider">|</div>
+      <div class="tool">Novidades do Hub</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <span>Versão 1.6</span>
+      <h1>Novidades</h1>
+      <p>Registro simples das melhorias recentes publicadas no hub trabalhista.</p>
+    </section>
+
+    <section class="timeline">
+      <article class="item">
+        <div class="date">07/05/2026</div>
+        <div>
+          <h2>Hub mais organizado</h2>
+          <ul>
+            <li>Favoritos por e-mail logado, salvos neste navegador.</li>
+            <li>Filtros por categoria e busca com termos do dia a dia.</li>
+            <li>Rodapé com versão e data de atualização.</li>
+          </ul>
+        </div>
+      </article>
+      <article class="item">
+        <div class="date">07/05/2026</div>
+        <div>
+          <h2>Recibos e demonstrativos</h2>
+          <ul>
+            <li>Recibos visuais adicionados em 13º, rescisão e adicional noturno.</li>
+            <li>Resumo visual de custo mensal e demonstrativo de INSS.</li>
+          </ul>
+        </div>
+      </article>
+      <article class="item">
+        <div class="date">06/05/2026</div>
+        <div>
+          <h2>Novas calculadoras</h2>
+          <ul>
+            <li>Calculadora de Cota PCD.</li>
+            <li>Calculadora de Cota Aprendiz.</li>
+          </ul>
+        </div>
+      </article>
+    </section>
+
+    <footer>BIASON • Hub de soluções trabalhistas • Versão 1.6</footer>
+  </main>
+
+  <script src="assets/hub-return.js"></script>
+</body>
+</html>

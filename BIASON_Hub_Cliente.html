@@ -209,6 +209,118 @@
       font:inherit;
       box-shadow:0 10px 24px -20px rgba(8,26,36,.3);
     }
+    .hubControls{
+      display:grid;
+      gap:12px;
+      margin-bottom:16px;
+    }
+    .categoryTabs{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .categoryTab{
+      min-height:36px;
+      padding:0 12px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      color:#334155;
+      font:inherit;
+      font-size:12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .categoryTab:hover,
+    .categoryTab.is-active{
+      background:#0a7b8f;
+      color:#fff;
+      border-color:#0a7b8f;
+    }
+    .quickPanels{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:16px;
+      margin:0 0 18px;
+    }
+    .quickPanel{
+      border:1px solid rgba(15,23,42,.08);
+      border-radius:20px;
+      background:rgba(255,255,255,.82);
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
+    .quickPanel__head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+    }
+    .quickPanel h3{
+      margin:0;
+      color:#081a24;
+      font-size:16px;
+      letter-spacing:-.01em;
+    }
+    .quickPanel p{
+      margin:0;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.45;
+    }
+    .favoriteList{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .favoriteChip{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      min-height:34px;
+      padding:0 11px;
+      border-radius:999px;
+      border:1px solid rgba(10,123,143,.18);
+      background:#fff;
+      color:#0b1b2a;
+      font-size:12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .favoriteChip:hover{transform:translateY(-1px);border-color:#0a7b8f}
+    .newsList{
+      display:grid;
+      gap:8px;
+    }
+    .newsItem{
+      display:grid;
+      gap:2px;
+      padding:9px 10px;
+      border-radius:14px;
+      background:#fff;
+      border:1px solid rgba(15,23,42,.08);
+    }
+    .newsItem strong{
+      font-size:12px;
+      color:#081a24;
+    }
+    .newsItem span{
+      color:#64748b;
+      font-size:11px;
+      line-height:1.4;
+    }
+    .emptyState{
+      display:none;
+      grid-column:1 / -1;
+      padding:20px;
+      border:1px dashed rgba(15,23,42,.16);
+      border-radius:18px;
+      background:rgba(255,255,255,.72);
+      color:#526173;
+      font-size:13px;
+      line-height:1.5;
+    }
 
     .grid{
       display:grid;
@@ -229,6 +341,36 @@
       overflow:hidden;
     }
     .card:hover{transform:translateY(-4px)}
+    .favoriteToggle{
+      position:absolute;
+      top:16px;
+      right:16px;
+      z-index:3;
+      width:34px;
+      height:34px;
+      display:grid;
+      place-items:center;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,.10);
+      background:rgba(255,255,255,.92);
+      color:#64748b;
+      cursor:pointer;
+    }
+    .favoriteToggle:hover,
+    .favoriteToggle.is-active{
+      color:#0a7b8f;
+      border-color:rgba(10,123,143,.30);
+      background:#eefbff;
+    }
+    .favoriteToggle svg{
+      width:17px;
+      height:17px;
+      fill:currentColor;
+    }
+    .card--featured .favoriteToggle{
+      top:48px;
+      right:12px;
+    }
     .cardIcon{
       width:22px;
       height:22px;
@@ -507,6 +649,9 @@
       .cardActions{
         gap:5px;
       }
+      .favoriteToggle{
+        display:none;
+      }
       .button,
       .button--ghost{
         min-height:28px;
@@ -522,10 +667,13 @@
 
     @media (max-width:1180px){
       .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .quickPanels{grid-template-columns:1fr}
     }
     @media (max-width:760px){
       .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
       .hero h1{font-size:34px}
+      .sectionHead{align-items:flex-start}
+      .toolSearch{width:100%}
     }
     @media (max-width:620px){
       main{padding:18px 14px 34px}
@@ -546,6 +694,7 @@
       </div>
       <div class="topbar__right">
         <div class="userPill" id="userPill">Carregando...</div>
+        <a class="topbarBtn" href="novidades.html">Novidades</a>
         <a class="topbarBtn" id="accessAdminLink" href="acessos.html" style="display:none">Acessos</a>
         <button class="topbarBtn" type="button" onclick="BiasonAuth.logout()">Sair</button>
       </div>
@@ -565,14 +714,51 @@
       <div class="sectionHead">
         <div class="sectionHead__left">
           <h2>Ferramentas</h2>
-          <p>Selecione um módulo para calcular, consultar, organizar arquivos e apoiar a rotina trabalhista.</p>
+          <p>Filtre por categoria, marque favoritos por acesso e encontre o módulo pelo termo do dia a dia.</p>
         </div>
         <input id="toolSearch" class="toolSearch" type="search" placeholder="Buscar ferramenta" autocomplete="off" />
       </div>
 
+      <div class="hubControls">
+        <div class="categoryTabs" id="categoryTabs" aria-label="Categorias de ferramentas">
+          <button class="categoryTab is-active" type="button" data-category="todas">Todas</button>
+          <button class="categoryTab" type="button" data-category="folha">Folha</button>
+          <button class="categoryTab" type="button" data-category="encargos">Encargos</button>
+          <button class="categoryTab" type="button" data-category="rescisao">Rescisão</button>
+          <button class="categoryTab" type="button" data-category="consultas">Consultas VIP</button>
+          <button class="categoryTab" type="button" data-category="documentos">Documentos</button>
+        </div>
+      </div>
+
+      <div class="quickPanels">
+        <section class="quickPanel" aria-labelledby="favoritesTitle">
+          <div class="quickPanel__head">
+            <div>
+              <h3 id="favoritesTitle">Favoritos deste acesso</h3>
+              <p>Salvos para o e-mail logado neste navegador.</p>
+            </div>
+          </div>
+          <div class="favoriteList" id="favoriteList"></div>
+        </section>
+        <section class="quickPanel" aria-labelledby="newsTitle">
+          <div class="quickPanel__head">
+            <div>
+              <h3 id="newsTitle">Novidades</h3>
+              <p>Últimos ajustes publicados no hub.</p>
+            </div>
+          </div>
+          <div class="newsList">
+            <div class="newsItem"><strong>Recibos visuais</strong><span>13º, rescisão, adicional noturno e custo receberam blocos de conferência.</span></div>
+            <div class="newsItem"><strong>Cotas legais</strong><span>Novas calculadoras separadas para PCD e Aprendiz.</span></div>
+            <div class="newsItem"><strong>Hub mais limpo</strong><span>Painel de sugestões removido e favicon da BIASON aplicado.</span></div>
+          </div>
+          <a class="button button--ghost" href="novidades.html" style="margin-top:12px;width:auto;min-height:36px;padding:0 12px">Ver página</a>
+        </section>
+      </div>
+
       <div class="grid" id="toolGrid">
 
-        <article class="card" data-search="jornada horas folha calculo calculadora ponto">
+        <article class="card" data-category="folha" data-search="jornada horas folha calculo calculadora ponto escala expediente banco de horas horario entrada saida intervalo">
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="clock-3"></i></span>
           <span class="cardTag">Horas e folha</span>
           <h3>Calculadora de Jornada</h3>
@@ -583,7 +769,7 @@
         </article>
 
 
-        <article class="card card--featured" data-search="rescisao desligamento verbas">
+        <article class="card card--featured" data-category="rescisao" data-search="rescisao desligamento verbas demissao demitir aviso previo acerto multa fgts termino contrato homologacao">
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="file-x-2"></i></span>
           <span class="cardTag">Desligamento</span>
           <h3>Simulador de Rescisão</h3>
@@ -594,7 +780,7 @@
         </article>
 
 
-        <article class="card" data-search="adicional noturno horas dsr rsr">
+        <article class="card" data-category="folha" data-search="adicional noturno horas dsr rsr noite jornada hora reduzida adicional de noite reflexo">
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="moon"></i></span>
           <span class="cardTag">Horas e folha</span>
           <h3>Adicional Noturno</h3>
@@ -605,7 +791,7 @@
         </article>
 
 
-        <article class="card" data-search="custo clt encargos beneficios provisoes">
+        <article class="card" data-category="encargos" data-search="custo clt encargos beneficios provisoes salario custo funcionario folha admissao quanto custa contratar">
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="calculator"></i></span>
           <span class="cardTag">Custos</span>
           <h3>Custo CLT</h3>
@@ -616,7 +802,7 @@
         </article>
 
 
-        <article class="card card--featured" data-search="rubricas consulta cruzamento tabela incidencias">
+        <article class="card card--featured" data-category="consultas" data-search="rubricas consulta cruzamento tabela incidencias e-social esocial inss irrf fgts pis natureza evento parametro">
           <span class="vipRibbon">Acesso VIP</span>
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="search-check"></i></span>
           <span class="cardTag">Consulta oficial</span>
@@ -628,7 +814,7 @@
         </article>
 
 
-        <article class="card" data-search="pat beneficio economia">
+        <article class="card" data-category="encargos" data-search="pat beneficio economia alimentacao vale refeicao incentivo fiscal encargos desconto">
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="hand-coins"></i></span>
           <span class="cardTag">Benefícios</span>
           <h3>Simulador Economia PAT</h3>
@@ -639,7 +825,7 @@
         </article>
 
 
-        <article class="card" data-search="fgts digital extrato txt complemento caixa manual preenchimento">
+        <article class="card" data-category="encargos" data-search="fgts digital extrato txt complemento caixa manual preenchimento recolhimento guia deposito mensal">
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="landmark"></i></span>
           <span class="cardTag">FGTS</span>
           <h3>Gerador FGTS Digital</h3>
@@ -651,7 +837,7 @@
         </article>
 
 
-        <article class="card card--featured" data-search="dirf irpf xml s-5002 comprovante relatorio lote funcionarios planilha zip">
+        <article class="card card--featured" data-category="consultas" data-search="dirf irpf xml s-5002 comprovante relatorio lote funcionarios planilha zip imposto renda informe rendimentos">
           <span class="vipRibbon">Acesso VIP</span>
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="receipt-text"></i></span>
           <span class="cardTag">Comprovantes</span>
@@ -664,7 +850,7 @@
         </article>
 
 
-        <article class="card" data-search="irrf comparativo lote calculo">
+        <article class="card" data-category="encargos" data-search="irrf comparativo lote calculo imposto renda desconto tabela 2026 salario">
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="scale"></i></span>
           <span class="cardTag">Comparativo</span>
           <h3>Simulador IRRF 2026</h3>
@@ -674,7 +860,7 @@
           </div>
         </article>
 
-        <article class="card" data-search="pcd cota legal deficiencia reabilitado inclusao funcionarios">
+        <article class="card" data-category="folha" data-search="pcd cota legal deficiencia reabilitado inclusao funcionarios cotas obrigatorio lei quantidade">
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="accessibility"></i></span>
           <span class="cardTag">Cotas legais</span>
           <h3>Calculadora Cota PCD</h3>
@@ -684,7 +870,7 @@
           </div>
         </article>
 
-        <article class="card" data-search="aprendiz cota aprendizagem menor aprendiz funcionarios base legal">
+        <article class="card" data-category="folha" data-search="aprendiz cota aprendizagem menor aprendiz funcionarios base legal jovem aprendiz quantidade obrigatorio">
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="graduation-cap"></i></span>
           <span class="cardTag">Cotas legais</span>
           <h3>Calculadora Cota Aprendiz</h3>
@@ -694,7 +880,7 @@
           </div>
         </article>
 
-        <article class="card" data-search="decimo terceiro 13 salario natalina primeira parcela segunda parcela">
+        <article class="card" data-category="folha" data-search="decimo terceiro 13 salario natalina primeira parcela segunda parcela gratificacao natalina novembro dezembro">
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="badge-dollar-sign"></i></span>
           <span class="cardTag">Folha anual</span>
           <h3>13º Salário</h3>
@@ -704,7 +890,7 @@
           </div>
         </article>
 
-        <article class="card" data-search="inss contribuicao tabela desconto aliquota previdencia">
+        <article class="card" data-category="encargos" data-search="inss contribuicao tabela desconto aliquota previdencia segurado desconto folha teto faixa">
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="percent"></i></span>
           <span class="cardTag">Encargos</span>
           <h3>Calculadora INSS</h3>
@@ -714,7 +900,7 @@
           </div>
         </article>
 
-        <article class="card" data-search="ferias abono um terco irrf inss recibo">
+        <article class="card" data-category="folha" data-search="ferias abono um terco irrf inss recibo descanso gozo venda 1/3 terco">
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="plane"></i></span>
           <span class="cardTag">Férias</span>
           <h3>Calculadora Férias</h3>
@@ -724,7 +910,7 @@
           </div>
         </article>
 
-        <article class="card" data-search="dissidio reajuste salario retroativo percentual acordo coletivo">
+        <article class="card" data-category="folha" data-search="dissidio reajuste salario retroativo percentual acordo coletivo convencao cct aumento sindical">
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="trending-up"></i></span>
           <span class="cardTag">Reajuste</span>
           <h3>Calculadora Dissídio</h3>
@@ -734,7 +920,7 @@
           </div>
         </article>
 
-        <article class="card" data-search="pdf juntar dividir comprimir converter word jpg imagens documentos">
+        <article class="card" data-category="documentos" data-search="pdf juntar dividir comprimir converter word jpg imagens documentos arquivo central unir separar">
           <span class="cardIconWrap"><i class="cardIcon" data-lucide="files"></i></span>
           <span class="cardTag">Documentos</span>
           <h3>Central PDF</h3>
@@ -747,7 +933,7 @@
       </div>
     </section>
 
-    <footer>BIASON • Hub de soluções para folha, fiscal e rubricas</footer>
+    <footer>BIASON • Hub de soluções para folha, fiscal e rubricas • Versão 1.6 • Atualizado em 07/05/2026</footer>
   </main>
 
   <div class="viewer" id="viewer" aria-hidden="true">
@@ -774,6 +960,8 @@
     const viewerClose = document.getElementById('viewerClose');
     const viewerNewTab = document.getElementById('viewerNewTab');
     const searchInput = document.getElementById('toolSearch');
+    const categoryTabs = document.getElementById('categoryTabs');
+    const favoriteList = document.getElementById('favoriteList');
     const cards = Array.from(document.querySelectorAll('#toolGrid .card'));
     const userPill = document.getElementById('userPill');
     const accessAdminLink = document.getElementById('accessAdminLink');
@@ -783,6 +971,9 @@
     const currentUserEmail = hubSession && hubSession.email ? hubSession.email : 'usuario nao identificado';
     const internalAdminEmails = new Set(['admin@biason.com.br', 'rh@biason.com.br']);
     const hasVipAccess = hubSession && (window.BiasonAuth.hasScope(hubSession, 'dirf') || window.BiasonAuth.hasScope(hubSession, 'rubricas'));
+    const favoriteStorageKey = `biason:favoritos:${currentUserEmail}`;
+    let activeCategory = 'todas';
+    let favorites = loadFavorites();
 
     userPill.innerHTML = `${currentUserEmail} <span class="userPill__status">${hasVipAccess ? 'Acesso VIP' : 'Acesso padrão'}</span>`;
     if (internalAdminEmails.has(currentUserEmail)) accessAdminLink.style.display = 'inline-flex';
@@ -794,6 +985,122 @@
       const url = new URL(file, window.location.href);
       url.searchParams.set('_dash', String(Date.now()));
       return url.href;
+    }
+
+    function normalizeText(value){
+      return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    }
+
+    function expandSearchQuery(value){
+      const query = normalizeText(value);
+      const aliases = {
+        demissao:'rescisao desligamento aviso previo acerto',
+        desligar:'rescisao desligamento aviso previo acerto',
+        funcionario:'colaborador empregado trabalhador folha',
+        salario:'remuneracao pagamento folha',
+        comprovante:'dirf irpf informe rendimentos',
+        imposto:'irrf inss renda desconto',
+        fgts:'fgts caixa digital recolhimento',
+        pdf:'documentos arquivo juntar dividir comprimir',
+        ferias:'ferias abono descanso terco',
+        cotas:'pcd aprendiz cota legal',
+        noite:'adicional noturno hora reduzida',
+        admissao:'custo clt contratar encargos'
+      };
+      const extra = Object.entries(aliases)
+        .filter(([key]) => query.includes(key))
+        .map(([, words]) => words)
+        .join(' ');
+      return {
+        base: query.split(/\s+/).filter(Boolean),
+        expanded: extra.split(/\s+/).filter(Boolean)
+      };
+    }
+
+    function loadFavorites(){
+      try{
+        const parsed = JSON.parse(localStorage.getItem(favoriteStorageKey) || '[]');
+        return Array.isArray(parsed) ? parsed : [];
+      }catch(err){
+        return [];
+      }
+    }
+
+    function saveFavorites(){
+      localStorage.setItem(favoriteStorageKey, JSON.stringify(favorites));
+    }
+
+    function cardKey(card){
+      const primary = card.querySelector('[data-open-file]');
+      return primary ? primary.getAttribute('data-open-file') : card.textContent.trim();
+    }
+
+    function cardLabel(card){
+      const title = card.querySelector('h3');
+      return title ? title.textContent.trim() : cardKey(card);
+    }
+
+    function injectFavoriteButtons(){
+      cards.forEach((card) => {
+        const key = cardKey(card);
+        card.dataset.key = key;
+        const button = document.createElement('button');
+        button.className = 'favoriteToggle';
+        button.type = 'button';
+        button.setAttribute('aria-label', `Favoritar ${cardLabel(card)}`);
+        button.innerHTML = '<i data-lucide="star"></i>';
+        button.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          toggleFavorite(key);
+        });
+        card.prepend(button);
+      });
+    }
+
+    function toggleFavorite(key){
+      favorites = favorites.includes(key)
+        ? favorites.filter((item) => item !== key)
+        : [...favorites, key];
+      saveFavorites();
+      renderFavorites();
+      applyFilters();
+      if(window.lucide) window.lucide.createIcons();
+    }
+
+    function renderFavorites(){
+      cards.forEach((card) => {
+        const active = favorites.includes(card.dataset.key);
+        const button = card.querySelector('.favoriteToggle');
+        if(button){
+          button.classList.toggle('is-active', active);
+          button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        }
+      });
+
+      favoriteList.innerHTML = '';
+      const favoriteCards = favorites
+        .map((key) => cards.find((card) => card.dataset.key === key))
+        .filter(Boolean);
+
+      if(!favoriteCards.length){
+        const empty = document.createElement('p');
+        empty.textContent = 'Use a estrela nos cards para montar seus atalhos.';
+        favoriteList.appendChild(empty);
+        return;
+      }
+
+      favoriteCards.forEach((card) => {
+        const primary = card.querySelector('[data-open-file]');
+        const chip = document.createElement('button');
+        chip.className = 'favoriteChip';
+        chip.type = 'button';
+        chip.innerHTML = `<i data-lucide="star"></i><span>${cardLabel(card)}</span>`;
+        chip.addEventListener('click', () => {
+          openTool(primary.getAttribute('data-open-file'), primary.getAttribute('data-label') || cardLabel(card));
+        });
+        favoriteList.appendChild(chip);
+      });
     }
 
     function openTool(file, label){
@@ -842,19 +1149,47 @@
       }
     });
 
-    searchInput.addEventListener('input', () => {
-      const query = (searchInput.value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    function applyFilters(){
+      const query = expandSearchQuery(searchInput.value || '');
+      let visibleCount = 0;
       cards.forEach((card) => {
-        const haystack = (card.dataset.search || card.textContent || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-        card.classList.toggle('hidden', !!query && !haystack.includes(query));
+        const haystack = normalizeText(`${card.dataset.search || ''} ${card.textContent || ''}`);
+        const categoryMatch = activeCategory === 'todas' || card.dataset.category === activeCategory;
+        const baseMatch = !query.base.length || query.base.every((term) => haystack.includes(term));
+        const expandedMatch = !query.expanded.length || query.expanded.some((term) => haystack.includes(term));
+        const queryMatch = baseMatch || expandedMatch;
+        const visible = categoryMatch && queryMatch;
+        card.classList.toggle('hidden', !visible);
+        if(visible) visibleCount += 1;
       });
+      let empty = document.getElementById('emptyState');
+      if(!empty){
+        empty = document.createElement('div');
+        empty.id = 'emptyState';
+        empty.className = 'emptyState';
+        empty.textContent = 'Nenhuma ferramenta encontrada. Tente buscar por outro termo ou mudar a categoria.';
+        document.getElementById('toolGrid').appendChild(empty);
+      }
+      empty.style.display = visibleCount ? 'none' : 'block';
+    }
+
+    searchInput.addEventListener('input', applyFilters);
+
+    categoryTabs.addEventListener('click', (event) => {
+      const tab = event.target.closest('[data-category]');
+      if(!tab) return;
+      activeCategory = tab.getAttribute('data-category');
+      categoryTabs.querySelectorAll('.categoryTab').forEach((item) => {
+        item.classList.toggle('is-active', item === tab);
+      });
+      applyFilters();
     });
 
     window.addEventListener('message', (event) => {
       try{
         const msg = event && event.data;
         if(!msg || typeof msg !== 'object') return;
-        if(msg.type === 'BIASON_BACK_TO_HUB'){
+        if(msg.type === 'BIASON_BACK_TO_HUB' || msg.type === 'biason:return-to-hub'){
           closeTool();
         }
       }catch(err){
@@ -862,9 +1197,12 @@
       }
     });
 
+    injectFavoriteButtons();
+    renderFavorites();
     if(window.lucide){
       window.lucide.createIcons();
     }
+    applyFilters();
 
   </script>
 </body>
