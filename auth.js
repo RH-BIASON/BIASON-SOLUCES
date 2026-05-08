@@ -42,6 +42,12 @@
       hash: "6fa4a79f4effce489edd7353f4a95b790dd966a7e48c1d76c12cb4915d7caa1e",
       scopes: ["hub", "dirf", "rubricas"],
     },
+    {
+      name: "Rangel Biason",
+      email: "rangel@biason.net",
+      hash: "c3f6d08aa77ea7c01eec2583694cf8a4fdd7a895f0b500f0753830836c804317",
+      scopes: ["hub", "dirf", "rubricas"],
+    },
   ];
 
   const pathParts = location.pathname.split("/");
