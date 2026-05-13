@@ -1000,6 +1000,14 @@
       document.body.appendChild(a);
       a.click(); a.remove(); URL.revokeObjectURL(url);
     }
+    function firstNameSlug(name){
+      const first = String(name || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .split(/\s+/)[0] || "";
+      return first.replace(/[^a-z0-9_-]/gi, "").toUpperCase();
+    }
     function setPills(fileName, record){
       const empDigits = sanitizeDigits(record.empregadorCnpj || "");
       const empBase = empDigits.length >= 8 ? empDigits.slice(0,8) : empDigits;
@@ -1083,7 +1091,8 @@
       const cpf = sanitizeDigits($("cpf").value) || "cpf";
       const ini = ($("compIni").value || "").trim() || "ini";
       const fim = ($("compFim").value || "").trim() || "fim";
-      const fname = `FGTS_Digital_recomposicao_${cpf}_${ini}_a_${fim}.txt`.replaceAll("/", "-");
+      const nomeCurto = firstNameSlug(activeRecord.nome) || cpf;
+      const fname = `FGTS_Digital_recomposicao_${nomeCurto}_${ini}_a_${fim}.txt`.replaceAll("/", "-");
       downloadText(fname, txt);
       if($("msg").style.display === "none"){ msg("ok","TXT gerado e baixado."); }
       else{ $("msg").innerHTML += "<br><br><b>TXT gerado e baixado.</b>"; }
