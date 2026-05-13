@@ -798,35 +798,86 @@
         o.raws += 1;
         rec.rawDeposits += 1;
       }
+      function extractCpfFromText(value){
+        const text = String(value || "");
+        const direct = /(?:^|\D)(\d{3}\.?\d{3}\.?\d{3}-?\d{2})(?=\D|$)/.exec(text);
+        if(direct){
+          const digits = direct[1].replace(/\D+/g, "");
+          if(digits.length === 11) return digits;
+        }
+
+        const compact = text.replace(/[^\d]/g, "");
+        if(compact.length === 11) return compact;
+
+        const spaced = /(?:^|\D)(\d[\d\s.\-]{9,18}\d)(?=\D|$)/.exec(text);
+        if(spaced){
+          const digits = spaced[1].replace(/\D+/g, "");
+          if(digits.length === 11) return digits;
+        }
+        return null;
+      }
+      function useCpf(cpf){
+        if(!cpf) return null;
+        if(currentKey && currentKey !== cpf && byKey.has(currentKey)){
+          const old = byKey.get(currentKey);
+          const next = ensure(cpf);
+          next.cpf = next.cpf || cpf;
+          next.pis = next.pis || old.pis;
+          next.matricula = next.matricula || old.matricula;
+          next.nome = next.nome || old.nome;
+          next.adm = next.adm || old.adm;
+          next.empregadorNome = next.empregadorNome || old.empregadorNome;
+          next.empregadorCnpj = next.empregadorCnpj || old.empregadorCnpj;
+          old.byComp.forEach((value, key) => {
+            const target = next.byComp.get(key) || { principal:0, v13:0, raws:0 };
+            target.principal += value.principal || 0;
+            target.v13 += value.v13 || 0;
+            target.raws += value.raws || 0;
+            next.byComp.set(key, target);
+          });
+          next.rawDeposits += old.rawDeposits || 0;
+          next.dupLines += old.dupLines || 0;
+          byKey.delete(currentKey);
+        }
+        currentKey = cpf;
+        const r = ensure(currentKey);
+        r.cpf = r.cpf || cpf;
+        return r;
+      }
 
       for(let i=0;i<lines.length;i++){
         const ln = lines[i] || "";
 
         // CPF (quando vem explícito)
         if(/\bCPF\b/i.test(ln)){
-          const mcpf = /(\d{3}\.?\d{3}\.?\d{3}-?\d{2}|\b\d{11}\b)/.exec(ln);
-          if(mcpf){
-            const digits = mcpf[1].replace(/\D+/g, "");
-            if(digits.length===11){
-              currentKey = digits;
-              const r = ensure(currentKey);
-              r.cpf = r.cpf || digits;
+          let foundCpf = extractCpfFromText(ln);
+          if(!foundCpf){
+            for(let j=i+1;j<Math.min(i+8, lines.length);j++){
+              foundCpf = extractCpfFromText(lines[j]);
+              if(foundCpf) break;
             }
+          }
+          useCpf(foundCpf);
+        }
+
+        // Alguns extratos trazem o CPF perto de rótulos de trabalhador/empregado sem a palavra CPF na mesma linha.
+        if(/\b(TRABALHADOR|EMPREGADO|FUNCIONARIO|FUNCIONÁRIO)\b/i.test(ln)){
+          for(let j=i;j<Math.min(i+8, lines.length);j++){
+            const foundCpf = extractCpfFromText(lines[j]);
+            if(foundCpf){ useCpf(foundCpf); break; }
           }
         }
 
         // No TXT da CAIXA, o CPF muitas vezes aparece no bloco de "MATRICULA".
         if(/\bMATRICULA\b/i.test(ln)){
-          // tenta achar um CPF (11 dígitos) nas próximas linhas
+          // tenta achar um CPF nas próximas linhas
           let foundCpf = null;
           for(let j=i;j<Math.min(i+10, lines.length);j++){
-            const m = /\b(\d{11})\b/.exec(lines[j]);
-            if(m){ foundCpf = m[1]; break; }
+            foundCpf = extractCpfFromText(lines[j]);
+            if(foundCpf) break;
           }
           if(foundCpf){
-            currentKey = foundCpf;
-            const r = ensure(currentKey);
-            r.cpf = r.cpf || foundCpf;
+            useCpf(foundCpf);
           } else {
             // fallback: se não achou CPF, usa matrícula numérica como chave
             let mat = null;
