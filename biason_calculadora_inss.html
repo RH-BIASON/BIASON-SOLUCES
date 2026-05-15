@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <title>BIASON | Calculadora de INSS</title>
+  <link rel="stylesheet" href="assets/biason-print.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -220,7 +221,7 @@
 
   .result-grid{
     display:grid;
-    grid-template-columns:repeat(4,minmax(0,1fr));
+    grid-template-columns:repeat(5,minmax(0,1fr));
     gap:14px;
     margin:18px 0;
   }
@@ -453,6 +454,11 @@
           <div class="stat__value" id="statBase">R$ 0,00</div>
           <div class="stat__sub">Com teto da tabela</div>
         </article>
+        <article class="stat">
+          <span class="stat__label">Após INSS</span>
+          <div class="stat__value" id="statLiquidoInss">R$ 0,00</div>
+          <div class="stat__sub">Salário menos contribuição</div>
+        </article>
       </div>
 
       <div class="table-wrap">
@@ -665,6 +671,7 @@ function clearNode(node){
       $('statInss').textContent = formatCents(result.total);
       $('statEfetiva').textContent = formatPercentFromRatio(result.effective * 100);
       $('statBase').textContent = formatCents(result.taxable);
+      $('statLiquidoInss').textContent = formatCents(salaryCents > result.total ? salaryCents - result.total : 0n);
 
       const tbodyFaixas = $('tbodyFaixas');
       clearNode(tbodyFaixas);
@@ -686,6 +693,7 @@ function clearNode(node){
         <tr><th>Salário informado</th><td>${formatCents(salaryCents)}</td></tr>
         <tr><th>Base considerada no cálculo</th><td>${formatCents(result.taxable)}</td></tr>
         <tr><th>Desconto total</th><td>${formatCents(result.total)}</td></tr>
+        <tr><th>Salário após INSS</th><td>${formatCents(salaryCents > result.total ? salaryCents - result.total : 0n)}</td></tr>
         <tr><th>Alíquota efetiva</th><td>${formatPercentFromRatio(result.effective * 100)}</td></tr>
       `;
 
@@ -696,6 +704,7 @@ function clearNode(node){
         Salario informado: ${formatCents(salaryCents)}<br>
         Base considerada: ${formatCents(result.taxable)}<br>
         Desconto INSS: ${formatCents(result.total)}<br>
+        Salario apos INSS: ${formatCents(salaryCents > result.total ? salaryCents - result.total : 0n)}<br>
         Aliquota efetiva: ${formatPercentFromRatio(result.effective * 100)}<br><br>
         Observacao: demonstrativo de conferencia do desconto previdenciario calculado pela tabela progressiva.<br>
         Emitido em: ________________________________________________

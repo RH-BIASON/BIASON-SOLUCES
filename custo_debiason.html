@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <title>BIASON | Custo CLT</title>
+  <link rel="stylesheet" href="assets/biason-print.css">
   <!--
     Esta página implementa uma versão reimaginada da “Calculadora de Custo de
     Funcionário (CLT)” seguindo o Design System unificado da marca De Biason.
@@ -211,6 +212,65 @@
     }
     .chip strong {
       color: var(--color-accent);
+    }
+    .regime-compare {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 1rem;
+    }
+    .regime-compare__head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: .85rem;
+    }
+    .regime-compare__head h3 {
+      margin: 0;
+      color: var(--color-brand);
+      font-size: 1rem;
+    }
+    .regime-compare__head p {
+      margin: .2rem 0 0;
+      color: var(--color-text-secondary);
+      font-size: .82rem;
+      line-height: 1.45;
+    }
+    .regime-compare__grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: .75rem;
+    }
+    .regime-card {
+      border: 1px solid var(--color-border);
+      border-radius: 14px;
+      padding: .8rem;
+      background: linear-gradient(180deg, #ffffff, #f8fbfd);
+    }
+    .regime-card.is-active {
+      border-color: rgba(10,132,190,.42);
+      box-shadow: 0 12px 24px rgba(10,132,190,.12);
+    }
+    .regime-card span {
+      display: block;
+      color: var(--color-text-secondary);
+      font-size: .72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .regime-card strong {
+      display: block;
+      margin-top: .35rem;
+      color: var(--color-brand);
+      font-size: 1.15rem;
+    }
+    .regime-card small {
+      display: block;
+      margin-top: .25rem;
+      color: var(--color-text-secondary);
+      line-height: 1.35;
     }
     table {
       width: 100%;
@@ -974,6 +1034,15 @@
             </tr>
           </tbody>
         </table>
+        <section class="regime-compare" aria-label="Comparativo de regime">
+          <div class="regime-compare__head">
+            <div>
+              <h3>Comparativo rápido de regime</h3>
+              <p>Mostra o impacto estimado do INSS patronal no custo mensal, mantendo salário, adicionais, FGTS, RAT, terceiros, provisões e benefícios informados.</p>
+            </div>
+          </div>
+          <div class="regime-compare__grid" id="regimeCompare"></div>
+        </section>
         <div class="footnote" id="note">
           Esta calculadora fornece uma <strong>estimativa</strong> de custo mensal. Não contempla particularidades como
           convenções coletivas, adicionais variáveis não informados, desoneração, rescisões, afastamentos, etc.
@@ -1026,6 +1095,10 @@
     <h2>Composição do custo mensal</h2>
     <table>
       <tbody id="pdfCalc"></tbody>
+    </table>
+    <h2>Comparativo de regime</h2>
+    <table>
+      <tbody id="pdfRegimes"></tbody>
     </table>
     <div class="tot" id="pdfTotalBox"></div>
     <div class="obs">
@@ -1114,6 +1187,41 @@
       };
     }
 
+    function totalComINSSPatronal(s, inssRate) {
+      const encargos = s.baseRemuneratoria * (inssRate + s.fgts + s.rat + s.terceiros);
+      const encargosSobreProvisao = (s.prov13 + s.provFerias) * (inssRate + s.fgts + s.rat + s.terceiros);
+      return {
+        encargos,
+        encargosSobreProvisao,
+        total: s.baseRemuneratoria + encargos + s.prov13 + s.provFerias + encargosSobreProvisao + s.beneficios
+      };
+    }
+
+    function renderRegimeCompare(s) {
+      const atual = s.regime;
+      const manualRate = s.inss;
+      const options = [
+        { key:'geral', label:'Geral', rate:.20, note:'INSS patronal 20% na folha.' },
+        { key:'simples', label:'Simples comum', rate:0, note:'INSS patronal zerado na folha.' },
+        { key:'simples_anexo_iv', label:'Simples Anexo IV', rate:.20, note:'INSS patronal 20% na folha.' }
+      ];
+      if (atual === 'manual') {
+        options.push({ key:'manual', label:'Manual informado', rate:manualRate, note:`INSS patronal ${pct(manualRate * 100)}.` });
+      }
+      $('regimeCompare').innerHTML = options.map(item => {
+        const model = totalComINSSPatronal(s, item.rate);
+        const diff = model.total - s.total;
+        const diffText = Math.abs(diff) < .01 ? 'regime selecionado' : `${diff > 0 ? '+' : ''}${brl(diff)} vs atual`;
+        return `
+          <article class="regime-card ${item.key === atual ? 'is-active' : ''}">
+            <span>${item.label}</span>
+            <strong>${brl(model.total)}</strong>
+            <small>${item.note}<br>${diffText}</small>
+          </article>
+        `;
+      }).join('');
+    }
+
     // Atualiza a interface com os cálculos
     function calc() {
       const s = getState();
@@ -1133,6 +1241,7 @@
       $('rFerias').textContent = brl(s.provFerias);
       $('rEncProv').textContent = brl(s.encargosSobreProvisao);
       $('rBenef').textContent = brl(s.beneficios);
+      renderRegimeCompare(s);
       // aviso no rodapé
       if (s.salario <= 0) {
         $('note').innerHTML = '<span style="color:#ef4444; font-weight:600;">Informe o salário base para calcular corretamente.</span> A calculadora é uma estimativa mensal.';
@@ -1215,6 +1324,12 @@
         tr('Encargos sobre provisões', brl(s.encargosSobreProvisao)),
         tr('Benefícios / custos mensais', brl(s.beneficios)),
       ].join('');
+      $('pdfRegimes').innerHTML = [
+        tr('Geral - INSS patronal 20%', brl(totalComINSSPatronal(s, .20).total)),
+        tr('Simples comum - INSS patronal 0% na folha', brl(totalComINSSPatronal(s, 0).total)),
+        tr('Simples Anexo IV - INSS patronal 20%', brl(totalComINSSPatronal(s, .20).total)),
+        s.regime === 'manual' ? tr(`Manual informado - INSS patronal ${pct(s.inss * 100)}`, brl(totalComINSSPatronal(s, s.inss).total)) : ''
+      ].filter(Boolean).join('');
       $('pdfTotalBox').innerHTML =
         `<strong>Custo total estimado: ${brl(s.total)}</strong><br>` +
         `Acréscimo sobre o salário base: ${(s.pctSobreSalarioBase * 100).toFixed(2).replace('.', ',')}%<br>` +

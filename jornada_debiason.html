@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <title>BIASON | Calculadora de Jornada</title>
+  <link rel="stylesheet" href="assets/biason-print.css">
   <!--
     Este arquivo implementa uma versão recriada da ferramenta "Calculadora de Jornada de Trabalho" sob o
     novo Design System da marca De Biason. A estrutura e a interface foram refeitas para
@@ -191,6 +192,88 @@
       margin-top: 0.35rem;
       font-size: 0.86rem;
       color: var(--color-text-secondary);
+    }
+    .payroll-panel {
+      margin-top: 1rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, #fff, #f7fbfd);
+      padding: 1rem;
+    }
+    .payroll-panel__head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: .9rem;
+    }
+    .payroll-panel__head h3 {
+      margin: 0;
+      color: var(--color-brand);
+      font-size: 1rem;
+    }
+    .payroll-panel__head p {
+      margin: .25rem 0 0;
+      color: var(--color-text-secondary);
+      font-size: .86rem;
+      line-height: 1.45;
+    }
+    .payroll-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: .75rem;
+    }
+    .payroll-field label {
+      display: block;
+      margin-bottom: .35rem;
+      color: var(--color-text-secondary);
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .payroll-field input {
+      width: 100%;
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: .72rem .8rem;
+      font: inherit;
+      background: #fff;
+    }
+    .payroll-summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: .75rem;
+      margin-top: .85rem;
+    }
+    .payroll-summary article {
+      border: 1px solid var(--color-border);
+      border-radius: 14px;
+      padding: .8rem;
+      background: #fff;
+    }
+    .payroll-summary span {
+      display: block;
+      color: var(--color-text-secondary);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .payroll-summary strong {
+      display: block;
+      margin-top: .32rem;
+      color: var(--color-brand);
+      font-size: 1.12rem;
+    }
+    @media print {
+      .payroll-grid {
+        display: none !important;
+      }
+      .payroll-panel {
+        break-inside: avoid;
+        box-shadow: none;
+      }
     }
     .report-preview {
       margin-top: 1.5rem;
@@ -953,6 +1036,54 @@
           </tr>
         </tbody>
       </table>
+      <section class="payroll-panel">
+        <div class="payroll-panel__head">
+          <div>
+            <h3>Resumo opcional para folha</h3>
+            <p>Preencha salário, divisor e benefícios quando quiser transformar a jornada semanal em uma leitura mensal para conferência de folha.</p>
+          </div>
+        </div>
+        <div class="payroll-grid">
+          <div class="payroll-field">
+            <label for="folhaSalario">Salário bruto</label>
+            <input id="folhaSalario" inputmode="decimal" placeholder="Ex.: 3000,00">
+          </div>
+          <div class="payroll-field">
+            <label for="folhaDivisor">Carga mensal</label>
+            <input id="folhaDivisor" inputmode="numeric" value="220">
+          </div>
+          <div class="payroll-field">
+            <label for="folhaExtra">Hora extra %</label>
+            <input id="folhaExtra" inputmode="decimal" value="50">
+          </div>
+          <div class="payroll-field">
+            <label for="folhaNoturno">Noturno %</label>
+            <input id="folhaNoturno" inputmode="decimal" value="20">
+          </div>
+          <div class="payroll-field">
+            <label for="folhaInsal">Insalubridade/peric.</label>
+            <input id="folhaInsal" inputmode="decimal" placeholder="Valor mensal">
+          </div>
+          <div class="payroll-field">
+            <label for="folhaVT">VT empresa</label>
+            <input id="folhaVT" inputmode="decimal" placeholder="0,00">
+          </div>
+          <div class="payroll-field">
+            <label for="folhaVR">VR/benefícios</label>
+            <input id="folhaVR" inputmode="decimal" placeholder="0,00">
+          </div>
+          <div class="payroll-field">
+            <label for="folhaDependentes">Dependentes</label>
+            <input id="folhaDependentes" inputmode="numeric" value="0">
+          </div>
+        </div>
+        <div class="payroll-summary" id="folhaResumo">
+          <article><span>Horas mensais</span><strong>0,00</strong></article>
+          <article><span>Horas extras</span><strong>0,00</strong></article>
+          <article><span>Adic. noturno</span><strong>R$ 0,00</strong></article>
+          <article><span>Base + benefícios</span><strong>R$ 0,00</strong></article>
+        </div>
+      </section>
       <div class="calculatorActions">
         <button class="cta-button" id="repWeekdays" type="button">Replicar Seg→Sex</button>
         <button class="cta-button" id="repFullWeek" type="button">Replicar Seg→Dom</button>
@@ -1064,6 +1195,16 @@
     function formatDec(mins) {
       if (mins == null || isNaN(mins)) return '';
       return (mins / 60).toFixed(2);
+    }
+
+    function parseMoneyLike(value) {
+      const normalized = String(value || '').replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '');
+      const n = Number(normalized);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function formatMoney(value) {
+      return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
     /**
@@ -1299,6 +1440,45 @@
       notes.innerHTML = reportNotes.map(item => `<li>${item}</li>`).join('');
     }
 
+    function renderPayrollSummary(data) {
+      const salario = parseMoneyLike(document.getElementById('folhaSalario').value);
+      const divisor = Math.max(0, parseMoneyLike(document.getElementById('folhaDivisor').value));
+      const percExtra = Math.max(0, parseMoneyLike(document.getElementById('folhaExtra').value)) / 100;
+      const percNoturno = Math.max(0, parseMoneyLike(document.getElementById('folhaNoturno').value)) / 100;
+      const insal = Math.max(0, parseMoneyLike(document.getElementById('folhaInsal').value));
+      const vt = Math.max(0, parseMoneyLike(document.getElementById('folhaVT').value));
+      const vr = Math.max(0, parseMoneyLike(document.getElementById('folhaVR').value));
+      const dependentes = Math.max(0, Math.trunc(parseMoneyLike(document.getElementById('folhaDependentes').value)));
+      const fatorMensal = 52 / 12;
+      const horasMensais = data.totTotal / 60 * fatorMensal;
+      const horasNoturnasMensais = data.totNight / 60 * fatorMensal;
+      const horasExtrasMensais = divisor > 0 ? Math.max(0, horasMensais - divisor) : 0;
+      const valorHora = divisor > 0 ? salario / divisor : 0;
+      const valorExtras = horasExtrasMensais * valorHora * (1 + percExtra);
+      const valorNoturno = horasNoturnasMensais * valorHora * percNoturno;
+      const baseComBeneficios = salario + valorExtras + valorNoturno + insal + vt + vr;
+      document.getElementById('folhaResumo').innerHTML = `
+        <article><span>Horas mensais</span><strong>${horasMensais.toLocaleString('pt-BR', { minimumFractionDigits:2, maximumFractionDigits:2 })}</strong></article>
+        <article><span>Horas extras</span><strong>${horasExtrasMensais.toLocaleString('pt-BR', { minimumFractionDigits:2, maximumFractionDigits:2 })}</strong></article>
+        <article><span>Adic. noturno</span><strong>${formatMoney(valorNoturno)}</strong></article>
+        <article><span>Base + benefícios</span><strong>${formatMoney(baseComBeneficios)}</strong></article>
+      `;
+      return {
+        salario,
+        divisor,
+        dependentes,
+        horasMensais,
+        horasExtrasMensais,
+        horasNoturnasMensais,
+        valorExtras,
+        valorNoturno,
+        insal,
+        vt,
+        vr,
+        baseComBeneficios
+      };
+    }
+
     /**
      * Exibe os resultados formatados nos cartões de resumo.
      */
@@ -1339,6 +1519,7 @@
         resultsDiv.appendChild(card);
       });
       renderReport(data);
+      renderPayrollSummary(data);
       return data;
     }
 
@@ -1404,6 +1585,12 @@
     document.querySelectorAll('#tableBody input[type="time"]').forEach(input => {
       input.addEventListener('input', () => {
         document.getElementById('reportPreview').hidden = true;
+      });
+    });
+    ['folhaSalario','folhaDivisor','folhaExtra','folhaNoturno','folhaInsal','folhaVT','folhaVR','folhaDependentes'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
+        const data = buildScheduleData();
+        renderPayrollSummary(data);
       });
     });
   </script>

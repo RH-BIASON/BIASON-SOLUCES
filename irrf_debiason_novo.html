@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <title>BIASON | Simulador IRRF 2026</title>
+  <link rel="stylesheet" href="assets/biason-print.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -69,7 +70,7 @@
     .notice.show{display:block}
     .notice.warn{border-color:#fed7aa;background:#fff7ed;color:#9a3412}
 
-    .cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px}
+    .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}
     .kpi{border:1px solid var(--border);border-radius:var(--radius);padding:12px;background:#fbfdff}
     .kpi .k{margin:0 0 6px;color:var(--muted);font-size:12px;font-weight:800}
     .kpi .v{margin:0;font-size:20px;font-weight:900;color:var(--text)}
@@ -545,6 +546,11 @@
                 <p class="v" id="k_gain">—</p>
                 <p class="s" id="k_gain_s">Economia anual aprox. com 13º: <span id="k_gain_y">—</span></p>
               </div>
+              <div class="kpi">
+                <p class="k">Líquido estimado</p>
+                <p class="v" id="k_liq26">—</p>
+                <p class="s" id="k_liq26_s">Rendimento líquido pela regra demonstrada.</p>
+              </div>
             </div>
 
             <div class="panel" style="margin-top:14px;">
@@ -845,6 +851,8 @@
     const gain = res.ganho_mensal;
     document.getElementById('k_gain').textContent = fmtBRL(gain);
     document.getElementById('k_gain_y').textContent = fmtBRL(gain*13.33);
+    document.getElementById('k_liq26').textContent = fmtBRL(res.salario_liquido_2026);
+    document.getElementById('k_liq26_s').textContent = `Antes: ${fmtBRL(res.salario_liquido_2025)} • INSS usado: ${fmtBRL(res.inss_real)}`;
 
     // Memória (espelha a do original)
     let rows='';

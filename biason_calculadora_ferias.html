@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <title>BIASON | Calculadora de Férias</title>
+  <link rel="stylesheet" href="assets/biason-print.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -345,7 +346,7 @@
     .shell-header__inner{padding:10px 14px}
   }
   @media print{
-    .shell-header,.guide,.actions,.status,.hero-note,.footnote,.callout,.badge-row{display:none !important}
+    .shell-header,.guide,.actions,.status,.hero-note,.footnote,.badge-row{display:none !important}
     main{display:block;max-width:none;padding:0;margin:0}
     .card{box-shadow:none;border:0;padding:0}
     .table-wrap{overflow:visible;border:0}
@@ -488,6 +489,11 @@
           <div class="stat__value" id="statIrrf">R$ 0,00</div>
           <div class="stat__sub">Com dedução por dependentes</div>
         </article>
+      </div>
+
+      <div class="callout" id="demonstrativoFerias">
+        <strong>Demonstrativo final</strong><br>
+        Informe os dados e clique em calcular para gerar uma leitura consolidada das férias, descontos e líquido estimado.
       </div>
 
       <div class="table-wrap">
@@ -748,6 +754,11 @@ function clearNode(node){
       $('statBruto').textContent = formatCents(result.totalVerbas);
       $('statInss').textContent = formatCents(result.inss);
       $('statIrrf').textContent = formatCents(result.irrf);
+      $('demonstrativoFerias').innerHTML = `
+        <strong>Demonstrativo final</strong><br>
+        Férias de ${result.dias} dia(s), ${result.abono ? 'com abono pecuniário' : 'sem abono pecuniário'}, ${result.adiantar13 ? 'com adiantamento de 13º' : 'sem adiantamento de 13º'}.
+        Total de verbas de <strong>${formatCents(result.totalVerbas)}</strong>, descontos de <strong>${formatCents(result.totalDescontos)}</strong> e líquido estimado de <strong>${formatCents(result.liquido)}</strong>.
+      `;
       renderEntrada(result);
       renderVerbas(result);
       renderDescontos(result);

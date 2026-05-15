@@ -1,0 +1,54 @@
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  button,
+  .actions,
+  .cta-buttons,
+  .calculatorActions,
+  .hubReturnBar,
+  .no-print {
+    display: none !important;
+  }
+
+  .card,
+  .panel,
+  .table-wrap,
+  .tableWrap,
+  .total-box,
+  .result-card,
+  .stat,
+  .kpi,
+  .receipt,
+  .reportCard,
+  .report-preview,
+  .regime-compare,
+  .payroll-panel {
+    box-shadow: none !important;
+    border-color: rgba(15, 23, 42, .22) !important;
+    break-inside: avoid;
+  }
+
+  table {
+    break-inside: auto;
+  }
+
+  tr,
+  .receipt,
+  .report-summary__card,
+  .reportItem,
+  .summary__item {
+    break-inside: avoid;
+  }
+}
