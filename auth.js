@@ -48,6 +48,12 @@
       hash: "c3f6d08aa77ea7c01eec2583694cf8a4fdd7a895f0b500f0753830836c804317",
       scopes: ["hub", "dirf", "rubricas"],
     },
+    {
+      name: "Juce Bebece",
+      email: "juce@bebece.com.br",
+      hash: "7bd2d913dd521806bf3b14fe0de1a9c05f3eafe6d74bd51c964ffa6e56dabec3",
+      scopes: ["hub"],
+    },
   ];
 
   const pathParts = location.pathname.split("/");
