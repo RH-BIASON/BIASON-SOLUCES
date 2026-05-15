@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <title>BIASON | Banco de Horas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{--brand:#0b3d91;--accent:#0a7b8f;--ink:#0b1b2a;--muted:#5b6b7a;--line:rgba(15,23,42,.12);--bg:#f4f7fb;--panel:#fff;--shadow:0 24px 48px -32px rgba(8,26,36,.48);--radius:20px;--ok:#0f766e;--warn:#b45309;--bad:#c53030}
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:radial-gradient(circle at top right,rgba(10,123,143,.12),transparent 26%),linear-gradient(180deg,#eef4f9 0%,#f7f9fc 30%,var(--bg) 100%)}
+    .topbar{position:sticky;top:0;z-index:20;background:linear-gradient(90deg,var(--brand),#12408f 62%,var(--accent));color:#fff;box-shadow:0 14px 28px -20px rgba(8,26,36,.65)}
+    .topbar__inner{max-width:1360px;min-height:68px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}.brand{font-weight:900;font-size:17px}.divider{opacity:.55;font-weight:800}.crumb{min-height:30px;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);font-size:12px;font-weight:800}
+    main{max-width:1360px;margin:18px auto 0;padding:0 22px 38px;display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px} main>*{min-width:0}
+    .card{background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.guide{position:sticky;top:90px;align-self:start;padding:22px;background:linear-gradient(180deg,rgba(8,26,36,.02),rgba(0,126,167,.05))}
+    h1,h2{margin:0;color:#081a24;letter-spacing:-.03em}.guide h1{font-size:30px}.guide p,.muted{color:var(--muted);font-size:13px;line-height:1.55}.guide ul{margin:14px 0 0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.55}
+    .workspace{display:grid;gap:18px}.hero{padding:24px;background:linear-gradient(145deg,#fff,#f6fbfd 65%,#eef7fb)}.eyebrow{display:inline-flex;min-height:30px;align-items:center;padding:0 12px;border-radius:999px;background:rgba(8,26,36,.06);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.1em}.hero h2{margin:12px 0 8px;font-size:38px}.hero p{max-width:86ch;margin:0;color:var(--muted);font-size:14px;line-height:1.55}
+    .panel{padding:22px}.form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}.field{display:grid;gap:6px}label{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#526272}input,select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:13px;padding:0 12px;background:#fff;color:var(--ink);font:inherit}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.btn{min-height:44px;border-radius:13px;padding:0 16px;font-weight:900;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink)}.btn.primary{border:0;background:#0b83bb;color:#fff}.btn:hover{transform:translateY(-1px)}
+    .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}.kpi{min-height:104px;border:1px solid var(--line);border-radius:16px;padding:14px;background:linear-gradient(180deg,#fff,#f8fbfd)}.kpi span{display:block;color:#00738f;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.kpi strong{display:block;margin-top:8px;font-size:24px;color:#081a24;overflow-wrap:anywhere}.kpi small{display:block;margin-top:8px;color:var(--muted);font-size:11px;line-height:1.35}
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px;background:#fff}table{width:100%;border-collapse:collapse;min-width:920px}th,td{padding:10px;border-bottom:1px solid var(--line);font-size:13px;text-align:left;vertical-align:middle}th{background:#f8fbfd;color:#526272;font-size:11px;text-transform:uppercase;letter-spacing:.08em}td input{min-height:38px;border-radius:10px}tr:last-child td{border-bottom:0}.right{text-align:right}.ok{color:var(--ok);font-weight:900}.warn{color:var(--warn);font-weight:900}.bad{color:var(--bad);font-weight:900}
+    .summary{margin-top:16px;border:1px dashed rgba(11,61,145,.25);border-radius:18px;padding:16px;background:#fbfdff}.summary h3{margin:0 0 8px;font-size:20px}.summary p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+    @media(max-width:1050px){main{grid-template-columns:1fr}.guide{position:relative;top:auto}.form-grid,.kpis{grid-template-columns:1fr 1fr}}@media(max-width:680px){main{padding:0 12px 28px}.form-grid,.kpis{grid-template-columns:1fr}.hero h2{font-size:30px}}@media print{.topbar,.guide,.actions,.hubReturnBar{display:none!important}main{display:block;padding:0}.card{box-shadow:none}.panel,.hero{break-inside:avoid}}
+  </style>
+</head>
+<body>
+  <header class="topbar"><div class="topbar__inner"><span class="brand">BIASON</span><span class="divider">|</span><strong>Banco de Horas</strong><span class="crumb">Controle de saldo</span></div></header>
+  <main>
+    <aside class="guide card">
+      <h1>Guia de uso</h1>
+      <p>Use para conferir saldo positivo ou negativo por dia, com prazo de compensação e resumo final.</p>
+      <ul>
+        <li>Informe jornada prevista e horários realizados.</li>
+        <li>O sábado pode ser controlado normalmente, conforme escala da empresa.</li>
+        <li>O prazo padrão é de 6 meses, mas pode ser ajustado.</li>
+        <li>Saldo positivo indica crédito; saldo negativo indica débito.</li>
+      </ul>
+    </aside>
+    <section class="workspace">
+      <article class="hero card"><span class="eyebrow">Horas e folha</span><h2>Banco de Horas</h2><p>Controle créditos, débitos, saldo acumulado e vencimento para compensação. A lógica é local e simples: horas realizadas menos jornada prevista do dia.</p></article>
+      <section class="panel card">
+        <div class="form-grid">
+          <div class="field"><label>Colaborador</label><input id="employee" value="Colaborador"></div>
+          <div class="field"><label>Jornada padrão</label><input id="defaultJourney" type="time" value="08:00"></div>
+          <div class="field"><label>Prazo compensação (meses)</label><input id="expireMonths" type="number" value="6" min="1"></div>
+          <div class="field"><label>Competência</label><input id="competence" type="month"></div>
+        </div>
+        <div class="actions">
+          <button class="btn primary" type="button" onclick="calculate()">Calcular saldo</button>
+          <button class="btn" type="button" onclick="addRow()">Adicionar linha</button>
+          <button class="btn" type="button" onclick="clearRows()">Limpar lançamentos</button>
+          <button class="btn" type="button" onclick="window.print()">Imprimir demonstrativo</button>
+        </div>
+        <div class="kpis" id="kpis"></div>
+        <div class="table-wrap"><table><thead><tr><th>Data</th><th>Entrada</th><th>Saída intervalo</th><th>Retorno</th><th>Saída</th><th>Previsto</th><th>Realizado</th><th>Saldo do dia</th><th>Vence em</th><th>Status</th></tr></thead><tbody id="rows"></tbody></table></div>
+        <div class="summary" id="summary"></div>
+      </section>
+    </section>
+  </main>
+  <script src="assets/hub-return.js"></script>
+  <script>
+    const rowsEl = document.getElementById('rows');
+    const brDate = d => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '-';
+    const toMin = v => { if(!v) return 0; const [h,m]=v.split(':').map(Number); return h*60+m; };
+    const span = (a,b) => { let x=toMin(a), y=toMin(b); if(!a || !b) return 0; if(y<x) y += 1440; return y-x; };
+    const hm = min => { const sign = min < 0 ? '-' : ''; min = Math.abs(Math.round(min)); return `${sign}${String(Math.floor(min/60)).padStart(2,'0')}:${String(min%60).padStart(2,'0')}`; };
+    const addMonths = (date, months) => { const d = new Date(date + 'T12:00:00'); d.setMonth(d.getMonth()+Number(months||0)); return d.toISOString().slice(0,10); };
+    function rowTemplate(data={}){
+      return `<tr>
+        <td><input type="date" class="date" value="${data.date||''}"></td>
+        <td><input type="time" class="in1" value="${data.in1||''}"></td>
+        <td><input type="time" class="out1" value="${data.out1||''}"></td>
+        <td><input type="time" class="in2" value="${data.in2||''}"></td>
+        <td><input type="time" class="out2" value="${data.out2||''}"></td>
+        <td><input type="time" class="journey" value="${data.journey||document.getElementById('defaultJourney').value}"></td>
+        <td class="worked right">-</td><td class="balance right">-</td><td class="expires">-</td><td class="status">-</td>
+      </tr>`;
+    }
+    function addRow(data){ rowsEl.insertAdjacentHTML('beforeend', rowTemplate(data)); }
+    function clearRows(){ rowsEl.innerHTML=''; seedRows(); calculate(); }
+    function seedRows(){
+      const now = new Date();
+      const base = document.getElementById('competence').value || now.toISOString().slice(0,7);
+      document.getElementById('competence').value = base;
+      const [y,m] = base.split('-').map(Number);
+      for(let i=1;i<=5;i++){
+        const d = new Date(y,m-1,i);
+        addRow({date:d.toISOString().slice(0,10), in1:'08:00', out1:'12:00', in2:'13:00', out2:'17:00'});
+      }
+    }
+    function calculate(){
+      let credit=0, debit=0, total=0, count=0;
+      const months = Number(document.getElementById('expireMonths').value || 6);
+      rowsEl.querySelectorAll('tr').forEach(tr => {
+        const date = tr.querySelector('.date').value;
+        const worked = span(tr.querySelector('.in1').value, tr.querySelector('.out1').value) + span(tr.querySelector('.in2').value, tr.querySelector('.out2').value);
+        const expected = toMin(tr.querySelector('.journey').value);
+        const balance = worked - expected;
+        if(date || worked){ count++; }
+        if(balance > 0) credit += balance;
+        if(balance < 0) debit += Math.abs(balance);
+        total += balance;
+        tr.querySelector('.worked').textContent = worked ? hm(worked) : '-';
+        tr.querySelector('.balance').textContent = hm(balance);
+        tr.querySelector('.balance').className = 'balance right ' + (balance > 0 ? 'ok' : balance < 0 ? 'bad' : '');
+        tr.querySelector('.expires').textContent = date ? brDate(addMonths(date, months)) : '-';
+        tr.querySelector('.status').innerHTML = balance > 0 ? '<span class="ok">Crédito</span>' : balance < 0 ? '<span class="bad">Débito</span>' : '<span class="muted">Neutro</span>';
+      });
+      document.getElementById('kpis').innerHTML =
+        kpi('Créditos', hm(credit), 'Total positivo no período') +
+        kpi('Débitos', hm(debit), 'Total negativo no período') +
+        kpi('Saldo final', hm(total), total >= 0 ? 'Saldo favorável ao empregado' : 'Saldo a compensar') +
+        kpi('Lançamentos', count, 'Linhas preenchidas');
+      document.getElementById('summary').innerHTML = `<h3>Demonstrativo do banco de horas</h3><p>${document.getElementById('employee').value || 'Colaborador'} possui saldo final de <strong>${hm(total)}</strong> no período informado. Créditos somam <strong>${hm(credit)}</strong> e débitos somam <strong>${hm(debit)}</strong>.</p>`;
+    }
+    function kpi(label,value,help){ return `<div class="kpi"><span>${label}</span><strong>${value}</strong><small>${help}</small></div>`; }
+    document.addEventListener('input', e => { if(e.target.closest('tbody') || ['defaultJourney','expireMonths','employee'].includes(e.target.id)) calculate(); });
+    seedRows(); calculate();
+  </script>
+</body>
+</html>
